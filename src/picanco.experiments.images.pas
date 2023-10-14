@@ -19,7 +19,8 @@ uses
 
 implementation
 
-uses session.pool, sdl.app.graphics.picture, picanco.experiments.constants;
+uses session.pool, sdl.app.graphics.picture, picanco.experiments.constants,
+  picanco.experiments.words.types;
 
 function GetAllImages: TStringList;
 var

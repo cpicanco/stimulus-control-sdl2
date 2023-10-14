@@ -42,7 +42,7 @@ var
   Code : TAlphaNumericCode;
   LWord : PTWord;
   LCandidateNegativeWords : TWordList;
-  LCandidateNegativeWordsWithImages : TWordList;
+  LCandidateNegativeComparisons : TWordList;
   LCandidateNegativeWordsWithNewImages : TWordList;
 begin
   for i := Low(AWord.Comparisons) to High(AWord.Comparisons) do begin
@@ -55,18 +55,58 @@ begin
   end;
 
   LCandidateNegativeWords := TWordList.Create;
-  LCandidateNegativeWordsWithImages := TWordList.Create;
+  LCandidateNegativeComparisons := TWordList.Create;
   LCandidateNegativeWordsWithNewImages := TWordList.Create;
   try
     for i := Low(AWord.CandidateNegativeWords) to
              High(AWord.CandidateNegativeWords) do begin
       LCandidateNegativeWords.Add(AWord.CandidateNegativeWords[i]);
     end;
-    for Code in E1WordsWithImagesRange do begin
-      LWord := HashWords[E1WordsWithImages[Code]];
-      if LWord^.Caption <> AWord.Caption then
-        LCandidateNegativeWordsWithImages.Add(LWord);
+
+    case AWord.CycleCode of
+      T1 : begin
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T2]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R2]]);
+      end;
+      T2 : begin
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R2]]);
+      end;
+      R1 : begin
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T2]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R2]]);
+      end;
+      R2 : begin
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T2]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R1]]);
+      end;
+
+      A1, A2: begin
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T1]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, T2]]);
+        LCandidateNegativeComparisons.Add(
+          HashWords[E1WordPerCycleCode[AWord.Cycle, R1]]);
+      end;
     end;
+
     for i := Low(E1WordsWithNewImages) to High(E1WordsWithNewImages) do begin
       LCandidateNegativeWordsWithNewImages.Add(
         HashNewWords[E1WordsWithNewImages[i]]);
@@ -92,14 +132,18 @@ begin
           end else begin
             case AWord.Phase.CompModality of
               ModalityA: Audio  := GetRandomWord(LCandidateNegativeWords);
+
               ModalityB: begin
                 case AWord.Phase.Condition of
-                  Condition_BC_CB_Training :
-                    Image := GetRandomWord(LCandidateNegativeWordsWithNewImages);
+                  Condition_BC_CB_Testing:
+                    Image :=
+                      GetRandomWord(LCandidateNegativeWordsWithNewImages);
                   else
-                    Image := GetRandomWord(LCandidateNegativeWordsWithImages);
+                    Image :=
+                      GetNextComparison(LCandidateNegativeComparisons);
                 end;
               end;
+
               ModalityC: Text   := GetRandomWord(LCandidateNegativeWords);
               ModalityD: Speech := @EmptyWord;
               else
@@ -113,7 +157,7 @@ begin
     end;
   finally
     LCandidateNegativeWords.Free;
-    LCandidateNegativeWordsWithImages.Free;
+    LCandidateNegativeComparisons.Free;
     LCandidateNegativeWordsWithNewImages.Free;
   end;
 end;

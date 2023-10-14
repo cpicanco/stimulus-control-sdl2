@@ -15,21 +15,6 @@ interface
 
 uses picanco.experiments.words.types;
 
-type
-  TAlphaNumericCode =
-   (NA,  X1,  X2,  Y1,  Y2,          // Unique codes per shape, pre-teaching
-    T1,  T2,  R1,  R2,  A1,  A2,     // Cycle codes
-    T01, T02, T03, T04, T05, T06,    // Unique codes per word, teaching/testing
-    T07, T08, T09, T10, T11, T12,
-    R01, R02,
-    A01, A02, A03, A04, A05, A06,
-    A07, A08, A09, A10, A11, A12);
-  TAlphaNumericCodes = array of TAlphaNumericCode;
-
-  E1CyclesRange = Cycle1..Cycle6;
-  E1CyclesCodeRange = T1..A2;
-  E1WordsWithImagesRange = T01..R02;
-
 const
   E1Reserved1 = 'falo';
   E1Reserved2 = 'bena';
@@ -102,7 +87,77 @@ const
     A07, A08, A09, A10, A11, A12,
     R01, R02);
 
+  E1WordsTeaching : array [E1TeachUniqueCodeRange] of string = (
+    E1Word01, E1Word02, E1Word03, E1Word04, E1Word05, E1Word06,
+    E1Word07, E1Word08, E1Word09, E1Word10, E1Word11, E1Word12);
+
+  E1WordsProbes   : array [E1ProbeUniqueCodeRange] of string = (
+    E1Word13, E1Word14, E1Word15, E1Word16, E1Word17, E1Word18,
+    E1Word19, E1Word20, E1Word21, E1Word22, E1Word23, E1Word24);
+
+  E1WordsReserved : array [E1ReserUniqueCodeRange] of string = (
+    E1Reserved1, E1Reserved2);
+
+  E1WordsWithCodes : array [E1WordsWithCodesRange] of string = (
+    E1Word01, E1Word02, E1Word03, E1Word04, E1Word05, E1Word06,
+    E1Word07, E1Word08, E1Word09, E1Word10, E1Word11, E1Word12,
+    E1Reserved1, E1Reserved2,
+    E1Word13, E1Word14, E1Word15, E1Word16, E1Word17, E1Word18,
+    E1Word19, E1Word20, E1Word21, E1Word22, E1Word23, E1Word24);
+
+function CycleCodeFromWord(AWord : string;
+  out ACycle : TCycle): TAlphaNumericCode;
+
+function UniqueCodeFromWord(AWord : string): TAlphaNumericCode;
+
 implementation
+
+function CycleCodeFromWord(AWord : string;
+  out ACycle : TCycle): TAlphaNumericCode;
+begin
+  case AWord of
+    E1Reserved1 : begin
+      ACycle := Cycle1;
+      Result := R1;
+    end;
+    E1Reserved2 : begin
+      ACycle := Cycle1;
+      Result := R2;
+    end
+    else begin
+      for Result in E1CyclesCodeRange do begin
+        if (Result = R1) or
+           (Result = R2) then
+          Continue;
+
+        for ACycle in E1CyclesRange do begin
+          if AWord = E1WordPerCycleCode[ACycle, Result] then
+            Exit;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function UniqueCodeFromWord(AWord : string): TAlphaNumericCode;
+begin
+  case AWord of
+    E1Reserved1 : Result := R01;
+    E1Reserved2 : Result := R02;
+    else begin
+      for Result in E1TeachUniqueCodeRange do begin
+        if AWord = E1WordsTeaching[Result] then begin
+          Exit;
+        end;
+      end;
+      for Result in E1ProbeUniqueCodeRange do begin
+        if AWord = E1WordsProbes[Result] then begin
+          Break;
+        end;
+      end;
+    end;
+  end;
+end;
 
 end.
 

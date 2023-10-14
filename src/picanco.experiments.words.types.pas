@@ -20,7 +20,6 @@ const
   MaxComparisons = 4;
 
 type
-
   TCycle = (CycleNone, Cycle1, Cycle2, Cycle3, Cycle4, Cycle5, Cycle6);
 
   TStage = (StageNone, StageTraining, StageTesting);
@@ -110,6 +109,32 @@ type
     Speech : string;   // D
   end;
 
+  TAlphaNumericCode =
+   (NA,  X1,  X2,  Y1,  Y2,          // Unique codes per shape, pre-teaching
+    T1,  T2,  R1,  R2,  A1,  A2,     // Cycle codes
+    T01, T02, T03, T04, T05, T06,    // Unique codes per word, teaching/testing
+    T07, T08, T09, T10, T11, T12,
+    R01, R02,
+    A01, A02, A03, A04, A05, A06,
+    A07, A08, A09, A10, A11, A12);
+
+  TAlphaNumericCodes = array of TAlphaNumericCode;
+
+  E1CyclesRange = Cycle1..Cycle6;
+  E1CyclesCodeRange = T1..A2;
+  E1CyclesCodeRangeWithImages = T1..R2;
+  E1WordsWithImagesRange = T01..R02;
+  E1WordsWithCodesRange = T01..A12;
+
+  // Reserved
+  E1ReserUniqueCodeRange = R01..R02;
+
+  // Teaching
+  E1TeachUniqueCodeRange = T01..T12;
+
+  // Probes
+  E1ProbeUniqueCodeRange = A01..A12;
+
   { TWord }
 
   PTWord = ^TWord;
@@ -117,6 +142,9 @@ type
     Syllable1 : TSyllable;
     Syllable2 : TSyllable;
     Cycle : TCycle;
+    CycleCode  : TAlphaNumericCode;
+    UniqueCode : TAlphaNumericCode;
+    Code  : TAlphaNumericCode;
     Phase : TPhase;
     Overlaps : TOverlaps;
     Caption : string;
@@ -142,9 +170,9 @@ type
 
   procedure InitializeWord(var AWord: TWord);
   function GetRandomWord(var AWords: TWordList): PTWord;
+  function GetNextComparison(var AWords: TWordList): PTWord;
   function GetWordFilenames(ACaption: string) : TWordFilenames;
   procedure SetNegativeComparisons(var AWord: TWord; var AWords: TWords);
-
 
 var
   Consonants : TConsonants;
@@ -167,6 +195,12 @@ begin
   i := Random(AWords.Count);
   Result := AWords[i];
   AWords.Delete(i);
+end;
+
+function GetNextComparison(var AWords: TWordList): PTWord;
+begin
+  Result := AWords[0];
+  AWords.Delete(0);
 end;
 
 procedure GetWordsFromLetter(AWord: TWord; AIndex: Integer;
@@ -317,7 +351,8 @@ procedure InitializeWord(var AWord: TWord);
 begin
   AWord.Caption := AWord.ToHumanReadableText;
   AWord.Filenames := GetWordFilenames(AWord.Caption);
-  //AWord.Phase := GetWordPhase(AWord);
+  AWord.CycleCode := CycleCodeFromWord(AWord.Caption, AWord.Cycle);
+  AWord.UniqueCode := UniqueCodeFromWord(AWord.Caption);
 
   AWord.Overlaps := DifferentConsonantsAndVowels;
   if AWord.Syllable1 = AWord.Syllable2 then begin
