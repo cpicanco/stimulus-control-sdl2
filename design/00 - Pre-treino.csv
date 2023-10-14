@@ -1,0 +1,7 @@
+ID,Cycle,Condition,Block,Trials,Relation,Code,Comparisons
+1,0,0,1,1,B-B,X1,1
+2,0,0,2,2,B-B,X1,2
+3,0,0,3,1,B-B,X2,1
+4,0,0,4,2,B-B,X2,2
+5,0,0,5,2,B-B,X1,2
+6,0,0,5,2,B-B,X2,2
