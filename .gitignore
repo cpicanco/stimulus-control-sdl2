@@ -33,3 +33,4 @@ lib/
 DebugOutput.txt
 data/*
 last_session.ini
+configurations.ini
