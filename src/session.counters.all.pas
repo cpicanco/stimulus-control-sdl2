@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit session.counters.all;
 
 {$mode ObjFPC}{$H+}
@@ -6,11 +15,13 @@ interface
 
 uses
   Classes, SysUtils
+  , sdl.app.output
+  , session.configurationfile
+  , session.counters.hierarquical
   , session.counters.consecutive
   , session.counters.mutuallyexclusive;
 
 type
-
     TTrialID = Word;
     TBlockID = Word;
 
@@ -18,24 +29,28 @@ type
 
     TCustomUIDCounter = class(TUIDCounter)
     protected
+      FCustomName : string;
       FEvents : TMutuallyExclusiveCounters;
       function ToString : string; override;
     public
       constructor Create;
       destructor Destroy; override;
+      procedure Next; override;
+      procedure NextConsecutive; override;
       procedure NextID(AValue : TTrialID); virtual; abstract;
       property Events : TMutuallyExclusiveCounters read FEvents;
+      property CustomName : string read FCustomName write FCustomName;
     end;
 
     { TTrialCounters }
 
     TTrialCounters = class(TCustomUIDCounter)
+    protected
+      function ToString : string; override;
     public
       ID : TTrialID; static;
       procedure Reset; override;
-      procedure Next; override;
       procedure NextID(AValue : TTrialID); override;
-      procedure NextConsecutive; override;
     end;
 
     { TBlockCounters }
@@ -45,11 +60,13 @@ type
       FTrial : TTrialCounters;
     protected
       function GetTrials: Word; overload;
+      function ToString : string; override;
     public
       ID : TBlockID; static;
       constructor Create;
       destructor Destroy; override;
       procedure Reset; override;
+      procedure ResetConsecutive; override;
       procedure Next; override;
       procedure NextID(AValue : TTrialID); override;
       procedure NextConsecutive; override;
@@ -61,17 +78,20 @@ type
 
     TSessionCounters = class(TCustomUIDCounter)
     strict private
+      FTree : TIDSessionCounter;
       FBlock : TBlockCounters;
       FTrial : TTrialCounters;
     protected
       function GetTrials : Word;
       function GetBlocks : Word;
       procedure NextTrial;
+
     public
       ID : Word; static;
       constructor Create;
       destructor Destroy; override;
       procedure Reset; override;
+      procedure NextID(AValue : TTrialID); override;
       procedure NextTrialConsecutive;
       procedure ResetTrialConsecutive;
       procedure NextTrialID(ATrialID : TTrialID);
@@ -82,10 +102,12 @@ type
       property Trial : TTrialCounters read FTrial;
       property Blocks : Word read GetBlocks;
       property Trials : Word read GetTrials;
+      property Tree : TIDSessionCounter read FTree;
     end;
 
 implementation
 
+uses session.pool, session.strutils;
 
 { TCustomUIDCounter }
 
@@ -105,18 +127,31 @@ begin
   inherited Destroy;
 end;
 
+procedure TCustomUIDCounter.Next;
+begin
+  inherited Next;
+  FEvents.Invalidate;
+end;
+
+procedure TCustomUIDCounter.NextConsecutive;
+begin
+  inherited NextConsecutive;
+  FEvents.Reset;
+end;
+
 { TTrialCounters }
+
+function TTrialCounters.ToString: string;
+begin
+  Result := KeyValue('Trial', (UID+1).ToString) +
+            KeyValue('ID', (ID+1).ToString) +
+            inherited ToString + FEvents.ToString;
+end;
 
 procedure TTrialCounters.Reset;
 begin
   inherited Reset;
   ID := 0;
-end;
-
-procedure TTrialCounters.Next;
-begin
-  inherited Next;
-  FEvents.Reset;
 end;
 
 procedure TTrialCounters.NextID(AValue: TTrialID);
@@ -125,40 +160,43 @@ begin
   ID := AValue;
 end;
 
-procedure TTrialCounters.NextConsecutive;
-begin
-  inherited NextConsecutive;
-  FEvents.Reset;
-end;
-
 { TBlockCounters }
 
 function TBlockCounters.GetTrials: Word;
 begin
-  Result := Trial.UID;
+  Result := FTrial.Count;
+end;
+
+function TBlockCounters.ToString: string;
+begin
+  Result := KeyValue('Block', (UID+1).ToString) +
+            KeyValue('ID', (ID+1).ToString) +
+            inherited ToString + FEvents.ToString;
 end;
 
 procedure TBlockCounters.Next;
 begin
   inherited Next;
-  Trial.Reset;
+  FTrial.Invalidate;
 end;
 
 procedure TBlockCounters.NextID(AValue: TTrialID);
 begin
   Next;
-  Inc(ID);
+  ID := AValue;
 end;
 
 procedure TBlockCounters.NextConsecutive;
 begin
   inherited NextConsecutive;
-  FTrial.Reset;
+  FTrial.Invalidate;
 end;
 
 constructor TBlockCounters.Create;
 begin
+  inherited Create;
   FTrial := TTrialCounters.Create;
+  FTrial.CustomName := 'Session.Block.Trial';
 end;
 
 destructor TBlockCounters.Destroy;
@@ -171,6 +209,12 @@ procedure TBlockCounters.Reset;
 begin
   inherited Reset;
   ID := 0;
+end;
+
+procedure TBlockCounters.ResetConsecutive;
+begin
+  inherited ResetConsecutive;
+  FTrial.Invalidate;
 end;
 
 { TSessionCounters }
@@ -192,13 +236,19 @@ end;
 
 constructor TSessionCounters.Create;
 begin
+  inherited Create;
+  CustomName := 'Session';
   FBlock := TBlockCounters.Create;
+  FBlock.CustomName := 'Session.Block';
   FTrial := TTrialCounters.Create;
+  FTrial.CustomName := 'Session.Trial';
+  FTree.Initialize;
 end;
 
 destructor TSessionCounters.Destroy;
 begin
-  FBlock := TBlockCounters.Create;
+  FTrial.Free;
+  FBlock.Free;
   inherited Destroy;
 end;
 
@@ -208,6 +258,11 @@ begin
   FTrial.Reset;
   FBlock.Trial.Reset;
   FBlock.Reset;
+end;
+
+procedure TSessionCounters.NextID(AValue: TTrialID);
+begin
+  { Next Session ID }
 end;
 
 procedure TSessionCounters.NextTrialConsecutive;
@@ -224,6 +279,8 @@ end;
 
 procedure TSessionCounters.NextTrialID(ATrialID: TTrialID);
 begin
+  Print(FTrial.ToString);
+  Print(FBlock.Trial.ToString);
   FTrial.Next; // session trials
   FBlock.Trial.NextID(ATrialID); // block trials
 end;
@@ -242,6 +299,7 @@ end;
 
 procedure TSessionCounters.NextBlockID(ABlockID: TBlockID);
 begin
+  Print(FBlock.ToString);
   FTrial.Reset;
   FBlock.NextID(ABlockID);
 end;

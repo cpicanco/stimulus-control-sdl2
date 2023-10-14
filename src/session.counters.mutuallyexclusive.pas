@@ -32,6 +32,7 @@ type
     constructor Create;
     destructor Destroy; virtual;
     procedure Reset;
+    procedure Invalidate;
     procedure Hit;
     procedure Miss;
     procedure None;
@@ -104,7 +105,16 @@ var
   LCounter : TConsecutivesCounter;
 begin
   for LCounter in FCounters do begin
-    LCounter.Reset;
+    LCounter.ResetConsecutive;
+  end;
+end;
+
+procedure TMutuallyExclusiveCounters.Invalidate;
+var
+  LCounter : TConsecutivesCounter;
+begin
+  for LCounter in FCounters do begin
+    LCounter.Invalidate;
   end;
 end;
 
@@ -129,10 +139,11 @@ var
   LCounterTypeString : string;
   LCounter : TConsecutivesCounter;
 begin
+  Result := '';
   for LCounterType in [Low(TCounterType)..High(TCounterType)] do begin
     WriteStr(LCounterTypeString, LCounterType);
     LCounter := FCounters[Ord(LCounterType)];
-    Result :=
+    Result := Result +
       KeyValue(LCounterTypeString, LCounter.Count.ToString) +
       KeyValue(LCounterTypeString+'.MaxConsecutives',
         LCounter.MaxConsecutives.ToString);

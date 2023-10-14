@@ -34,6 +34,7 @@ type
       procedure NextConsecutive; virtual;
       procedure Reset; virtual;
       procedure ResetConsecutive; virtual;
+      procedure Invalidate; virtual;
       property MaxConsecutives : Word read FMaxConsecutives;
       property Consecutives : Word read FConsecutives;
       property Count : Word read GetCount;
@@ -62,7 +63,7 @@ begin
   Result :=
     KeyValue('Count', FCount.ToString) +
     KeyValue('Consecutives', FConsecutives.ToString) +
-    KeyValue('MaxConsecutives', FMaxConsecutives.ToString, '');
+    KeyValue('MaxConsecutives', FMaxConsecutives.ToString);
 end;
 
 function TConsecutivesCounter.GetCount: Word;
@@ -72,26 +73,21 @@ end;
 
 constructor TConsecutivesCounter.Create;
 begin
-  FCount := 0;
-  FConsecutives := 0;
-  FMaxConsecutives := 0;
+  Invalidate;
 end;
 
 procedure TConsecutivesCounter.Next;
 begin
   Inc(FCount);
-  ResetConsecutive;
 end;
 
 procedure TConsecutivesCounter.Reset;
 begin
   FCount := 0;
-  ResetConsecutive;
 end;
 
 procedure TConsecutivesCounter.NextConsecutive;
 begin
-  Inc(FCount);
   Inc(FConsecutives);
 end;
 
@@ -103,11 +99,18 @@ begin
   FConsecutives := 0;
 end;
 
+procedure TConsecutivesCounter.Invalidate;
+begin
+  FCount := 0;
+  FConsecutives := 0;
+  FMaxConsecutives := 0;
+end;
+
 { TUIDCounter }
 
 function TUIDCounter.ToString: string;
 begin
-  Result := 'UID=' + FUID.ToString + LineEnding + (inherited ToString);
+  Result := KeyValue('UID', FUID.ToString) + inherited ToString;
 end;
 
 constructor TUIDCounter.Create;

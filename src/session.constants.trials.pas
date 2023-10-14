@@ -17,6 +17,7 @@ type
 
   TTrialParameters = record
     Name : string;
+    ReferenceName : string;
     Kind : string;
     Cursor : integer;
     RepeatTrials : integer;
@@ -27,6 +28,7 @@ type
 
   TTrialKeys = record
     Name : string;
+    ReferenceName : string;
     Cursor : string;
     Kind : string;
     LimitedHold : string;
@@ -38,6 +40,7 @@ type
 const
   TrialKeys : TTrialKeys = (
     Name : 'Name';
+    ReferenceName : 'ReferenceName';
     Cursor : 'Cursor';
     Kind : 'Kind';
     LimitedHold : 'LimitedHold';

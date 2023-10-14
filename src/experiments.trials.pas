@@ -15,7 +15,7 @@ interface
 
 uses session.constants.trials, session.constants.mts;
 
-procedure WriteToConfigurationFile;
+procedure WriteToConfigurationFile(AFilename : string);
 
 var
   GlobalTrialParameters : TTrialParameters;
@@ -29,6 +29,7 @@ uses
   , LazFileUtils
   //, StrUtils
   , session.csv
+  , session.constants.blocks
   , sdl.app.output
   , session.constants.dragdrop
   //, session.fileutils
@@ -45,16 +46,17 @@ uses
 
 var Writer : TConfigurationWriter;
 
-procedure WriteTrials(AName: string; ARelation: string;
-  AWord: TWord; AComparisons: integer; AHasConsequence : Boolean = True;
-  ASamples: integer = 1; ARepeatTrials: integer = 1;
-  AHasLimitedHold : Boolean = False);
+procedure WriteTrials(AName: string; AReferenceName : string;
+  ARelation: string; AWord: TWord; AComparisons: integer;
+  AHasConsequence : Boolean = True; ASamples: integer = 1;
+  ARepeatTrials: integer = 1; AHasLimitedHold : Boolean = False);
 var
   LWord : TWord;
   i: Integer;
 begin
   with Writer.TrialConfig do begin
     with TrialKeys do begin
+      Values[ReferenceName] := AReferenceName;
       Values[Name] := AName;
       Values[Cursor] := GlobalTrialParameters.Cursor.ToString;
       Values[Kind] := TMTS.ClassName;
@@ -88,23 +90,31 @@ begin
   Writer.WriteTrial;
 end;
 
-procedure WriteToConfigurationFile;
+procedure WriteToConfigurationFile(AFilename : string);
 var
-  LID : integer;
+  LTrialID : integer;
+  LBlockID : integer;
   LCycle : integer;
-  LBlock : integer = 0;
+  LBackUpBlock : integer = 0;
+  LEndOnCriteria : Boolean;
   LTrials : integer;
+  LHitCriterion : integer;
   LComparisons : integer;
   LCondition : integer;
+  LBackUpBlockErrors : integer;
+  LMaxBlockRepetition : integer;
+  LMaxBlockRepetitionInSession, LNextBlockOnHitCriterion, i: integer;
   LName : string;
   LRelation : string;
-  LCode : TAlphaNumericCode;
-  LHasConsequence : Boolean;
+  LCode : string;
+  LHasConsequence , LEndOnHitCriterion: Boolean;
   LWord : TWord;
   LPhase : TPhase;
   LStartAt : TStartAt;
-  FCSVRows : TCSVRows;
+  FCSVTrials : TCSVRows;
+  FCSVBlocks : TCSVRows;
   LTrialConfiguration : TStringList;
+  LBlockConfiguration : TStringList;
 
   function ToAlphaNumericCode(S : string) : TAlphaNumericCode;
   var
@@ -125,43 +135,108 @@ var
       SetComparisons(Result);
     end;
   end;
+
+  function Validated : Boolean;
+  begin
+    Result := (LHitCriterion >= 0) and
+              (LHitCriterion <= 100);
+    if not Result then
+      raise Exception.Create('Hit porcentage criterion is not valid: '+
+        LHitCriterion.ToString);
+  end;
+
 begin
   //Format('%.2d', [LCycle])
-  FCSVRows := TCSVRows.Create('test.csv');
-
   Writer := TConfigurationWriter.Create(ConfigurationFile);
+  if BlocksFileExists(AFilename) then begin
+    FCSVBlocks := TCSVRows.Create(AFilename, True);
+    try
+      for LBlockConfiguration in FCSVBlocks do  begin
+        with LBlockConfiguration, BlockKeys do begin
+          LBlockID := Values['ID'].ToInteger -1;
+          LBackUpBlock :=
+            Values[NextBlockOnNotCriterionKey].ToInteger -1;
+          LBackUpBlockErrors :=
+            Values[BackUpBlockErrorsKey].ToInteger;
+          LMaxBlockRepetition :=
+            Values[MaxBlockRepetitionKey].ToInteger;
+          LMaxBlockRepetitionInSession :=
+            Values[MaxBlockRepetitionInSessionKey].ToInteger;
+          LEndOnHitCriterion :=
+            Values[EndSessionOnHitCriterionKey].ToBoolean;
+          LNextBlockOnHitCriterion :=
+            Values[NextBlockOnHitCriterionKey].ToInteger -1;
+          LHitCriterion :=
+            Values[CrtHitPorcentageKey].ToInteger;
+        end;
+
+        if not Validated then Exit;
+
+        Writer.CurrentBlock := LBlockID;
+        with Writer.BlockConfig, BlockKeys do begin
+          Values['Name'] :=
+            'Block ' + LBlockID.ToString;
+          Values[NextBlockOnNotCriterionKey] :=
+            LBackUpBlock.ToString;
+          Values[BackUpBlockErrorsKey] :=
+            LBackUpBlockErrors.ToString;
+          Values[MaxBlockRepetitionKey] :=
+            LMaxBlockRepetition.ToString;
+          Values[MaxBlockRepetitionInSessionKey] :=
+            LMaxBlockRepetitionInSession.ToString;
+          Values[EndSessionOnHitCriterionKey] :=
+            LEndOnHitCriterion.ToString;
+          Values[NextBlockOnHitCriterionKey] :=
+            LNextBlockOnHitCriterion.ToString;
+          Values[CrtHitPorcentageKey] := LHitCriterion.ToString;
+        end;
+        Writer.WriteBlock;
+      end;
+    finally
+      FCSVBlocks.Free;
+    end;
+  end else begin
+    LBlockID := 0;
+    Writer.CurrentBlock := LBlockID;
+    with Writer.BlockConfig do begin
+      Values['Name'] := 'Block ' + LBlockID.ToString;
+    end;
+    Writer.WriteBlock;
+  end;
+
+  FCSVTrials := TCSVRows.Create(AFilename);
   try
-    for LTrialConfiguration in FCSVRows do  begin
+    for LTrialConfiguration in FCSVTrials do  begin
       with LTrialConfiguration do begin
-        LID          := Values['ID'].ToInteger;
+        LTrialID     := Values['ID'].ToInteger;
         LCycle       := Values['Cycle'].ToInteger;
         LCondition   := Values['Condition'].ToInteger;
-        LBlock        := Values['Block'].ToInteger -1;
-        LTrials      := Values['Trials'].ToInteger;
+        LBlockID     := Values['Block'].ToInteger -1;
+        LTrials      := Values['Trials'].ToInteger; // TODO
         LComparisons := Values['Comparisons'].ToInteger;
         LRelation    := Values['Relation'];
-        LCode        := ToAlphaNumericCode(Values['Code']);
-        LHasConsequence := True;
+        LCode        := Values['Code'];
+        LHasConsequence := True;  // TODO
       end;
       LPhase := GetPhase(LCycle, LCondition, LRelation);
-      LWord := GetWord(LPhase, LCode);
-      LStartAt.Block := 1;
-      LStartAt.Trial:= 1;
-      Writer.StartAt := LStartAt;
+      LWord := GetWord(LPhase, ToAlphaNumericCode(LCode));
 
-      Writer.CurrentBlock := LBlock;
-      with Writer.BlockConfig do begin
-        Values['Name'] := 'Block ' + LBlock.ToString;
+      Writer.CurrentBlock := LBlockID;
+      for i := 0 to LTrials -1 do begin
+        LName :=
+          LWord.Caption + #32 + LRelation + #32 + LComparisons.ToString + 'C';
+        WriteTrials(
+          LName, LCode, LRelation, LWord, LComparisons, LHasConsequence);
       end;
-      Writer.WriteBlock;
-
-      LName :=
-        LWord.Caption + #32 + LRelation + #32 + LComparisons.ToString + 'C';
-      WriteTrials(LName, LRelation, LWord, LComparisons, LHasConsequence);
     end;
+
+    LStartAt.Block := 14;
+    LStartAt.Trial:= 0;
+    Writer.StartAt := LStartAt;
+
   finally
     Writer.Free;
-    FCSVRows.Free;
+    FCSVTrials.Free;
   end;
 end;
 

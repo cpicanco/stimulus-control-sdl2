@@ -1,15 +1,16 @@
 object FormBackground: TFormBackground
-  Left = 579
+  Left = 600
   Height = 364
-  Top = 182
+  Top = 188
   Width = 566
   BorderStyle = bsNone
   Caption = 'Stimulus Control'
   ClientHeight = 364
   ClientWidth = 566
-  SessionProperties = 'ComboBoxParticipant.ItemIndex;ComboBoxParticipant.Items;OpenDialog1.InitialDir'
+  SessionProperties = 'ComboBoxParticipant.ItemIndex;ComboBoxParticipant.Items;OpenDialog1.InitialDir;ComboBoxCondition.ItemIndex'
   LCLVersion = '3.99.0.0'
   WindowState = wsFullScreen
+  OnCreate = FormCreate
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
@@ -49,7 +50,7 @@ object FormBackground: TFormBackground
     object ButtonLoadConfigurationFile: TButton
       Left = 16
       Height = 26
-      Top = 112
+      Top = 144
       Width = 240
       Caption = 'Carregar Arquivo de Configuração'
       TabOrder = 2
@@ -58,7 +59,7 @@ object FormBackground: TFormBackground
     object ButtonNewConfigurationFile: TButton
       Left = 16
       Height = 26
-      Top = 80
+      Top = 112
       Width = 240
       Caption = 'Novo Arquivo de Configuração'
       TabOrder = 3
@@ -72,6 +73,15 @@ object FormBackground: TFormBackground
       Caption = 'Novo Participante'
       TabOrder = 4
       OnClick = ButtonNewParticipantClick
+    end
+    object ComboBoxCondition: TComboBox
+      Left = 16
+      Height = 23
+      Top = 80
+      Width = 240
+      ItemHeight = 15
+      TabOrder = 5
+      Text = 'Condição'
     end
   end
   object OpenDialog1: TOpenDialog

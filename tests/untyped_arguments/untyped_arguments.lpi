@@ -10,7 +10,7 @@
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="standalone_experiment"/>
+      <Title Value="untyped_arguments"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -26,15 +26,7 @@
     </RunParams>
     <Units>
       <Unit>
-        <Filename Value="standalone_experiment.lpr"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\..\src\sdl.app.renderer.nolcl.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\..\src\sdl.app.events.nolcl.pas"/>
+        <Filename Value="untyped_arguments.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -43,12 +35,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="standalone_experiment"/>
+      <Filename Value="untyped_arguments"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="..\.."/>
-      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src;..\..\dependencies\epiktimer;..\..\src\schedules;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\utils"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
@@ -57,10 +47,9 @@
       </Debugging>
     </Linking>
     <Other>
-      <CustomOptions Value="-dNO_LCL"/>
-      <OtherDefines Count="1">
-        <Define0 Value="NO_LCL"/>
-      </OtherDefines>
+      <ConfigFile>
+        <WriteConfigFilePath Value=""/>
+      </ConfigFile>
     </Other>
   </CompilerOptions>
   <Debugging>

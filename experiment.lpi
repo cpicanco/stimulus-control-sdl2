@@ -525,14 +525,6 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="src\picanco.experiments.audio.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="dependencies\mspeech\SpeechLib_TLB.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
         <Filename Value="src\session.csv.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
@@ -586,6 +578,18 @@
       </Unit>
       <Unit>
         <Filename Value="src\sdl.app.stimulus.typeable.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.counters.hierarquical.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.constants.blocks.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.trials.shuffler.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

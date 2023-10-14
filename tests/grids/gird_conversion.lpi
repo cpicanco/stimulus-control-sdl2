@@ -10,7 +10,7 @@
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="standalone_experiment"/>
+      <Title Value="gird_conversion"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -26,15 +26,7 @@
     </RunParams>
     <Units>
       <Unit>
-        <Filename Value="standalone_experiment.lpr"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\..\src\sdl.app.renderer.nolcl.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="..\..\src\sdl.app.events.nolcl.pas"/>
+        <Filename Value="gird_conversion.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -43,12 +35,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="standalone_experiment"/>
+      <Filename Value="gird_conversion"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="..\.."/>
-      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src;..\..\dependencies\epiktimer;..\..\src\schedules;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\utils"/>
+      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
@@ -57,9 +48,12 @@
       </Debugging>
     </Linking>
     <Other>
-      <CustomOptions Value="-dNO_LCL"/>
+      <ConfigFile>
+        <WriteConfigFilePath Value=""/>
+      </ConfigFile>
+      <CustomOptions Value="-dGRIDS_TEST"/>
       <OtherDefines Count="1">
-        <Define0 Value="NO_LCL"/>
+        <Define0 Value="GRIDS_TEST"/>
       </OtherDefines>
     </Other>
   </CompilerOptions>

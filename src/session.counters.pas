@@ -15,11 +15,9 @@ unit session.counters;
 
 interface
 
-uses session.counters.consecutive
-  , session.counters.all;
+uses session.configuration, session.counters.consecutive, session.counters.all;
 
 type
-
 
   { TCounters }
 
@@ -29,13 +27,13 @@ type
     Session : TSessionCounters;
     Block : TBlockCounters;
     Trial : TTrialCounters;
-    function EndTrial(ARepeatValue : Word; AGoToValue : SmallInt) : Boolean;
-    procedure EndGoToTrial(ATrialID : TTrialID);
+    function EndTrial(ANextTrial: SmallInt) : Boolean;
+    function EndBlock(ANextBlock : SmallInt): Boolean;
     procedure Hit;
     procedure Miss;
     procedure None;
+    procedure Reset;
     procedure BeforeBeginSession;
-    function EndBlock(ARepeatValue : Word; AGoToValue : SmallInt) : Boolean;
     procedure EndSession;
   end;
 
@@ -44,7 +42,7 @@ var
 
 implementation
 
-uses Classes, SysUtils, session.pool, sdl.app.output;
+uses Classes, SysUtils, session.pool, sdl.app.output, session.configurationfile;
 
 { TCounterManager }
 
@@ -77,20 +75,27 @@ begin
   Pool.Session := Session;
   Pool.Block   := Block;
   Pool.Trial   := Trial;
+
+  Trial.ID := ConfigurationFile.StartAt.Trial;
+  Block.ID := ConfigurationFile.StartAt.Block;
 end;
 
-function TCounters.EndBlock(ARepeatValue: Word; AGoToValue: SmallInt): Boolean;
+function TCounters.EndBlock(ANextBlock: SmallInt) : Boolean;
 begin
   Result := True;
-  if ARepeatValue > 0 then begin
-    if Session.Block.Consecutives < ARepeatValue then begin
-      Result := False;
-      Session.NextBlockConsecutive;
-      Session.ResetBlockConsecutive;
-    end;
+  Session.Tree.Block[Block.ID].Increment; // per id global count
+  Session.Block.Events.Reset;
+
+  if ANextBlock = Block.ID then begin
+    Session.Block.NextConsecutive;
   end else begin
-    // TODO : AGoToValue
-    Session.NextBlockID(Trial.ID+1);
+    Session.Block.ResetConsecutive;
+  end;
+
+  if (ANextBlock > -1) and (ANextBlock < Length(Session.Tree.Block)) then begin
+    Session.NextBlockID(ANextBlock);
+  end else begin
+    Result := False;
   end;
 end;
 
@@ -99,51 +104,68 @@ begin
   Session.Free;
 end;
 
-function TCounters.EndTrial(ARepeatValue: Word; AGoToValue: SmallInt): Boolean;
+function TCounters.EndTrial(ANextTrial: SmallInt) : Boolean;
 begin
   Result := True;
-  if ARepeatValue > 0 then begin
-    if Session.Block.Trial.Consecutives < ARepeatValue then begin
-      Result := False;
-      Session.NextTrialConsecutive;
-      Session.ResetTrialConsecutive;
-    end;
+  Session.Tree.Block[Block.ID].Trial[Trial.ID].Increment;
+  Session.Trial.Events.Reset;
+  Session.Block.Trial.Events.Reset;
+
+  if ANextTrial = Trial.ID then begin
+    Session.NextTrialConsecutive;
   end else begin
-    // TODO : AGoToValue
-    Session.NextTrialID(Trial.ID+1);
+    Session.ResetTrialConsecutive;
+  end;
+
+  if (ANextTrial > -1) and
+     (ANextTrial < Length(Session.Tree.Block[Block.ID].Trial)) then begin
+    Session.NextTrialID(ANextTrial);
+  end else begin
+    Result := False;
   end;
 end;
 
-procedure TCounters.EndGoToTrial(ATrialID: TTrialID);
-begin
-  if ATrialID = Trial.ID then begin
-    Trial.NextConsecutive;
-  end else begin
-    Trial.NextID(ATrialID);
-  end;
-  //Block.Trial.Count;
-  //Session.Trial.Count;
-end;
+//procedure TCounters.EndGoToTrial(ATrialID: TTrialID);
+//begin
+//  if ATrialID = Trial.ID then begin
+//    Trial.NextConsecutive;
+//  end else begin
+//    Trial.NextID(ATrialID);
+//  end;
+//  //Block.Trial.Count;
+//  //Session.Trial.Count;
+//end;
 
 procedure TCounters.Hit;
 begin
   Session.Events.Hit;
-  Block.Events.Hit;
-  Trial.Events.Hit;
+  Session.Trial.Events.Hit;
+  Session.Block.Events.Hit;
+  Session.Block.Trial.Events.Hit;
 end;
 
 procedure TCounters.Miss;
 begin
   Session.Events.Miss;
-  Block.Events.Miss;
-  Trial.Events.Miss;
+  Session.Trial.Events.Miss;
+  Session.Block.Events.Miss;
+  Session.Block.Trial.Events.Miss;
 end;
 
 procedure TCounters.None;
 begin
   Session.Events.None;
-  Block.Events.None;
-  Trial.Events.None;
+  Session.Trial.Events.None;
+  Session.Block.Events.None;
+  Session.Block.Trial.Events.None;
+end;
+
+procedure TCounters.Reset;
+begin
+  Session.Events.Reset;
+  Session.Trial.Events.Reset;
+  Session.Block.Events.Reset;
+  Session.Block.Trial.Events.Reset;
 end;
 
 end.

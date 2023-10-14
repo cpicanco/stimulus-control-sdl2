@@ -44,7 +44,7 @@ implementation
 
 function TConfigurationWriter.GetCurrentTrial: integer;
 begin
-  Result := FConfigurationFile.Trials[CurrentBlock+1];
+  Result := FConfigurationFile.Trials[CurrentBlock];
 end;
 
 procedure TConfigurationWriter.SetStartTrial(AValue: TStartAt);
@@ -79,7 +79,7 @@ begin
   with FConfigurationFile do begin
     for i := 0 to FBlockConfig.Count -1 do begin
       FBlockConfig.GetNameValue(i, LName, LValue);
-      WriteToBlock(Self.CurrentBlock+1, LName, LValue);
+      WriteToBlock(Self.CurrentBlock, LName, LValue);
     end;
   end;
 end;
@@ -91,8 +91,8 @@ var
   LCurrentTrial : integer;
   LCurrentBlock  : integer;
 begin
-  LCurrentTrial := CurrentTrial+1;
-  LCurrentBlock  := CurrentBlock+1;
+  LCurrentTrial := CurrentTrial;
+  LCurrentBlock  := CurrentBlock;
   with FConfigurationFile do begin
     for i := 0 to FTrialConfig.Count -1 do begin
       FTrialConfig.GetNameValue(i, LName, LValue);

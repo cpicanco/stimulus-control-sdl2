@@ -46,19 +46,17 @@ implementation
 uses session.intertrial
    , session.configuration
    , session.configurationfile
+   , session.endcriteria
+   , session.pool
    , sdl.app.trials.mts
    , sdl.app.trials.dragdrop
    , sdl.app.trials.last
    ;
 
-var
-  TrialID : integer;
-
 { TTrialFactory }
 
 class constructor TTrialFactory.Create;
 begin
-  TrialID := 0;
   Registry := TTrialRegistry.Create;
   CurrentTrial := nil;
 end;
@@ -87,17 +85,17 @@ begin
   if not Registry.TryGetData(TrialData.Kind, TrialClass) then
     raise EArgumentException.CreateFmt(
       'Trial kind is not registered: %s %s', [TrialData.Kind, TrialClass]);
-
+  EndCriteria.InvalidateTrial(TrialData);
   CurrentTrial := TrialClass.Create(nil);
-  Inc(TrialID);
-  CurrentTrial.Name := 'T'+TrialID.ToString;
+  CurrentTrial.Name := 'T' + Pool.Trial.UID.ToString;
   CurrentTrial.OnTrialEnd := InterTrial.OnBegin;
   CurrentTrial.Data := TrialData;
 end;
 
 class function TTrialFactory.GetLastTrial: ITrial;
 var
-  LMockData : TTrialData = (ID:-1; Kind : ''; Parameters:nil);
+  LMockData : TTrialData = (
+    ID: -1 ; Kind : 'TLastTrial'; ReferenceName: 'Mock'; Parameters: nil);
 begin
   CurrentTrial := TLastTrial.Create(nil);
   CurrentTrial.OnTrialEnd := nil;

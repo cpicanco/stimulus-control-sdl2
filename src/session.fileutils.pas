@@ -24,6 +24,8 @@ procedure AppendFilesTo(var AStimuliArray: TStringArray;
   AFolder: string;
   AExtensions : string = '*.bmp;*.jpg');
 
+procedure GetDesignFilesFor(AStrings : TStrings);
+
 procedure LoadMessageFromFile(var AMessage : string; AFilename : string);
 
 function NewConfigurationFile : string;
@@ -55,6 +57,22 @@ begin
       AStimuliArray[i] := Files[i];
   finally
     Files.Free;
+  end;
+end;
+
+procedure GetDesignFilesFor(AStrings : TStrings);
+var
+  i : integer;
+const
+  LDefaultExtension = '*.csv';
+  LDefaultFolder    = 'design';
+begin
+  FindAllFiles(AStrings, LDefaultFolder, LDefaultExtension, False);
+  if AStrings.Count > 0 then begin
+    for i := 0 to AStrings.Count -1 do begin
+      AStrings[i] :=
+        ExtractFileNameWithoutExt(ExtractFileNameOnly(AStrings[i]));
+    end;
   end;
 end;
 
@@ -94,6 +112,7 @@ end;
 
 function NewConfigurationFile : string;
 begin
+  RandSeed := Random(MaxInt);  // Generate a random seed
   NewConfigurationFile := Pool.BaseFilePath + 'last_session.ini';
   if FileExists(NewConfigurationFile) then
     DeleteFile(NewConfigurationFile);
@@ -102,8 +121,7 @@ begin
     ConfigurationFile.Free;
   ConfigurationFile := TConfigurationFile.Create(NewConfigurationFile);
   ConfigurationFile.CacheUpdates := True;
-  ConfigurationFile.WriteString(_Main, _NumBlock, '3');
-  ConfigurationFile.WriteToBlock(1, _Name, 'SS');
+  ConfigurationFile.WriteInteger(_Main, 'RandSeed', RandSeed);
   ConfigurationFile.Invalidate;
 end;
 

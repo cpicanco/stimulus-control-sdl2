@@ -15,7 +15,7 @@ interface
 
 uses common.helpers;
 
-function MakeConfigurationFile : string;
+function MakeConfigurationFile(AFilename : string) : string;
 
 var
   ConfigurationFilename : string = '';
@@ -30,13 +30,13 @@ uses
   , session.configurationfile
   ;
 
-function MakeConfigurationFile: string;
+function MakeConfigurationFile(AFilename : string): string;
 begin
   Result := NewConfigurationFile;
   GlobalTrialParameters.InterTrialInterval := ITI.SecondsToMiliseconds;
   GlobalTrialParameters.LimitedHold := LimitedHold.MinutesToMiliseconds;
   GlobalTrialParameters.Cursor := 1;
-  Experiments.Trials.WriteToConfigurationFile;
+  Experiments.Trials.WriteToConfigurationFile(AFilename);
   ConfigurationFile.Invalidate;
   ConfigurationFile.UpdateFile;
 end;

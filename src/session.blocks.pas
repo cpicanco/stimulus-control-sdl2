@@ -81,7 +81,7 @@ end;
 
 procedure TBlock.BeforePlay;
 begin
-  Pool.EndCriteria.Invalidate;
+  Pool.EndCriteria.InvalidateBlock;
 end;
 
 procedure TBlock.Play;

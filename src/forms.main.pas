@@ -14,7 +14,7 @@ unit forms.main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
+  Classes, SysUtils, Forms, Controls, Dialogs, StdCtrls, ExtCtrls,
   IniPropStorage;
 
 type
@@ -26,6 +26,7 @@ type
     ButtonLoadConfigurationFile: TButton;
     ButtonNewConfigurationFile: TButton;
     ButtonRunSession: TButton;
+    ComboBoxCondition: TComboBox;
     ComboBoxParticipant: TComboBox;
     IniPropStorage1: TIniPropStorage;
     OpenDialog1: TOpenDialog;
@@ -37,6 +38,7 @@ type
     procedure BeginSession(Sender: TObject);
     procedure EndSession(Sender : TObject);
     procedure CloseSDLApp(Sender : TObject);
+    procedure FormCreate(Sender: TObject);
   private
     //FEyeLink : TEyeLink;
     function ParticipantFolderName : string;
@@ -62,8 +64,6 @@ uses
   , session.fileutils
   , experiments
   , sdl.app
-  , sdl.app.output
-  , eyelink.classes
   ;
 
 { TFormBackground }
@@ -87,8 +87,22 @@ begin
 end;
 
 procedure TFormBackground.ButtonNewConfigurationFileClick(Sender: TObject);
+var
+  LFilename : string;
 begin
-  ConfigurationFilename := Experiments.MakeConfigurationFile;
+  if ComboBoxCondition.Items.Count = 0 then begin
+    ShowMessage('A pasta de condições (design) está vazia.');
+    Exit;
+  end;
+  if ComboBoxCondition.ItemIndex = -1 then begin
+    ShowMessage('Escolha uma condição.');
+    Exit;
+  end else begin
+    with ComboBoxCondition do begin
+      LFilename := Items[ItemIndex];
+    end;
+  end;
+  ConfigurationFilename := Experiments.MakeConfigurationFile(LFilename);
 end;
 
 procedure TFormBackground.ButtonNewParticipantClick(Sender: TObject);
@@ -127,6 +141,11 @@ begin
   TLogger.SetFooter;
   SDLSession.Free;
   SDLApp.Free;
+end;
+
+procedure TFormBackground.FormCreate(Sender: TObject);
+begin
+  GetDesignFilesFor(ComboBoxCondition.Items);
 end;
 
 function TFormBackground.ParticipantFolderName: string;

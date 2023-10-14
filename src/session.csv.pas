@@ -24,18 +24,44 @@ type
   private
     FCSVDocument: TCSVDocument;
   public
-    constructor Create(AFilename : string);
+    constructor Create(AFilename : string; AIsBlockFile : Boolean = False);
     destructor Destroy; override;
     function GetEnumerator: IEnumerator;
   end;
 
+  function BlocksFileExists(AFilename : string) : Boolean;
+
 implementation
 
-constructor TCSVRows.Create(AFilename: string);
+uses session.pool, LazFileUtils;
+
+const
+  LDefaultExtention = '.csv';
+  LDefaultFolder = 'design';
+  LDefaultBlocksFolder = 'blocks';
+
+function BlocksFileExists(AFilename: string): Boolean;
+begin
+  Result := FileExistsUTF8(
+    Pool.BaseFilePath +
+    LDefaultFolder+DirectorySeparator+
+    LDefaultBlocksFolder+DirectorySeparator+
+    AFilename+LDefaultExtention);
+end;
+
+constructor TCSVRows.Create(AFilename: string; AIsBlockFile: Boolean);
 begin
   inherited Create;
   FCSVDocument := TCSVDocument.Create;
-  FCSVDocument.LoadFromFile(AFilename);
+  if AIsBlockFile then begin
+    FCSVDocument.LoadFromFile(
+      LDefaultFolder+DirectorySeparator+
+      LDefaultBlocksFolder+DirectorySeparator+
+      AFilename+LDefaultExtention);
+  end else begin
+    FCSVDocument.LoadFromFile(
+      LDefaultFolder+DirectorySeparator+AFilename+LDefaultExtention);
+  end;
 end;
 
 destructor TCSVRows.Destroy;

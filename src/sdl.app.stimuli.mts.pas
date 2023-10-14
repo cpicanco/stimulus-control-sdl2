@@ -105,8 +105,10 @@ begin
 
       if LIsHit then begin
         FSoundCorrect.Play;
+        Pool.Counters.Hit;
       end else begin
         FSoundWrong.Play;
+        Pool.Counters.Miss;
       end;
     end;
 
@@ -199,6 +201,11 @@ procedure TMTSStimuli.SampleResponse(Sender: TObject);
 var
   LStimulus: IStimulus;
 begin
+  //if FIsDMTS then
+  //for LStimulus in FSamples do begin
+  //  LStimulus.Stop;
+  //end;
+
   for LStimulus in FComparisons do begin
     LStimulus.Start;
   end;

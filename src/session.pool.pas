@@ -43,7 +43,9 @@ var
 
 implementation
 
-uses SysUtils, SDL2, FileUtil;
+uses SysUtils, SDL2
+  , FileUtil
+  ;
 
 initialization
   Pool := TPool.Create;
