@@ -207,11 +207,6 @@ begin
   FBlockID := Result;
 end;
 
-//function TEndCriteria.ForcePlayBlockOnEndSession: Boolean;
-//begin
-//
-//end;
-
 function TEndCriteria.IsEndSession: Boolean;
 
   procedure ForceEndSession;

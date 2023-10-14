@@ -106,15 +106,13 @@ var
   LMaxBlockRepetitionInSession, LNextBlockOnHitCriterion, i: integer;
   LName : string;
   LRelation : string;
-  LCode : string;
+  LCode , LInstruction: string;
   LHasConsequence , LEndOnHitCriterion: Boolean;
   LWord : TWord;
   LPhase : TPhase;
   LStartAt : TStartAt;
-  FCSVTrials : TCSVRows;
-  FCSVBlocks : TCSVRows;
-  LTrialConfiguration : TStringList;
-  LBlockConfiguration : TStringList;
+  LParser : TCSVRows;
+  LRow : TStringList;
 
   function ToAlphaNumericCode(S : string) : TAlphaNumericCode;
   var
@@ -148,11 +146,14 @@ var
 begin
   //Format('%.2d', [LCycle])
   Writer := TConfigurationWriter.Create(ConfigurationFile);
-  if BlocksFileExists(AFilename) then begin
-    FCSVBlocks := TCSVRows.Create(AFilename, True);
-    try
-      for LBlockConfiguration in FCSVBlocks do  begin
-        with LBlockConfiguration, BlockKeys do begin
+  LParser := TCSVRows.Create;
+  try
+    // parse blocks
+    if BlocksFileExists(AFilename) then begin
+      LParser.Clear;
+      LParser.LoadFromFile(InsideBlocksSubFolder(AFilename));
+      for LRow in LParser do  begin
+        with LRow, BlockKeys do begin
           LBlockID := Values['ID'].ToInteger -1;
           LBackUpBlock :=
             Values[NextBlockOnNotCriterionKey].ToInteger -1;
@@ -192,51 +193,66 @@ begin
         end;
         Writer.WriteBlock;
       end;
-    finally
-      FCSVBlocks.Free;
-    end;
-  end else begin
-    LBlockID := 0;
-    Writer.CurrentBlock := LBlockID;
-    with Writer.BlockConfig do begin
-      Values['Name'] := 'Block ' + LBlockID.ToString;
-    end;
-    Writer.WriteBlock;
-  end;
-
-  FCSVTrials := TCSVRows.Create(AFilename);
-  try
-    for LTrialConfiguration in FCSVTrials do  begin
-      with LTrialConfiguration do begin
-        LTrialID     := Values['ID'].ToInteger;
-        LCycle       := Values['Cycle'].ToInteger;
-        LCondition   := Values['Condition'].ToInteger;
-        LBlockID     := Values['Block'].ToInteger -1;
-        LTrials      := Values['Trials'].ToInteger; // TODO
-        LComparisons := Values['Comparisons'].ToInteger;
-        LRelation    := Values['Relation'];
-        LCode        := Values['Code'];
-        LHasConsequence := True;  // TODO
-      end;
-      LPhase := GetPhase(LCycle, LCondition, LRelation);
-      LWord := GetWord(LPhase, ToAlphaNumericCode(LCode));
-
+    end else begin
+      LBlockID := 0;
       Writer.CurrentBlock := LBlockID;
-      for i := 0 to LTrials -1 do begin
-        LName :=
-          LWord.Caption + #32 + LRelation + #32 + LComparisons.ToString + 'C';
-        WriteTrials(
-          LName, LCode, LRelation, LWord, LComparisons, LHasConsequence);
+      with Writer.BlockConfig do begin
+        Values['Name'] := 'Block ' + LBlockID.ToString;
       end;
+      Writer.WriteBlock;
     end;
 
-    LStartAt.Block := 14;
-    LStartAt.Trial:= 0;
-    Writer.StartAt := LStartAt;
+    // parse trials
+    if BaseFileExists(AFilename) then begin
+      LParser.Clear;
+      LParser.LoadFromFile(InsideBaseFolder(AFilename));
+      for LRow in LParser do  begin
+        with LRow do begin
+          LTrialID     := Values['ID'].ToInteger;
+          LCycle       := Values['Cycle'].ToInteger;
+          LCondition   := Values['Condition'].ToInteger;
+          LBlockID     := Values['Block'].ToInteger -1;
+          LTrials      := Values['Trials'].ToInteger; // TODO
+          LComparisons := Values['Comparisons'].ToInteger;
+          LRelation    := Values['Relation'];
+          LCode        := Values['Code'];
+          LHasConsequence := True;  // TODO
+        end;
+        LPhase := GetPhase(LCycle, LCondition, LRelation);
+        LWord := GetWord(LPhase, ToAlphaNumericCode(LCode));
+
+        Writer.CurrentBlock := LBlockID;
+        for i := 0 to LTrials -1 do begin
+          LName :=
+            LWord.Caption + #32 + LRelation + #32 + LComparisons.ToString + 'C';
+          WriteTrials(
+            LName, LCode, LRelation, LWord, LComparisons, LHasConsequence);
+        end;
+      end;
+
+      LStartAt.Block := 0;
+      LStartAt.Trial:= 0;
+      Writer.StartAt := LStartAt;
+    end;
+
+    // parse instructions to trials
+    if InstructionsFileExist(AFilename) then begin
+      LParser.Clear;
+      LParser.LoadFromFile(InsideInstructionsSubFolder(AFilename));
+       for LRow in LParser do  begin
+        with LRow, TrialKeys do begin
+          LBlockID     := Values['Block'].ToInteger-1;
+          LTrialID     := Values['Trial'].ToInteger-1;
+          LInstruction := Values[Instruction];
+          Writer.WriteInstruction(LBlockID, LTrialID,
+            Instruction, LInstruction);
+        end;
+      end;
+    end;
 
   finally
     Writer.Free;
-    FCSVTrials.Free;
+    LParser.Free;
   end;
 end;
 

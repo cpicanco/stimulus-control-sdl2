@@ -23,6 +23,7 @@ uses
   , sdl.app.moveable.contract
   , sdl.app.trials.contract
   , sdl.app.stimuli.contract
+  , sdl.app.stimuli.instruction
   , sdl.app.events.abstract
   , sdl.app.events.custom
   , session.configuration
@@ -36,12 +37,14 @@ type
     private
       FLimitedHoldTimer    : TSDLTimer;
       FVisible: Boolean;
+      FIStimuli : IStimuli;
     protected
+      FInstruction : TInstructionStimuli;
       FOnTrialEnd : TNotifyEvent;
       FData : TTrialData;
-      FIStimuli : IStimuli;
       procedure Paint; override;
       procedure EndTrialCallBack(Sender : TObject);
+      procedure EndInstructionCallBack(Sender : TObject);
       procedure MouseMove(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
       procedure MouseDown(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
       procedure MouseUp(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
@@ -49,6 +52,7 @@ type
       procedure SetTrialData(ATrialData: TTrialData); virtual;
       function GetOnTrialEnd: TNotifyEvent;
       function GetTrialData: TTrialData;
+      function GetIStimuli : IStimuli; virtual; abstract;
     public
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -204,6 +208,15 @@ begin
   end;
 end;
 
+procedure TTrial.EndInstructionCallBack(Sender: TObject);
+begin
+  if Sender is TInstructionStimuli then begin
+    TInstructionStimuli(Sender).Stop;
+    FIStimuli := GetIStimuli;
+    Show;
+  end;
+end;
+
 procedure TTrial.Paint;
 var
   Child : TComponent;
@@ -229,13 +242,19 @@ begin
   if Assigned(Parameters) then begin
     with TrialKeys do begin
       with Parameters do begin
-        if not Values[LimitedHold].IsEmpty then
+        if not Values[LimitedHold].IsEmpty then begin
           FLimitedHoldTimer.Interval := Values[LimitedHold].ToInteger;
+        end;
+        if not Values[Instruction].IsEmpty then begin
+          FInstruction := TInstructionStimuli.Create(Self);
+          FInstruction.OnFinalize := @EndInstructionCallBack;
+          FInstruction.Load(FData.Parameters, Self);
+          FIStimuli := FInstruction;
+        end else begin
+          FIStimuli := GetIStimuli;
+        end;
       end;
     end;
-  end;
-  if Assigned(FIStimuli) then begin
-    FIStimuli.Load(FData.Parameters, Self);
   end;
 end;
 

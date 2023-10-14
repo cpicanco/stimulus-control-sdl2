@@ -239,7 +239,7 @@ end;
 
 function TMTSStimuli.AsInterface: IStimuli;
 begin
-  Result := Self as IStimuli
+  Result := Self as IStimuli;
 end;
 
 procedure TMTSStimuli.DoExpectedResponse;

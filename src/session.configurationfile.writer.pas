@@ -31,6 +31,8 @@ type
     destructor Destroy; override;
     procedure WriteBlock;
     procedure WriteTrial;
+    procedure WriteInstruction(ABlock, ATrial : integer;
+      AName, AValue : string);
     property BlockConfig : TStringList read FBlockConfig;
     property TrialConfig: TStringList read FTrialConfig;
     property CurrentBlock  : integer read FCurrentBlock write FCurrentBlock;
@@ -98,6 +100,14 @@ begin
       FTrialConfig.GetNameValue(i, LName, LValue);
       WriteToTrial(LCurrentTrial, LCurrentBlock, LName, LValue);
     end;
+  end;
+end;
+
+procedure TConfigurationWriter.WriteInstruction(ABlock, ATrial: integer; AName,
+  AValue: string);
+begin
+  with FConfigurationFile do begin
+    WriteToInstruction(ABlock, ATrial, AName, AValue);
   end;
 end;
 

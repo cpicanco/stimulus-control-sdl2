@@ -18,6 +18,7 @@ uses
   , sdl.app.events.abstract
   , sdl.app.trials
   //, sdl.app.graphics.picture.dragdrop
+  , sdl.app.stimuli.contract
   , sdl.app.stimuli.dragdrop
   , sdl.timer
   , session.configuration
@@ -42,6 +43,7 @@ type
     procedure DragDropDone(Sender : TObject);
     procedure TimerEndTrial(Sender: TObject);
   protected
+    function GetIStimuli: IStimuli; override;
     procedure MouseMove(Sender: TObject; Shift: TCustomShiftState; X, Y: Integer);
       override;
     procedure SetTrialData(ATrialData: TTrialData); override;
@@ -72,7 +74,6 @@ begin
 
   FStimuli := TDragDropStimuli.Create(Self);
   FStimuli.OnDragDropDone:=@DragDropDone;
-  FIStimuli := FStimuli.AsInterface;
 
   //FStimuli.LogEvent := @LogEvent;
   FReportData.WrongDragDrops := 0;
@@ -123,7 +124,6 @@ begin
   //  end;
   //  IDragDropHelpSerie.AssignParameters(LParameters);
   //end;
-  inherited Show;
 end;
 
 procedure TDragDrop.DragDropDone(Sender: TObject);
@@ -134,6 +134,11 @@ end;
 procedure TDragDrop.TimerEndTrial(Sender: TObject);
 begin
   EndTrial;
+end;
+
+function TDragDrop.GetIStimuli: IStimuli;
+begin
+  Result := FStimuli.AsInterface;
 end;
 
 procedure TDragDrop.MouseMove(Sender: TObject; Shift: TCustomShiftState; X,

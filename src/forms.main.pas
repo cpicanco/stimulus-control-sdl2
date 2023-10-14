@@ -77,6 +77,7 @@ begin
   SDLApp.SetupAudio;
   SDLApp.SetupText;
   SDLApp.OnClose := @CloseSDLApp;
+  Pool.App := SDLApp;
 
   SDLSession := TSession.Create(Self);
   SDLSession.OnBeforeStart := @BeginSession;

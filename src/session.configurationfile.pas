@@ -34,6 +34,7 @@ type
     FTrialCount: integer;
     function GetStartAt: TStartAt;
     procedure SetStartAt(AValue: TStartAt);
+    class function InstructionSection(BlockIndex, TrialIndex : integer) : string;
     class function TrialSection(BlockIndex, TrialIndex : integer) : string;
     class function BlockSection(BlockIndex : integer) : string;
     function CurrentBlockSection : string;
@@ -62,6 +63,8 @@ type
     procedure WriteToTrial(ATrial : integer; AStrings : TStrings); overload;
     procedure WriteToTrial(ATrial : integer; AName, AValue: string); overload;
     procedure WriteToTrial(ATrial : integer; ABlock : integer; AName, AValue: string); overload;
+    procedure WriteToInstruction(ATrial : integer; ABlock : integer; AName, AValue: string);
+
     procedure WriteToMain(AKey: string; AValue: string);
     procedure WriteMain(AMain : TStrings);
     procedure WriteBlockFromTarget(ATargetBlock : integer; ATargetConfigurationFile : TConfigurationFile;
@@ -131,6 +134,12 @@ procedure TConfigurationFile.SetStartAt(AValue: TStartAt);
 begin
   WriteToMain('StartAt',
     (AValue.Block+1).ToString + '-' + (AValue.Trial+1).ToString);
+end;
+
+class function TConfigurationFile.InstructionSection(BlockIndex,
+  TrialIndex: integer): string;
+begin
+  Result := BlockSection(BlockIndex) + ' - ' + 'M' + IntToStr(TrialIndex+1);
 end;
 
 function TConfigurationFile.CurrentBlock: TBlockData;
@@ -214,6 +223,9 @@ end;
 
 function TConfigurationFile.GetTrial(BlockIndex, TrialIndex: integer): TTrialData;
 var
+  LTrialSection : string;
+  LInstructionSection : string;
+  LParameters : TStringList;
   i : integer;
 begin
   i := FPositions.Value(TrialIndex);
@@ -222,7 +234,31 @@ begin
     raise EArgumentOutOfRangeException.Create(
       i.ToString + ' is out of bounds ' + TotalTrials.ToString);
   end;
-  Result := GetTrialBase(BlockIndex, i);
+
+  // do not shuffle instructions
+  LInstructionSection := InstructionSection(BlockIndex, TrialIndex);
+
+  // shuffle trials
+  LTrialSection := TrialSection(BlockIndex, i);
+  with Result do
+    begin
+      Id :=  i + 1;
+      Kind := ReadString(LTrialSection, _Kind, '');
+      ReferenceName := ReadString(LTrialSection, 'ReferenceName', '');
+      Parameters := TStringList.Create;
+      Parameters.CaseSensitive := False;
+      Parameters.Duplicates := dupIgnore;
+      ReadSectionValues(LTrialSection, Parameters);
+      LParameters := TStringList.Create;
+      try
+        ReadSectionValues(LInstructionSection, LParameters);
+        for i := 0 to LParameters.Count-1 do begin
+          Parameters.Append(LParameters[i]);
+        end;
+      finally
+        LParameters.Free;
+      end;
+    end;
 end;
 
 function TConfigurationFile.GetTrialBase(BlockIndex,
@@ -417,6 +453,12 @@ procedure TConfigurationFile.WriteToTrial(ATrial: integer; ABlock: integer;
   AName, AValue: string);
 begin
   WriteString(TrialSection(ABlock, ATrial),AName,AValue);
+end;
+
+procedure TConfigurationFile.WriteToInstruction(ATrial: integer;
+  ABlock: integer; AName, AValue: string);
+begin
+  WriteString(InstructionSection(ABlock, ATrial),AName,AValue);
 end;
 
 procedure TConfigurationFile.WriteToMain(AKey: string; AValue: string);

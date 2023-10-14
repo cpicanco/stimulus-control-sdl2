@@ -24,12 +24,19 @@ type
   private
     FCSVDocument: TCSVDocument;
   public
-    constructor Create(AFilename : string; AIsBlockFile : Boolean = False);
+    constructor Create;
     destructor Destroy; override;
     function GetEnumerator: IEnumerator;
+    procedure LoadFromFile(AFilename : string);
+    procedure Clear;
   end;
 
+  function InsideBaseFolder(AFilename : string) : string;
+  function InsideBlocksSubFolder(AFilename : string) : string;
+  function InsideInstructionsSubFolder(AFilename : string) : string;
+  function BaseFileExists(AFilename : string) : Boolean;
   function BlocksFileExists(AFilename : string) : Boolean;
+  function InstructionsFileExist(AFilename : string) : Boolean;
 
 implementation
 
@@ -38,41 +45,73 @@ uses session.pool, LazFileUtils;
 const
   LDefaultExtention = '.csv';
   LDefaultFolder = 'design';
+  LDefaultInstructionsFolder = 'instructions';
   LDefaultBlocksFolder = 'blocks';
+
+function InsideBaseFolder(AFilename: string): string;
+begin
+  Result := Pool.BaseFilePath +
+    LDefaultFolder+DirectorySeparator+
+    AFilename+LDefaultExtention;
+end;
+
+function InsideBlocksSubFolder(AFilename: string): string;
+begin
+  Result := Pool.BaseFilePath +
+            LDefaultFolder+DirectorySeparator+
+            LDefaultBlocksFolder+DirectorySeparator+
+            AFilename+LDefaultExtention;
+end;
+
+function InsideInstructionsSubFolder(AFilename: string): string;
+begin
+  Result := Pool.BaseFilePath +
+            LDefaultFolder+DirectorySeparator+
+            LDefaultInstructionsFolder+DirectorySeparator+
+            AFilename+LDefaultExtention;
+end;
+
+function BaseFileExists(AFilename: string): Boolean;
+begin
+  Result := FileExistsUTF8(InsideBaseFolder(AFilename));
+end;
 
 function BlocksFileExists(AFilename: string): Boolean;
 begin
-  Result := FileExistsUTF8(
-    Pool.BaseFilePath +
-    LDefaultFolder+DirectorySeparator+
-    LDefaultBlocksFolder+DirectorySeparator+
-    AFilename+LDefaultExtention);
+  Result := FileExistsUTF8(InsideBlocksSubFolder(AFilename));
 end;
 
-constructor TCSVRows.Create(AFilename: string; AIsBlockFile: Boolean);
+function InstructionsFileExist(AFilename: string): Boolean;
+begin
+  Result := FileExistsUTF8(InsideInstructionsSubFolder(AFilename));
+end;
+
+constructor TCSVRows.Create;
 begin
   inherited Create;
   FCSVDocument := TCSVDocument.Create;
-  if AIsBlockFile then begin
-    FCSVDocument.LoadFromFile(
-      LDefaultFolder+DirectorySeparator+
-      LDefaultBlocksFolder+DirectorySeparator+
-      AFilename+LDefaultExtention);
-  end else begin
-    FCSVDocument.LoadFromFile(
-      LDefaultFolder+DirectorySeparator+AFilename+LDefaultExtention);
-  end;
 end;
 
 destructor TCSVRows.Destroy;
 begin
   FCSVDocument.Free;
+  inherited Destroy;
 end;
 
 function TCSVRows.GetEnumerator: IEnumerator;
 begin
   // TCSVRowParser is reference counted
   Result := TCSVRowParser.Create(FCSVDocument) as IEnumerator;
+end;
+
+procedure TCSVRows.LoadFromFile(AFilename: string);
+begin
+  FCSVDocument.LoadFromFile(AFilename);
+end;
+
+procedure TCSVRows.Clear;
+begin
+  FCSVDocument.Clear;
 end;
 
 end.

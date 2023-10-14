@@ -14,7 +14,7 @@ unit session.pool;
 interface
 
 uses
-  session.endcriteria, session.counters, session.counters.all;
+  sdl.app, session.endcriteria, session.counters, session.counters.all;
 
 type
 
@@ -37,6 +37,7 @@ type
     Trial : TTrialCounters;
     Block : TBlockCounters;
     EndCriteria : TEndCriteria;
+    App : TSDLApplication;
   end;
 var
   Pool : TPool;

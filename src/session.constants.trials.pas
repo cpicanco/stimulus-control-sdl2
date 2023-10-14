@@ -19,6 +19,7 @@ type
     Name : string;
     ReferenceName : string;
     Kind : string;
+    Instruction : string;
     Cursor : integer;
     RepeatTrials : integer;
     LimitedHold : integer;
@@ -31,6 +32,7 @@ type
     ReferenceName : string;
     Cursor : string;
     Kind : string;
+    Instruction : string;
     LimitedHold : string;
     InterTrialInterval : string;
     RepeatTrials : string;
@@ -43,6 +45,7 @@ const
     ReferenceName : 'ReferenceName';
     Cursor : 'Cursor';
     Kind : 'Kind';
+    Instruction : 'Instruction';
     LimitedHold : 'LimitedHold';
     InterTrialInterval : 'InterTrialInterval';
     RepeatTrials : 'RepeatTrial';
