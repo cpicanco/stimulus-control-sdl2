@@ -25,15 +25,17 @@ type
 
   TEndCriteria = class
   private
-    FBlockID : integer;
-    FTrialID : integer;
+    //Pool.Block.ID : integer;
+    //Pool.Trial.ID : integer;
     FCurrentBlock : TBlockData;
     FCurrentTrial : TTrialData;
     function NextTrial : SmallInt;
     function NextBlock : SmallInt;
     function HitPorcentageInBlock : real;
-    function IsEndBlock : Boolean;
-    function IsEndSession : Boolean;
+    function IsEndBlock(ATrialID : Word) : Boolean;
+    function IsEndSession(ABlockID : Word) : Boolean;
+    function ShouldEndSession(var ABlockID : Word) : Boolean;
+    function ShouldEndBlock(var ATrialID : Word) : Boolean;
     function HitPorcentageCriterionAchieved : Boolean;
   public
     constructor Create;
@@ -66,43 +68,48 @@ begin
   FCurrentBlock := ConfigurationFile.CurrentBlock;
   ConfigurationFile.NewTrialOrder(FCurrentBlock);
 
-  if FBlockID < ConfigurationFile.TotalBlocks then
-    FBlockID := Pool.Block.ID;
   BlockName := FCurrentBlock.Name;
-  FTrialID := 0;
+  //Pool.Trial.ID := 0;
 end;
 
 procedure TEndCriteria.InvalidateTrial(ATrialData : TTrialData);
 begin
   FCurrentTrial := ATrialData;
-  if FTrialID < FCurrentBlock.TotalTrials then begin
-    FTrialID := Pool.Trial.ID;
-  end;
+
   TrialName := FCurrentTrial.Parameters.Values['Name'];
 end;
 
 function TEndCriteria.OfSession: Boolean;
 begin
-  // TEndCriteria.OfSession is called every block end
-  Result := IsEndSession;
+  // TEndCriteria.OfSession is called once every block end
+  Result := IsEndSession(Pool.Block.ID);
 end;
 
+// TEndCriteria.OfBlock is called once every intertrial end
+// after TEndCriteria.OfTrial
 function TEndCriteria.OfBlock: Boolean;
+var
+  LNextBlock : SmallInt;
 begin
-  // TEndCriteria.OfBlock is called every intertrial end
-  // after TEndCriteria.OfTrial
-  Result := IsEndBlock;
+  Result := ShouldEndBlock(Pool.Trial.ID);
   if Result then begin
-    //WriteLastBlocData;
-    Pool.Counters.EndBlock(NextBlock);
+    LNextBlock := NextBlock;
+    Pool.Counters.BeforeEndBlock;
+    Pool.Counters.EndBlock(LNextBlock);
   end;
 end;
 
+// TEndCriteria.OfTrial is called once every intertrial end
 function TEndCriteria.OfTrial: Boolean;
+var
+  LNextTrial: Word;
 begin
-  // TEndCriteria.OfTrial is called every intertrial end
-  Pool.Counters.EndTrial(NextTrial);
+  LNextTrial := NextTrial;
+  ShouldEndBlock(LNextTrial);
+  Pool.Counters.BeforeEndTrial;
+  Pool.Counters.EndTrial(LNextTrial);
 
+  // if IsEndBlock reset NextTrial on next NextBlock call
   // this result does not have a function right now
   Result := True;
 end;
@@ -125,15 +132,14 @@ begin
   if (LGoToTrial > -1) and (LGoToTrial < FCurrentBlock.TotalTrials) then begin
     Result := LGoToTrial;
   end else begin
-    Result := FTrialID+1;
+    Result := Pool.Trial.ID+1;
   end;
 
   if LRepeatValue > 0 then begin
     if Pool.Session.Block.Trial.Consecutives < LRepeatValue then begin
-      Result := FTrialID;
+      Result := Pool.Trial.ID;
     end;
   end;
-  FTrialID := Result;
 end;
 
 function TEndCriteria.NextBlock: SmallInt;
@@ -153,7 +159,7 @@ begin
   end;
 
   // go to next block by default
-  Result := FBlockID+1;
+  Result := Pool.Block.ID+1;
 
   // go to back up block if it was setup and there are errors
   if (FCurrentBlock.NextBlockOnNotCriterion > -1) and
@@ -171,7 +177,7 @@ begin
           // if global, go to a different block
           repsGlobal: begin
             if LRepeatValue > 0 then begin
-              if Pool.Session.Tree.Block[FBlockID].Count < LRepeatValue then begin
+              if Pool.Session.Tree.Block[Pool.Block.ID].Count < LRepeatValue then begin
                 Result := FCurrentBlock.NextBlockOnNotCriterion;
               end;
             end;
@@ -180,15 +186,13 @@ begin
           // if consecutive, "go to" same block
           repsConsecutive: begin
             if Pool.Session.Block.Consecutives < LRepeatValue then begin
-              Result := FBlockID;
+              Result := Pool.Block.ID;
             end;
           end;
         end;
-      FBlockID := Result;
       Exit;
     end;
   end;
-
 
   if FCurrentBlock.CrtHitPorcentage > 0 then begin
     if HitPorcentageCriterionAchieved then begin
@@ -205,20 +209,19 @@ begin
       //end;
     end;
   end;
-  FBlockID := Result;
 end;
 
-function TEndCriteria.IsEndSession: Boolean;
+function TEndCriteria.ShouldEndSession(var ABlockID: Word): Boolean;
 
   procedure ForceEndSession;
   begin
-    FBlockID := ConfigurationFile.TotalBlocks;
+    ABlockID := ConfigurationFile.TotalBlocks;
   end;
 
   procedure EvaluateCriteriaToForceEndSession;
   begin
     if FCurrentBlock.MaxBlockRepetitionInSession > 0 then begin
-      if Pool.Session.Tree.Block[FBlockID].Count =
+      if Pool.Session.Tree.Block[Pool.Block.ID].Count =
          FCurrentBlock.MaxBlockRepetitionInSession then begin
          ForceEndSession;
       end;
@@ -227,7 +230,7 @@ function TEndCriteria.IsEndSession: Boolean;
 
 begin
   EvaluateCriteriaToForceEndSession;
-  Result := FBlockID >= ConfigurationFile.TotalBlocks;
+  Result := IsEndSession(ABlockID);
 end;
 
 function TEndCriteria.HitPorcentageCriterionAchieved: Boolean;
@@ -243,11 +246,21 @@ begin
   Result := (LHits * 100)/FCurrentBlock.TotalTrials;
 end;
 
-function TEndCriteria.IsEndBlock: Boolean;
+function TEndCriteria.IsEndBlock(ATrialID : Word): Boolean;
+begin
+  Result := ATrialID >= FCurrentBlock.TotalTrials;
+end;
+
+function TEndCriteria.IsEndSession(ABlockID: Word): Boolean;
+begin
+  Result := ABlockID >= ConfigurationFile.TotalBlocks;
+end;
+
+function TEndCriteria.ShouldEndBlock(var ATrialID: Word): Boolean;
 
   procedure ForceEndBlock;
   begin
-    FTrialID := FCurrentBlock.TotalTrials;
+    ATrialID := FCurrentBlock.TotalTrials;
   end;
 
   procedure EvaluateCriteriaToForceEndBlock;
@@ -257,7 +270,7 @@ function TEndCriteria.IsEndBlock: Boolean;
 
 begin
   EvaluateCriteriaToForceEndBlock;
-  Result := FTrialID >= FCurrentBlock.TotalTrials;
+  Result := IsEndBlock(ATrialID);
 end;
 
 

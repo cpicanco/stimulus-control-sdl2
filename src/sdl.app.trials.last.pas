@@ -68,6 +68,7 @@ begin
   inherited Create(AOwner);
   FText := TText.Create(Self);
   FText.FontName := 'Raleway-Regular';
+  FText.FontSize := 150;
   FText.Load('Fim.');
   FText.Parent := Self;
   FText.Centralize;

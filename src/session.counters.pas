@@ -29,6 +29,8 @@ type
     Trial : TTrialCounters;
     function EndTrial(ANextTrial: SmallInt) : Boolean;
     function EndBlock(ANextBlock : SmallInt): Boolean;
+    procedure BeforeEndTrial;
+    procedure BeforeEndBlock;
     procedure Hit;
     procedure Miss;
     procedure None;
@@ -83,7 +85,6 @@ end;
 function TCounters.EndBlock(ANextBlock: SmallInt) : Boolean;
 begin
   Result := True;
-  Session.Tree.Block[Block.ID].Increment; // per id global count
   Session.Block.Events.Reset;
 
   if ANextBlock = Block.ID then begin
@@ -92,11 +93,23 @@ begin
     Session.Block.ResetConsecutive;
   end;
 
+  Session.NextBlockID(ANextBlock);
+
   if (ANextBlock > -1) and (ANextBlock < Length(Session.Tree.Block)) then begin
-    Session.NextBlockID(ANextBlock);
+    Result := True;
   end else begin
     Result := False;
   end;
+end;
+
+procedure TCounters.BeforeEndTrial;
+begin
+  Session.Tree.Block[Block.ID].Trial[Trial.ID].Increment;
+end;
+
+procedure TCounters.BeforeEndBlock;
+begin
+  Session.Tree.Block[Block.ID].Increment;
 end;
 
 procedure TCounters.EndSession;
@@ -105,9 +118,9 @@ begin
 end;
 
 function TCounters.EndTrial(ANextTrial: SmallInt) : Boolean;
+var
+  LIsLastTrial: Boolean;
 begin
-  Result := True;
-  Session.Tree.Block[Block.ID].Trial[Trial.ID].Increment;
   Session.Trial.Events.Reset;
   Session.Block.Trial.Events.Reset;
 
@@ -117,9 +130,11 @@ begin
     Session.Trial.ResetConsecutive;
   end;
 
+  Session.NextTrialID(ANextTrial);
+
   if (ANextTrial > -1) and
      (ANextTrial < Length(Session.Tree.Block[Block.ID].Trial)) then begin
-    Session.NextTrialID(ANextTrial);
+    Result := True;
   end else begin
     Result := False;
   end;
