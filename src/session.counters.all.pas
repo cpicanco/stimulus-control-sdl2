@@ -49,7 +49,7 @@ type
       function ToString : string; override;
     public
       ID : TTrialID; static;
-      procedure Reset; override;
+      procedure Invalidate; override;
       procedure NextID(AValue : TTrialID); override;
     end;
 
@@ -65,11 +65,10 @@ type
       ID : TBlockID; static;
       constructor Create;
       destructor Destroy; override;
-      procedure Reset; override;
-      procedure ResetConsecutive; override;
+      procedure Invalidate; override;
       procedure Next; override;
       procedure NextID(AValue : TTrialID); override;
-      procedure NextConsecutive; override;
+      procedure ResetConsecutive; override;
       property Trial : TTrialCounters read FTrial write FTrial;
       property Trials : Word read GetTrials;
     end;
@@ -93,10 +92,10 @@ type
       procedure Reset; override;
       procedure NextID(AValue : TTrialID); override;
       procedure NextTrialConsecutive;
-      procedure ResetTrialConsecutive;
+      //procedure ResetTrialConsecutive;
       procedure NextTrialID(ATrialID : TTrialID);
-      procedure NextBlockConsecutive;
-      procedure ResetBlockConsecutive;
+      //procedure NextBlockConsecutive;
+      //procedure ResetBlockConsecutive;
       procedure NextBlockID(ABlockID : TBlockID);
       property Block : TBlockCounters read FBlock;
       property Trial : TTrialCounters read FTrial;
@@ -143,14 +142,14 @@ end;
 
 function TTrialCounters.ToString: string;
 begin
-  Result := KeyValue('Trial', (UID+1).ToString) +
+  Result := KeyValue(CustomName, (UID+1).ToString) +
             KeyValue('ID', (ID+1).ToString) +
             inherited ToString + FEvents.ToString;
 end;
 
-procedure TTrialCounters.Reset;
+procedure TTrialCounters.Invalidate;
 begin
-  inherited Reset;
+  inherited Invalidate;
   ID := 0;
 end;
 
@@ -169,7 +168,7 @@ end;
 
 function TBlockCounters.ToString: string;
 begin
-  Result := KeyValue('Block', (UID+1).ToString) +
+  Result := KeyValue(CustomName, (UID+1).ToString) +
             KeyValue('ID', (ID+1).ToString) +
             inherited ToString + FEvents.ToString;
 end;
@@ -186,12 +185,6 @@ begin
   ID := AValue;
 end;
 
-procedure TBlockCounters.NextConsecutive;
-begin
-  inherited NextConsecutive;
-  FTrial.Invalidate;
-end;
-
 constructor TBlockCounters.Create;
 begin
   inherited Create;
@@ -205,9 +198,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TBlockCounters.Reset;
+procedure TBlockCounters.Invalidate;
 begin
-  inherited Reset;
+  inherited Invalidate;
   ID := 0;
 end;
 
@@ -267,40 +260,18 @@ end;
 
 procedure TSessionCounters.NextTrialConsecutive;
 begin
-  //FTrial.NextConsecutive; // redundant
+  FTrial.NextConsecutive;
   FBlock.Trial.NextConsecutive;
-end;
-
-procedure TSessionCounters.ResetTrialConsecutive;
-begin
-  //FTrial.ResetConsecutive;  // redundant
-  FBlock.Trial.ResetConsecutive;
 end;
 
 procedure TSessionCounters.NextTrialID(ATrialID: TTrialID);
 begin
-  Print(FTrial.ToString);
-  Print(FBlock.Trial.ToString);
   FTrial.Next; // session trials
   FBlock.Trial.NextID(ATrialID); // block trials
 end;
 
-procedure TSessionCounters.NextBlockConsecutive;
-begin
-  FTrial.Reset;
-  FBlock.NextConsecutive;
-end;
-
-procedure TSessionCounters.ResetBlockConsecutive;
-begin
-  FTrial.Reset;
-  FBlock.ResetConsecutive;
-end;
-
 procedure TSessionCounters.NextBlockID(ABlockID: TBlockID);
 begin
-  Print(FBlock.ToString);
-  FTrial.Reset;
   FBlock.NextID(ABlockID);
 end;
 

@@ -112,9 +112,9 @@ begin
   Session.Block.Trial.Events.Reset;
 
   if ANextTrial = Trial.ID then begin
-    Session.NextTrialConsecutive;
+    Session.Trial.NextConsecutive;
   end else begin
-    Session.ResetTrialConsecutive;
+    Session.Trial.ResetConsecutive;
   end;
 
   if (ANextTrial > -1) and

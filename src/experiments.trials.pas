@@ -176,7 +176,7 @@ begin
         Writer.CurrentBlock := LBlockID;
         with Writer.BlockConfig, BlockKeys do begin
           Values['Name'] :=
-            'Block ' + LBlockID.ToString;
+            'Block ' + (LBlockID+1).ToString;
           Values[NextBlockOnNotCriterionKey] :=
             LBackUpBlock.ToString;
           Values[BackUpBlockErrorsKey] :=

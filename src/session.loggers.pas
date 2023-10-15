@@ -28,7 +28,8 @@ type
     public
       constructor Create(AFilename : string);
       destructor Destroy; override;
-      class function Row(Cols: array of string): string;
+      class function Row(Cols: array of string;
+        ALineEnding : string = LineEnding): string;
       class function GetBaseFilename: string; static;
       class procedure SetHeader(ASessionName: string; AParticipantName: string); static;
       class procedure SetFooter; static;
@@ -94,7 +95,7 @@ begin
     Result := ExtractFileNameWithoutExt(DataFilename);
 end;
 
-class function TLogger.Row(Cols: array of string): string;
+class function TLogger.Row(Cols: array of string; ALineEnding: string): string;
 const
   TAB = #9;
 var
@@ -107,7 +108,7 @@ begin
     if i < LastColumn then
       Result := Result + Cols[i]+TAB
     else
-      Result := Result + Cols[i]+LineEnding;
+      Result := Result + Cols[i]+ALineEnding;
 end;
 
 class procedure TLogger.SetHeader(ASessionName: string;

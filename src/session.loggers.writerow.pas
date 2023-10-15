@@ -19,6 +19,7 @@ uses
 procedure WriteDataRow;
 
 var
+  BaseHeader,
   BlockName,
   LastTrialHeader,
   TrialHeader,
@@ -36,58 +37,72 @@ uses session.constants
    , session.loggers.instances
    , session.pool;
 
+const
+  Tab = #9;
+
+procedure InitializeBaseHeader;
+begin
+  ITIBegin := 0;
+  ITIEnd := 0;
+  BaseHeader := TLogger.Row([
+    'Session.Trial.UID',
+    'Session.Block.UID',
+    'Session.Block.ID',
+    'Session.Block.Trial.UID',
+    'Session.Block.Trial.ID',
+    'Session.Block.Name',
+    'Session.Block.Trial.Name',
+    'ITI.Begin',
+    'ITI.End'],'');
+  TrialHeader := '';
+  LastTrialHeader := ' ';
+end;
+
 procedure WriteDataRow;
 var
   LSaveData : TDataProcedure;
-  i, j : integer;
-  LTrialNo, LBlockID,
-  LTrialID, ITIData, LData : string;
+  ITIData, LData : string;
 const
-  DoNotApply = #32#32#32#32#32#32 + 'NA';
+  DoNotApply = 'NA';
+  EmptyName = '--------';
 begin
   if TrialHeader <> LastTrialHeader then begin
-    LData := TLogger.Row([
-      rsReportTrialNO,
-      rsReportBlockID,
-      rsReportBlockName,
-      rsReportTrialID,
-      rsReportTrialName,
-      rsReportITIBeg,
-      rsReportITIEnd,
-      TrialHeader]);
+    LData := TLogger.Row([BaseHeader, TrialHeader]);
   end;
   LastTrialHeader := TrialHeader;
 
-  i := Pool.Trial.ID;
-  j := Pool.Block.ID;
-  LTrialNo := (Pool.Trial.Count + 1).ToString;
-  LBlockID := (j + 1).ToString;
-  LTrialID := (i + 1).ToString;
+  if BlockName.IsEmpty then begin
+    BlockName := EmptyName;
+  end;
 
-  // FTrial Name
-  if TrialName = '' then
-    TrialName := '--------';
+  if TrialName.IsEmpty then begin
+    TrialName := EmptyName;
+  end;
 
-  // iti
-  if Pool.Trial.Count = 0 then
-    ITIData := DoNotApply + #9 + TimestampToStr(0)
-  else
+  if Pool.Session.Trial.UID = 0 then begin
+    ITIData := DoNotApply + Tab + TimestampToStr(0)
+  end else begin
     ITIData :=
-      TimestampToStr(ITIBegin) + #9 +
-      TimestampToStr(ITIEnd);
+      TimestampToStr(ITIBegin) + Tab + TimestampToStr(TickCount - Pool.TimeStart);
+  end;
 
   // write data
   LSaveData := GetSaveDataProc(LGData);
   LData := TLogger.Row([LData +
-    LTrialNo,
-    LBlockID,
+    (Pool.Session.Trial.UID+1).ToString,
+    (Pool.Session.Block.UID + 1).ToString,
+    (Pool.Session.Block.ID + 1).ToString,
+    (Pool.Session.Block.Trial.UID + 1).ToString,
+    (Pool.Session.Block.Trial.ID + 1).ToString,
     BlockName,
-    LTrialID,
     TrialName,
     ITIData,
     TrialData]);
   LSaveData(LData);
 end;
+
+initialization
+  InitializeBaseHeader;
 
 end.
 

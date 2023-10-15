@@ -112,7 +112,8 @@ end;
 
 function NewConfigurationFile : string;
 begin
-  RandSeed := Random(MaxInt);  // Generate a random seed
+  //RandSeed := Random(MaxInt);  // Generate a random seed
+  RandSeed := 1270036106;
   NewConfigurationFile := Pool.BaseFilePath + 'last_session.ini';
   if FileExists(NewConfigurationFile) then
     DeleteFile(NewConfigurationFile);

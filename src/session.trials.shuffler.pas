@@ -37,7 +37,7 @@ type
   TShuffler = class
   private
     FShuffledList: TIntegerList;
-    procedure Shuffle(AListSize: Integer); overload;
+    procedure SimpleShuffle(AList: TReferenceList); overload;
   public
     constructor Create;
     destructor Destroy; override;
@@ -46,6 +46,8 @@ type
   end;
 
 implementation
+
+uses session.pool;
 
 { TItem }
 
@@ -65,11 +67,17 @@ begin
   inherited Destroy;
 end;
 
-procedure TShuffler.Shuffle(AListSize: Integer);
+procedure TShuffler.SimpleShuffle(AList: TReferenceList);
 var
   i, j : Integer;
 begin
-  for i := 0 to AListSize - 1 do begin
+  FShuffledList.Clear;
+  if AList.Count = 1 then begin
+    FShuffledList.Add(0);
+    Exit;
+  end;
+
+  for i := 0 to AList.Count - 1 do begin
     FShuffledList.Add(i);
   end;
 
@@ -83,9 +91,12 @@ function TShuffler.Value(AIndex: Integer): Integer;
 begin
   if (AIndex >= 0) and (AIndex < FShuffledList.Count) then
     Result := FShuffledList[AIndex]
-  else
+  else begin
     raise EArgumentOutOfRangeException.Create(
-      'TShuffler.Value:'+AIndex.ToString);
+      'Block '+(Pool.Block.ID+1).ToString+
+      ' TShuffler.Value: '+AIndex.ToString+
+      ' FShuffledList.Count: '+FShuffledList.Count.ToString);
+  end;
 end;
 
 procedure TShuffler.Shuffle(AList: TReferenceList);
@@ -149,7 +160,7 @@ begin
     if (LUniqueCount.Count = 1) or
        (LUniqueCount.Count = AList.Count) or
        ((LUniqueCount.Count = 2) and (AList.Count <= 4)) then begin
-      Shuffle(AList.Count);
+      SimpleShuffle(AList);
       Exit;
     end;
 

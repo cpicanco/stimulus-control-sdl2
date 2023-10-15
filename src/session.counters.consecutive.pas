@@ -50,7 +50,7 @@ type
     public
       constructor Create;
       procedure Next; override;
-      procedure NextConsecutive; override;
+      procedure Invalidate; virtual;
       property UID : Word read FUID;
   end;
 
@@ -125,10 +125,10 @@ begin
   Inc(FUID);
 end;
 
-procedure TUIDCounter.NextConsecutive;
+procedure TUIDCounter.Invalidate;
 begin
-  inherited NextConsecutive;
-  Inc(FUID);
+  inherited Invalidate;
+  FUID := 0;
 end;
 
 end.
