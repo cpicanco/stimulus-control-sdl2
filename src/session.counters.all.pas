@@ -83,8 +83,6 @@ type
     protected
       function GetTrials : Word;
       function GetBlocks : Word;
-      procedure NextTrial;
-
     public
       ID : Word; static;
       constructor Create;
@@ -143,7 +141,7 @@ end;
 function TTrialCounters.ToString: string;
 begin
   Result := KeyValue(CustomName, (UID+1).ToString) +
-            KeyValue('ID', (ID+1).ToString) +
+            KeyValue('ID', ID.ToString) +
             inherited ToString + FEvents.ToString;
 end;
 
@@ -169,7 +167,7 @@ end;
 function TBlockCounters.ToString: string;
 begin
   Result := KeyValue(CustomName, (UID+1).ToString) +
-            KeyValue('ID', (ID+1).ToString) +
+            KeyValue('ID', ID.ToString) +
             inherited ToString + FEvents.ToString;
 end;
 
@@ -222,11 +220,6 @@ begin
   Result := FBlock.Count;
 end;
 
-procedure TSessionCounters.NextTrial;
-begin
-  Trial.Next;
-end;
-
 constructor TSessionCounters.Create;
 begin
   inherited Create;
@@ -266,12 +259,14 @@ end;
 
 procedure TSessionCounters.NextTrialID(ATrialID: TTrialID);
 begin
+  Print(FTrial.ToString);
   FTrial.Next; // session trials
   FBlock.Trial.NextID(ATrialID); // block trials
 end;
 
 procedure TSessionCounters.NextBlockID(ABlockID: TBlockID);
 begin
+  Print(FBlock.ToString);
   FBlock.NextID(ABlockID);
 end;
 

@@ -52,7 +52,6 @@ implementation
 uses
   session.pool
   , session.loggers.writerow
-  , timestamps
   ;
 
 { TEndCriteria }
@@ -94,13 +93,13 @@ begin
   // after TEndCriteria.OfTrial
   Result := IsEndBlock;
   if Result then begin
+    //WriteLastBlocData;
     Pool.Counters.EndBlock(NextBlock);
   end;
 end;
 
 function TEndCriteria.OfTrial: Boolean;
 begin
-  WriteDataRow;
   // TEndCriteria.OfTrial is called every intertrial end
   Pool.Counters.EndTrial(NextTrial);
 

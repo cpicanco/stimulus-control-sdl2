@@ -37,11 +37,11 @@ type
   TShuffler = class
   private
     FShuffledList: TIntegerList;
-    procedure SimpleShuffle(AList: TReferenceList); overload;
+    procedure SimpleShuffle(AList: TReferenceList);
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Shuffle(AList: TReferenceList); overload;
+    procedure Shuffle(AList: TReferenceList);
     function Value(AIndex: Integer): Integer;
   end;
 

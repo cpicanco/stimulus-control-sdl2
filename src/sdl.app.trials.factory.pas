@@ -48,6 +48,7 @@ uses session.intertrial
    , session.configurationfile
    , session.endcriteria
    , session.pool
+   , session.loggers.writerow
    , sdl.app.trials.instruction
    , sdl.app.trials.mts
    , sdl.app.trials.dragdrop
@@ -77,9 +78,13 @@ class procedure TTrialFactory.Play;
 var
   TrialData : TTrialData;
   TrialClass : TTrialClass;
+  LTestMode : Boolean = True;
 begin
   if Assigned(CurrentTrial) then
+  begin
+    WriteDataRow;
     FreeAndNil(CurrentTrial);
+  end;
 
   TrialData := ConfigurationFile.CurrentTrial;
   if not Registry.TryGetData(TrialData.Kind, TrialClass) then
@@ -90,8 +95,15 @@ begin
   CurrentTrial := TrialClass.Create(nil);
   CurrentTrial.Name := 'T' + Pool.Trial.UID.ToString;
   CurrentTrial.OnTrialEnd := InterTrial.OnBegin;
-  CurrentTrial.Data := TrialData;
-  CurrentTrial.Show;
+
+  if LTestMode then begin
+    CurrentTrial.TestMode := True;
+    CurrentTrial.Data := TrialData;
+    CurrentTrial.DoExpectedResponse;
+  end else begin
+    CurrentTrial.Data := TrialData;
+    CurrentTrial.Show;
+  end;
 end;
 
 class function TTrialFactory.GetLastTrial: ITrial;

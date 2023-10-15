@@ -223,8 +223,8 @@ begin
 
         Writer.CurrentBlock := LBlockID;
         for i := 0 to LTrials -1 do begin
-          LName :=
-            LWord.Caption + #32 + LRelation + #32 + LComparisons.ToString + 'C';
+          LName := LTrialID.ToString + #32 + '(' + LWord.Caption + #32 +
+            LRelation + #32 + LComparisons.ToString + 'C)';
           WriteTrials(
             LName, LCode, LRelation, LWord, LComparisons, LHasConsequence);
         end;

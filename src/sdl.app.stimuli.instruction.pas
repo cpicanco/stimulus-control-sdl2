@@ -54,8 +54,7 @@ uses session.pool, sdl2_ttf;
 procedure TInstructionStimuli.InstructionMouseDown(Sender: TObject;
   Shift: TCustomShiftState; X, Y: Integer);
 begin
-  if Assigned(OnFinalize) then
-    OnFinalize(Self);
+  DoExpectedResponse;
 end;
 
 constructor TInstructionStimuli.Create(AOwner: TComponent);
@@ -76,7 +75,8 @@ end;
 
 procedure TInstructionStimuli.DoExpectedResponse;
 begin
-
+  if Assigned(OnFinalize) then
+    OnFinalize(Self);
 end;
 
 procedure TInstructionStimuli.Load(AParameters: TStringList; AParent: TObject);

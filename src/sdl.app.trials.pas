@@ -36,6 +36,7 @@ type
   TTrial = class(TCustomRenderer, ITrial)
     private
       FLimitedHoldTimer    : TSDLTimer;
+      FTestMode: Boolean;
       FVisible: Boolean;
       FIStimuli : IStimuli;
     protected
@@ -63,9 +64,11 @@ type
       procedure EndTrial; virtual;
       procedure Show; virtual;
       procedure Hide; virtual;
+      procedure DoExpectedResponse;
       property Visible : Boolean read FVisible;
       property Data : TTrialData read GetTrialData write SetTrialData;
       property OnTrialEnd : TNotifyEvent read GetOnTrialEnd write SetOnTrialEnd;
+      property TestMode : Boolean read FTestMode write FTestMode;
   end;
 
 const
@@ -245,7 +248,8 @@ begin
         if not Values[LimitedHold].IsEmpty then begin
           FLimitedHoldTimer.Interval := Values[LimitedHold].ToInteger;
         end;
-        if not Values[Instruction].IsEmpty then begin
+        if (not Values[Instruction].IsEmpty) and
+           (not TestMode) then begin
           FInstruction := TInstructionStimuli.Create(Self);
           FInstruction.OnFinalize := @EndInstructionCallBack;
           FInstruction.Load(FData.Parameters, Self);
@@ -280,6 +284,11 @@ begin
   FVisible := False;
   if Assigned(FIStimuli) then FIStimuli.Stop;
   FLimitedHoldTimer.Stop;
+end;
+
+procedure TTrial.DoExpectedResponse;
+begin
+  FIStimuli.DoExpectedResponse;
 end;
 
 end.

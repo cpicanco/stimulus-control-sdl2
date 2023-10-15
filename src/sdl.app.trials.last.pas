@@ -19,6 +19,7 @@ uses
   , session.configuration
   , sdl.app.trials
   , sdl.app.graphics.text
+  , sdl.app.stimuli.contract
   ;
 
 type
@@ -30,6 +31,7 @@ type
       FRect : TSDL_Rect;
       FText : TText;
     protected
+      function GetIStimuli: IStimuli; override;
       procedure SetBoundsRect(AValue: TSDL_Rect); override;
       procedure SetTrialData(ATrialData: TTrialData); override;
     public
@@ -44,6 +46,11 @@ type
 implementation
 
 { TLastTrial }
+
+function TLastTrial.GetIStimuli: IStimuli;
+begin
+  Result := nil;
+end;
 
 procedure TLastTrial.SetBoundsRect(AValue: TSDL_Rect);
 begin

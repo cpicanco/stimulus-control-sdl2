@@ -45,15 +45,14 @@ begin
   ITIBegin := 0;
   ITIEnd := 0;
   BaseHeader := TLogger.Row([
+    'Report.Timestamp',
     'Session.Trial.UID',
     'Session.Block.UID',
     'Session.Block.ID',
     'Session.Block.Trial.UID',
     'Session.Block.Trial.ID',
     'Session.Block.Name',
-    'Session.Block.Trial.Name',
-    'ITI.Begin',
-    'ITI.End'],'');
+    'Session.Block.Trial.Name'],'');
   TrialHeader := '';
   LastTrialHeader := ' ';
 end;
@@ -61,9 +60,8 @@ end;
 procedure WriteDataRow;
 var
   LSaveData : TDataProcedure;
-  ITIData, LData : string;
+  LData : string;
 const
-  DoNotApply = 'NA';
   EmptyName = '--------';
 begin
   if TrialHeader <> LastTrialHeader then begin
@@ -79,24 +77,17 @@ begin
     TrialName := EmptyName;
   end;
 
-  if Pool.Session.Trial.UID = 0 then begin
-    ITIData := DoNotApply + Tab + TimestampToStr(0)
-  end else begin
-    ITIData :=
-      TimestampToStr(ITIBegin) + Tab + TimestampToStr(TickCount - Pool.TimeStart);
-  end;
-
   // write data
   LSaveData := GetSaveDataProc(LGData);
   LData := TLogger.Row([LData +
-    (Pool.Session.Trial.UID+1).ToString,
+    TimestampToStr(TickCount - Pool.TimeStart),
+    (Pool.Session.Trial.UID + 1).ToString,
     (Pool.Session.Block.UID + 1).ToString,
     (Pool.Session.Block.ID + 1).ToString,
     (Pool.Session.Block.Trial.UID + 1).ToString,
     (Pool.Session.Block.Trial.ID + 1).ToString,
     BlockName,
     TrialName,
-    ITIData,
     TrialData]);
   LSaveData(LData);
 end;

@@ -244,7 +244,13 @@ end;
 
 procedure TMTSStimuli.DoExpectedResponse;
 begin
+  // for real time simulations
   //FComparisons[0].DoResponse;
+
+  // for short time simulations
+  Pool.Counters.Hit;
+  if Assigned(OnFinalize) then
+    OnFinalize(Self);
 end;
 
 procedure TMTSStimuli.Load(AParameters: TStringList; AParent: TObject);
