@@ -44,8 +44,6 @@ type
     function OfSession : Boolean;
     function OfBlock : Boolean;
     function OfTrial : Boolean;
-    function Running : Boolean;
-    property RunningAt : TStartAt read GetRunningAt write SetRunningAt;
   end;
 
 var
