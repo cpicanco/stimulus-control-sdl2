@@ -140,17 +140,6 @@ begin
   end;
 end;
 
-//procedure TCounters.EndGoToTrial(ATrialID: TTrialID);
-//begin
-//  if ATrialID = Trial.ID then begin
-//    Trial.NextConsecutive;
-//  end else begin
-//    Trial.NextID(ATrialID);
-//  end;
-//  //Block.Trial.Count;
-//  //Session.Trial.Count;
-//end;
-
 procedure TCounters.Hit;
 begin
   Session.Events.Hit;

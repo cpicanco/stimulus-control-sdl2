@@ -75,8 +75,8 @@ end;
 procedure TEndCriteria.InvalidateTrial(ATrialData : TTrialData);
 begin
   FCurrentTrial := ATrialData;
-
   TrialName := FCurrentTrial.Parameters.Values['Name'];
+  WriteDataRow;
 end;
 
 function TEndCriteria.OfSession: Boolean;
