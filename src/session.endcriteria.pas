@@ -76,7 +76,6 @@ procedure TEndCriteria.InvalidateTrial(ATrialData : TTrialData);
 begin
   FCurrentTrial := ATrialData;
   TrialName := FCurrentTrial.Parameters.Values['Name'];
-  WriteDataRow;
 end;
 
 function TEndCriteria.OfSession: Boolean;
@@ -146,6 +145,7 @@ function TEndCriteria.NextBlock: SmallInt;
 var
   LRepeatStyle: TRepeatStyle;
   LRepeatValue: Integer;
+  i : integer;
 begin
   LRepeatStyle := repsNone;
   if FCurrentBlock.MaxBlockRepetition > 0 then begin
@@ -164,7 +164,8 @@ begin
   // go to back up block if it was setup and there are errors
   if (FCurrentBlock.NextBlockOnNotCriterion > -1) and
      (FCurrentBlock.BackUpBlockErrors > 0) then begin
-    if Pool.Block.Events.Misses.Count >= FCurrentBlock.BackUpBlockErrors then begin
+    i := Pool.Block.Events.Misses.Count;
+    if i >= FCurrentBlock.BackUpBlockErrors then begin
 
       // decide where to go base of repeat style
       case LRepeatStyle of

@@ -35,8 +35,6 @@ type
     public
       constructor Create;
       destructor Destroy; override;
-      procedure Next; override;
-      procedure NextConsecutive; override;
       procedure NextID(AValue : TTrialID); virtual; abstract;
       property Events : TMutuallyExclusiveCounters read FEvents;
       property CustomName : string read FCustomName write FCustomName;
@@ -68,7 +66,6 @@ type
       procedure Invalidate; override;
       procedure Next; override;
       procedure NextID(AValue : TTrialID); override;
-      procedure ResetConsecutive; override;
       property Trial : TTrialCounters read FTrial write FTrial;
       property Trials : Word read GetTrials;
     end;
@@ -90,10 +87,7 @@ type
       procedure Reset; override;
       procedure NextID(AValue : TTrialID); override;
       procedure NextTrialConsecutive;
-      //procedure ResetTrialConsecutive;
       procedure NextTrialID(ATrialID : TTrialID);
-      //procedure NextBlockConsecutive;
-      //procedure ResetBlockConsecutive;
       procedure NextBlockID(ABlockID : TBlockID);
       property Block : TBlockCounters read FBlock;
       property Trial : TTrialCounters read FTrial;
@@ -124,18 +118,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TCustomUIDCounter.Next;
-begin
-  inherited Next;
-  FEvents.Invalidate;
-end;
-
-procedure TCustomUIDCounter.NextConsecutive;
-begin
-  inherited NextConsecutive;
-  FEvents.Reset;
-end;
-
 { TTrialCounters }
 
 function TTrialCounters.ToString: string;
@@ -148,6 +130,7 @@ end;
 procedure TTrialCounters.Invalidate;
 begin
   inherited Invalidate;
+  FEvents.Invalidate;
   ID := 0;
 end;
 
@@ -202,12 +185,6 @@ begin
   ID := 0;
 end;
 
-procedure TBlockCounters.ResetConsecutive;
-begin
-  inherited ResetConsecutive;
-  FTrial.Invalidate;
-end;
-
 { TSessionCounters }
 
 function TSessionCounters.GetTrials: Word;
@@ -260,8 +237,8 @@ end;
 procedure TSessionCounters.NextTrialID(ATrialID: TTrialID);
 begin
   Print(FTrial.ToString);
-  FTrial.Next; // session trials
-  FBlock.Trial.NextID(ATrialID); // block trials
+  FTrial.Next; // increment session trials
+  FBlock.Trial.NextID(ATrialID); // increment block trials
 end;
 
 procedure TSessionCounters.NextBlockID(ABlockID: TBlockID);

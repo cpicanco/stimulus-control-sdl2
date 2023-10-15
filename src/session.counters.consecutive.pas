@@ -34,6 +34,7 @@ type
       procedure NextConsecutive; virtual;
       procedure Reset; virtual;
       procedure ResetConsecutive; virtual;
+      procedure FlushMaxConsecutives;
       procedure Invalidate; virtual;
       property MaxConsecutives : Word read FMaxConsecutives;
       property Consecutives : Word read FConsecutives;
@@ -93,10 +94,15 @@ end;
 
 procedure TConsecutivesCounter.ResetConsecutive;
 begin
+  FlushMaxConsecutives;
+  FConsecutives := 0;
+end;
+
+procedure TConsecutivesCounter.FlushMaxConsecutives;
+begin
   if FConsecutives > FMaxConsecutives then begin
     FMaxConsecutives := FConsecutives;
   end;
-  FConsecutives := 0;
 end;
 
 procedure TConsecutivesCounter.Invalidate;

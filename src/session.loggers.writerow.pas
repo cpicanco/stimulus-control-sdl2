@@ -19,15 +19,13 @@ uses
 procedure WriteDataRow;
 
 var
-  BaseHeader,
-  BlockName,
-  LastTrialHeader,
-  TrialHeader,
-  TrialName,
-  TrialData,
-  TrialResult: string;
-  ITIBegin,
-  ITIEnd: Extended;
+  BlockName : string;
+  TrialName : string;
+  //ITIBegin  : Extended;
+  //ITIEnd    : Extended;
+
+procedure AppendToTrialHeader(AHeader : string);
+procedure AppendToTrialData(AData : string);
 
 implementation
 
@@ -37,22 +35,45 @@ uses session.constants
    , session.loggers.instances
    , session.pool;
 
+var
+  BaseHeader,
+  LastTrialHeader,
+  TrialHeader,
+  TrialData : string;
+
 const
   Tab = #9;
 
+procedure Append(var ALeft: string; ARight  : string);
+begin
+  if ALeft.IsEmpty then begin
+    ALeft := ARight;
+  end else begin
+    ALeft := String.Join(Tab, [ALeft, ARight]);
+  end;
+end;
+
+procedure AppendToTrialHeader(AHeader: string);
+begin
+  Append(TrialHeader, AHeader);
+end;
+
+procedure AppendToTrialData(AData: string);
+begin
+  Append(TrialData, AData);
+end;
+
 procedure InitializeBaseHeader;
 begin
-  ITIBegin := 0;
-  ITIEnd := 0;
-  BaseHeader := TLogger.Row([
+  BaseHeader := String.Join(Tab, [
     'Report.Timestamp',
     'Session.Trial.UID',
     'Session.Block.UID',
-    'Session.Block.ID',
     'Session.Block.Trial.UID',
+    'Session.Block.ID',
     'Session.Block.Trial.ID',
     'Session.Block.Name',
-    'Session.Block.Trial.Name'],'');
+    'Session.Block.Trial.Name']);
   TrialHeader := '';
   LastTrialHeader := ' ';
 end;
@@ -66,8 +87,8 @@ const
 begin
   if TrialHeader <> LastTrialHeader then begin
     LData := TLogger.Row([BaseHeader, TrialHeader]);
+    LastTrialHeader := TrialHeader;
   end;
-  LastTrialHeader := TrialHeader;
 
   if BlockName.IsEmpty then begin
     BlockName := EmptyName;
@@ -83,13 +104,14 @@ begin
     TimestampToStr(TickCount - Pool.TimeStart),
     (Pool.Session.Trial.UID + 1).ToString,
     (Pool.Session.Block.UID + 1).ToString,
-    (Pool.Session.Block.ID + 1).ToString,
     (Pool.Session.Block.Trial.UID + 1).ToString,
+    (Pool.Session.Block.ID + 1).ToString,
     (Pool.Session.Block.Trial.ID + 1).ToString,
     BlockName,
     TrialName,
     TrialData]);
   LSaveData(LData);
+  TrialData := '';
 end;
 
 initialization

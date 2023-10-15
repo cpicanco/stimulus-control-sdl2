@@ -48,8 +48,6 @@ uses session.intertrial
    , session.configurationfile
    , session.endcriteria
    , session.pool
-   , session.loggers.writerow
-   //, sdl.app.trials.instruction
    , sdl.app.trials.mts
    , sdl.app.trials.dragdrop
    , sdl.app.trials.last

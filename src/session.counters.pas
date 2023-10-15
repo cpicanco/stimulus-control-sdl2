@@ -34,6 +34,7 @@ type
     procedure Hit;
     procedure Miss;
     procedure None;
+    procedure RandomEvent;
     procedure Reset;
     procedure BeforeBeginSession;
     procedure EndSession;
@@ -44,7 +45,11 @@ var
 
 implementation
 
-uses Classes, SysUtils, session.pool, sdl.app.output, session.configurationfile;
+uses Classes, SysUtils
+  , sdl.app.output
+  , session.loggers.writerow
+  , session.pool
+  , session.configurationfile;
 
 { TCounterManager }
 
@@ -80,12 +85,14 @@ begin
 
   Trial.ID := ConfigurationFile.StartAt.Trial;
   Block.ID := ConfigurationFile.StartAt.Block;
+
+  AppendToTrialHeader(Session.Trial.Events.Header);
 end;
 
 function TCounters.EndBlock(ANextBlock: SmallInt) : Boolean;
 begin
   Result := True;
-  Session.Block.Events.Reset;
+  Session.Block.Events.Invalidate;
 
   if ANextBlock = Block.ID then begin
     Session.Block.NextConsecutive;
@@ -105,6 +112,9 @@ end;
 procedure TCounters.BeforeEndTrial;
 begin
   Session.Tree.Block[Block.ID].Trial[Trial.ID].Increment;
+  AppendToTrialData(Session.Block.Trial.Events.Last);
+  AppendToTrialData(Session.Trial.Events.ToData);
+  WriteDataRow;
 end;
 
 procedure TCounters.BeforeEndBlock;
@@ -118,16 +128,15 @@ begin
 end;
 
 function TCounters.EndTrial(ANextTrial: SmallInt) : Boolean;
-var
-  LIsLastTrial: Boolean;
 begin
-  Session.Trial.Events.Reset;
-  Session.Block.Trial.Events.Reset;
+  Session.Block.Trial.Events.Invalidate;
 
   if ANextTrial = Trial.ID then begin
     Session.Trial.NextConsecutive;
+    Session.Block.Trial.NextConsecutive;
   end else begin
     Session.Trial.ResetConsecutive;
+    Session.Block.Trial.ResetConsecutive;
   end;
 
   Session.NextTrialID(ANextTrial);
@@ -162,6 +171,15 @@ begin
   Session.Trial.Events.None;
   Session.Block.Events.None;
   Session.Block.Trial.Events.None;
+end;
+
+procedure TCounters.RandomEvent;
+begin
+  case Random(3) of
+    0 : Hit;
+    1 : Miss;
+    2 : None;
+  end;
 end;
 
 procedure TCounters.Reset;

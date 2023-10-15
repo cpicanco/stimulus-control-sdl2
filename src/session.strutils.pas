@@ -15,7 +15,7 @@ uses
 
 implementation
 
-uses StrUtils, session.pool;
+uses session.pool;
 
 function KeyValue(AKey, AValue: string; ALineEnding: string): string;
 begin

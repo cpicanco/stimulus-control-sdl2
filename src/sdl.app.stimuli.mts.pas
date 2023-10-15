@@ -248,7 +248,16 @@ begin
   //FComparisons[0].DoResponse;
 
   // for short time simulations
-  Pool.Counters.Hit;
+  case FComparisons.Count of
+    0 : Pool.Counters.Hit;
+    else begin
+      if Random < (0.9/1.0) then begin
+        Pool.Counters.Hit;
+      end else begin
+        Pool.Counters.Miss;
+      end;
+    end;
+  end;
   if Assigned(OnFinalize) then
     OnFinalize(Self);
 end;
