@@ -600,6 +600,10 @@
         <Filename Value="src\sdl.app.stimuli.instruction.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="src\session.loggers.writerow.timestamp.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

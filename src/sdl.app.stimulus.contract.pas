@@ -29,6 +29,7 @@ type
     procedure Stop;
     procedure DoResponse;
     function GetID: TStimulusID;
+    function ToData : string;
   end;
 
 implementation

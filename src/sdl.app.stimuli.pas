@@ -15,8 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, Schedules
-  , sdl.app.stimuli.contract
-  , sdl.app.stimulus.contract;
+  , sdl.app.stimuli.contract;
 
 type
 
@@ -36,6 +35,7 @@ type
     procedure SetOnResponse(AValue: TNotifyEvent);
     procedure SetOnStop(AValue : TNotifyEvent);
   protected
+    function CustomName : string;
     //function ContainerItems : IEnumerable; virtual; abstract;
     procedure DoExpectedResponse; virtual; abstract;
     procedure Load(AParameters: TStringList; AParent: TObject); virtual;
@@ -58,6 +58,11 @@ type
 implementation
 
 { TStimuli }
+
+function TStimuli.CustomName: string;
+begin
+  Result := Self.ClassName.Replace('T', '');
+end;
 
 procedure TStimuli.Consequence(Sender: TObject);
 begin

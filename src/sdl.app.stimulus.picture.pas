@@ -29,6 +29,7 @@ type
     private
       FPicture : TPicture;
     protected
+      function GetStimulusName : string; override;
       procedure MouseDown(Sender: TObject; Shift: TCustomShiftState;
         X, Y: Integer); override;
     public
@@ -47,6 +48,15 @@ uses
 
 { TPictureStimulus }
 
+function TPictureStimulus.GetStimulusName: string;
+begin
+  if IsSample then begin
+    Result := 'Picture.Sample' + #9 + FWord;
+  end else begin
+    Result := 'Picture.Comparison' + #9 + FWord;
+  end;
+end;
+
 procedure TPictureStimulus.MouseDown(Sender: TObject; Shift: TCustomShiftState;
   X, Y: Integer);
 begin
@@ -55,12 +65,10 @@ end;
 
 procedure TPictureStimulus.Load(AParameters: TStringList; AParent: TObject;
   ARect: TSDL_Rect);
-var
-  LWord : string;
 begin
   FPicture := TPicture.Create(Self);
-  LWord := GetWordValue(AParameters, IsSample, Index);
-  FPicture.LoadFromFile(LWord+IMG_EXT);
+  FWord := GetWordValue(AParameters, IsSample, Index);
+  FPicture.LoadFromFile(FWord+IMG_EXT);
   FPicture.BoundsRect := ARect;
   FPicture.Parent := TCustomRenderer(AParent);
   FPicture.OnMouseDown := @MouseDown;

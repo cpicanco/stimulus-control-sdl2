@@ -34,7 +34,6 @@ type
   private
     FTextFromVocalResponse : string;
     FRect : TSDL_Rect;
-    FWord : string;
     FRecorder : TAudioRecorderComponent;
     FPlayback : TAudioPlaybackComponent;
     FRecorderButton : TToggleButton;
@@ -80,7 +79,7 @@ end;
 
 function TSpeechStimulus.GetStimulusName: string;
 begin
-  Result := FWord;
+  Result := 'Speech' + #9 + FWord;
 end;
 
 procedure TSpeechStimulus.MouseUp(Sender: TObject; Shift: TCustomShiftState; X,

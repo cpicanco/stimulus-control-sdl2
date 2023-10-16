@@ -48,7 +48,6 @@ function TStimulusID.ToString: string;
       end;
   end;
 begin
-
   Result := ''.Join('-', [
     Name,
     'P'+Formated(SubjcID),

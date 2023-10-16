@@ -33,6 +33,7 @@ type
     private
       FText : TText;
     protected
+      function GetStimulusName : string; override;
       procedure MouseDown(Sender: TObject; Shift: TCustomShiftState;
         X, Y: Integer); override;
     public
@@ -50,6 +51,15 @@ uses
 
 { TTextStimuli }
 
+function TTextStimulus.GetStimulusName: string;
+begin
+  if IsSample then begin
+    Result := 'Text.Sample' + #9 + FWord;
+  end else begin
+    Result := 'Text.Comparison' + #9 + FWord;
+  end;
+end;
+
 procedure TTextStimulus.MouseDown(Sender: TObject; Shift: TCustomShiftState;
   X, Y: Integer);
 begin
@@ -58,12 +68,10 @@ end;
 
 procedure TTextStimulus.Load(AParameters: TStringList; AParent: TObject;
   ARect: TSDL_Rect);
-var
-  LWord : string;
 begin
+  FWord := GetWordValue(AParameters, IsSample, Index);
   FText := TText.Create(Self);
-  LWord := GetWordValue(AParameters, IsSample, Index);
-  FText.Load(LWord);
+  FText.Load(FWord);
   FText.CentralizeWith(ARect);
   FText.Parent := TCustomRenderer(AParent);
   FText.OnMouseDown := @MouseDown;

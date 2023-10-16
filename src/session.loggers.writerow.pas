@@ -36,6 +36,7 @@ uses session.constants
    , session.pool;
 
 var
+  SaveData : TDataProcedure = nil;
   BaseHeader,
   LastTrialHeader,
   TrialHeader,
@@ -80,11 +81,14 @@ end;
 
 procedure WriteDataRow;
 var
-  LSaveData : TDataProcedure;
   LData : string;
 const
   EmptyName = '--------';
 begin
+  if not Assigned(SaveData) then begin
+    SaveData := GetSaveDataProc(LGData);
+  end;
+
   if TrialHeader <> LastTrialHeader then begin
     LData := TLogger.Row([BaseHeader, TrialHeader]);
     LastTrialHeader := TrialHeader;
@@ -99,7 +103,6 @@ begin
   end;
 
   // write data
-  LSaveData := GetSaveDataProc(LGData);
   LData := TLogger.Row([LData +
     TimestampToStr(TickCount - Pool.TimeStart),
     (Pool.Session.Trial.UID + 1).ToString,
@@ -110,8 +113,9 @@ begin
     BlockName,
     TrialName,
     TrialData]);
-  LSaveData(LData);
+  SaveData(LData);
   TrialData := '';
+  TrialHeader := '';
 end;
 
 initialization

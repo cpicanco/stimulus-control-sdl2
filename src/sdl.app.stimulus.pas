@@ -33,6 +33,7 @@ type
 
   TStimulus = class(TComponent, IStimulus)
     private
+      FPosition: Integer;
       FResponseID : Integer;
       FStimulusID : ShortInt;
       FIndex : integer;
@@ -52,6 +53,8 @@ type
       procedure SetOnMouseUp(AValue: TOnMouseEvent);
       procedure SetOnResponse(AValue: TNotifyEvent);
     protected
+      FWord : string;
+      function ToData: string;
       function GetRect: TRectangule; virtual; abstract;
       function GetStimulusName : string; virtual; abstract;
       procedure SetRect(AValue: TRectangule); virtual; abstract;
@@ -77,13 +80,14 @@ type
       property OnResponse : TNotifyEvent read FOnResponse write SetOnResponse;
       property IsSample : Boolean read FIsSample write SetIsSample;
       property Index : Integer read FIndex write FIndex;
+      property Position : Integer read FPosition write FPosition;
       property Rectangule  : TRectangule read GetRect write SetRect;
   end;
 
 
 implementation
 
-uses session.pool;
+uses session.pool, session.loggers.writerow.timestamp;
 
 { TStimulus }
 
@@ -97,8 +101,8 @@ function TStimulus.GetID: TStimulusID;
 begin
   Result.SubjcID := Pool.Counters.Subject;
   Result.SessiID := Pool.Session.ID;
-  Result.BlockID := Pool.Block.ID;
-  Result.TrialID := Pool.Trial.ID;
+  Result.BlockID := Pool.Session.Block.UID;
+  Result.TrialID := Pool.Session.Trial.UID;
   if IsSample then begin
     Result.StimuID := -FIndex;
   end else begin
@@ -144,6 +148,11 @@ begin
   FOnResponse:=AValue;
 end;
 
+function TStimulus.ToData: string;
+begin
+  Result := FWord+'-'+Position.ToString;
+end;
+
 constructor TStimulus.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -163,6 +172,7 @@ end;
 procedure TStimulus.DoResponse;
 begin
   Inc(FResponseID);
+  Timestamp('Stimulus.Response'+#32+GetID.ToString);
   if Assigned(OnResponse) then
     OnResponse(Self);
 end;

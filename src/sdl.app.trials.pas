@@ -76,7 +76,7 @@ const
 
 implementation
 
-uses session.constants.trials;
+uses session.constants.trials, session.loggers.writerow.timestamp;
 
 { TTrial }
 
@@ -274,16 +274,22 @@ end;
 
 procedure TTrial.Show;
 begin
-  FVisible := True;
-  if Assigned(FIStimuli) then FIStimuli.Start;
-  FLimitedHoldTimer.Start;
+  if Assigned(FIStimuli) then begin
+    FIStimuli.Start;
+    FLimitedHoldTimer.Start;
+    FVisible := True;
+    Timestamp(FIStimuli.CustomName+'.Show');
+  end;
 end;
 
 procedure TTrial.Hide;
 begin
-  FVisible := False;
-  if Assigned(FIStimuli) then FIStimuli.Stop;
-  FLimitedHoldTimer.Stop;
+  if Assigned(FIStimuli) then begin
+    FVisible := False;
+    Timestamp(FIStimuli.CustomName+'.Hide');
+    FIStimuli.Stop;
+    FLimitedHoldTimer.Stop;
+  end;
 end;
 
 procedure TTrial.DoExpectedResponse;

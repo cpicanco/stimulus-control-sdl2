@@ -33,7 +33,6 @@ type
       FInstruction : TTypeableStimulus;
       procedure InstructionMouseDown(Sender: TObject;
         Shift: TCustomShiftState; X, Y: Integer);
-
     public
       constructor Create(AOwner : TComponent); override;
       destructor Destroy; override;
@@ -47,7 +46,7 @@ type
 
 implementation
 
-uses session.pool, sdl2_ttf;
+uses session.pool;
 
 { TInstructionStimuli }
 

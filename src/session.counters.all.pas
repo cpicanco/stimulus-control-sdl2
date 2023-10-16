@@ -16,7 +16,6 @@ interface
 uses
   Classes, SysUtils
   , sdl.app.output
-  , session.configurationfile
   , session.counters.hierarquical
   , session.counters.consecutive
   , session.counters.mutuallyexclusive;

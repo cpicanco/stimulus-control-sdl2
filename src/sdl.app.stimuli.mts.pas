@@ -80,6 +80,8 @@ uses
   , sdl.app.stimulus
   , sdl.app.stimulus.audio
   , sdl.app.stimulus.speech
+  , session.loggers.writerow
+  , session.loggers.writerow.timestamp
   , session.constants.trials
   , session.constants.mts
   , session.pool
@@ -104,9 +106,11 @@ begin
       end;
 
       if LIsHit then begin
+        Timestamp('Hit.Start');
         FSoundCorrect.Play;
         Pool.Counters.Hit;
       end else begin
+        Timestamp('Miss.Start');
         FSoundWrong.Play;
         Pool.Counters.Miss;
       end;
@@ -122,6 +126,14 @@ end;
 
 procedure TMTSStimuli.ConsequenceDone(Sender: TObject);
 begin
+  if (Sender as ISound) = FSoundCorrect then begin
+    Timestamp('Hit.Stop');
+  end;
+
+  if (Sender as ISound) = FSoundWrong then begin
+    Timestamp('Miss.Stop');
+  end;
+
   FSoundCorrect.SetOnStop(nil);
   FSoundWrong.SetOnStop(nil);
   if Assigned(OnFinalize) then
@@ -163,6 +175,7 @@ var
 begin
   if Sender = FButton then begin
     if FButton.Sibling <> nil then begin
+      Timestamp('Button.Response');
       FButton.Hide;
       LStimulus := FButton.Sibling.Owner as TStimulus;
       DoConsequence(LStimulus);
@@ -176,6 +189,7 @@ var
   LIStimulus : IStimulus;
 begin
   if Sender is TStimulus then begin
+    //Timestamp('Comparison.Response');
     LStimulus := Sender as TStimulus;
     if LStimulus is TSpeechStimulus then begin
       FButton.Sibling := TSpeechStimulus(LStimulus).Rectangule;
@@ -209,6 +223,7 @@ begin
   for LStimulus in FComparisons do begin
     LStimulus.Start;
   end;
+  Timestamp('Comparison.Start');
 end;
 
 
@@ -286,8 +301,9 @@ var
     LCallbacks.OnResponse  := @ComparisonResponse;
     LParameters := TStringList.Create;
     try
-      if not Assigned(Grid) then
+      if not Assigned(Grid) then begin
         Grid := TGrid.Create(3);
+      end;
       Grid.FixedSample:=True;
 
       if AComparisons = 1 then begin
@@ -302,6 +318,7 @@ var
           LItem := TStimulusFactory.New(Self, ComparLetter, LCallbacks);
           LItem.IsSample := False;
           LItem.Index := i;
+          LItem.Position := Comparisons[i].Position;
 
           LParameters.Clear;
           LItem.Name:=MTSKeys.Comparisons+(i+1).ToString;
@@ -316,6 +333,7 @@ var
           LItem := TStimulusFactory.New(Self, SampleLetter, LCallbacks);
           LItem.IsSample := True;
           LItem.Index := i;
+          LItem.Position := Samples[i].Position;
 
           LItem.Name := MTSKeys.Samples+(i+1).ToString;
           LItem.Load(AParameters, AParent, Samples[i].Rect);
@@ -323,6 +341,8 @@ var
           Samples[i].Item := LItem as TObject;
           FSamples.Add(LItem);
         end;
+        AppendToTrialHeader(Pool.Session.Trial.Events.Header);
+        AppendToTrialHeader(Grid.Header);
       end;
     finally
       LParameters.Free;

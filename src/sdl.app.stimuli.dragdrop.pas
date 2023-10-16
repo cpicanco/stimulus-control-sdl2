@@ -45,6 +45,7 @@ type
     FAnimation : TAnimation;
     FDoneAnimations : TAnimations;
     FGridOrientation : TGridOrientation;
+    function GetRandomSample : TDragDropablePicture;
     procedure OtherDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure RightDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure SetFocus(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer);
@@ -52,7 +53,6 @@ type
     procedure SetOnOtherDragDrop(AValue: TDragDropEvent);
     procedure SetOnRightDragDrop(AValue: TDragDropEvent);
     procedure SetOnWrongDragDrop(AValue: TDragDropEvent);
-    function GetRandomSample : TDragDropablePicture;
     procedure FreeGridItems;
     procedure WrongDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Animate(ASample : TDragDropablePicture);

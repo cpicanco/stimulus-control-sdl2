@@ -43,11 +43,15 @@ type
 implementation
 
 uses SysUtils
+  , DateUtils
   , LazFileUtils
   , session.pool
+  , session.loggers.writerow.timestamp
   , session.loggers.instances;
 
 const FirstBasename: string = '001';
+
+var StartTime : TDateTime;
 
 { TLogger }
 
@@ -117,13 +121,15 @@ var
   LHeader : string;
   LFirstFilename : string;
 begin
+  StartTime := Time;
   LFirstFilename := Pool.BaseFileName + FirstBasename;
   LHeader :=
     HSUBJECT_NAME + #9 + AParticipantName + LineEnding +
     HSESSION_NAME + #9 + ASessionName + LineEnding +
-    HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
+    HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(StartTime) + LineEnding;
   DataFilename := CreateLogger(LGData, LFirstFilename, LHeader);
   TimestampsFilename := CreateLogger(LGTimestamps, LFirstFilename, LHeader);
+  session.loggers.writerow.timestamp.SaveData := GetSaveDataProc(LGTimestamps);
   Pool.BaseFilename := GetBaseFilename;
   Pool.Session.ID := ExtractFileNameOnly(Pool.BaseFilename).ToInteger;
 end;
@@ -131,8 +137,12 @@ end;
 class procedure TLogger.SetFooter;
 var
   Footer : string;
+  LStopTime : TDateTime;
 begin
-  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+  LStopTime := Time;
+  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 +
+    TimeToStr(LStopTime)+ LineEnding + LineEnding +
+    'Length:' + #9+ TimeToStr(Time - StartTime);
   FreeLogger(LGTimestamps, Footer);
   FreeLogger(LGData, Footer);
 end;

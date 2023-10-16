@@ -47,9 +47,11 @@ implementation
 
 uses Classes, SysUtils
   , sdl.app.output
+  , sdl.app.grids
   , session.loggers.writerow
   , session.pool
-  , session.configurationfile;
+  , session.configurationfile
+  ;
 
 { TCounterManager }
 
@@ -85,8 +87,6 @@ begin
 
   Trial.ID := ConfigurationFile.StartAt.Trial;
   Block.ID := ConfigurationFile.StartAt.Block;
-
-  AppendToTrialHeader(Session.Trial.Events.Header);
 end;
 
 function TCounters.EndBlock(ANextBlock: SmallInt) : Boolean;
@@ -114,6 +114,7 @@ begin
   Session.Tree.Block[Block.ID].Trial[Trial.ID].Increment;
   AppendToTrialData(Session.Block.Trial.Events.Last);
   AppendToTrialData(Session.Trial.Events.ToData);
+  AppendToTrialData(Grid.ToData);
   WriteDataRow;
 end;
 

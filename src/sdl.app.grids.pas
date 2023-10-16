@@ -49,6 +49,8 @@ type
       function IntToCell(AN : Cardinal) : TCell;
       function RectFromPosition(APosition: integer) : TRect;
       function PositionFromObject(AObject: TObject) : integer;
+      function Header : string;
+      function ToData : string;
       procedure UpdatePositions(ASamples, AComparisons: integer;
         AGridOrientation : TGridOrientation);
       {Cria seleção randômica de modelos e comparações em posições diferentes no AGrid}
@@ -71,7 +73,9 @@ implementation
 uses
   Math
   , sdl.app
-  , sdl.app.grids.methods;
+  , sdl.app.grids.methods
+  , sdl.app.stimulus.contract
+  ;
 
 { TGrid }
 
@@ -243,16 +247,18 @@ var
   begin
     A.Index := B.Index;
     A.Rect  := B.Rect;
+    // A.Position := B.Position; // do not override position
     // A.Item := B.Item; // do not override Item Pointer
   end;
 
-  procedure RandomizeGridItems(var AGridItems : TGridItems);
+  procedure GridListToGridItems(var AGridItems : TGridItems);
   var
     i: Integer;
   begin
     for i := Low(AGridItems) to High(AGridItems) do
     begin
-      Cell := IntToCell(LGridList.First);
+      AGridItems[i].Position := LGridList.First;
+      Cell := IntToCell(AGridItems[i].Position);
       SecureCopy(AGridItems[i], FGrid[Cell[0], Cell[1]]);
       LGridList.Delete(0);
     end;
@@ -268,7 +274,7 @@ var
     LGridList := TGridList.Create;
     for i in LLatinRow do LGridList.Add(i);
     //RandomizeGridList(LGridList);
-    RandomizeGridItems(AGridItems);
+    GridListToGridItems(AGridItems);
     LGridList.Free;
   end;
 
@@ -278,21 +284,23 @@ begin
       goNone: begin
         LGridList:= InvalidateGridList;
         RandomizeGridList(LGridList);
-        RandomizeGridItems(Samples);
-        RandomizeGridItems(Comparisons);
+        GridListToGridItems(Samples);
+        GridListToGridItems(Comparisons);
         LGridList.Free;
       end;
       else begin
         if FFixedSample then begin
           LGridList := InvalidateGridList(True);
-          Cell := IntToCell(LGridList.First);
+          Samples[Low(Samples)].Position := LGridList.First;
+          Cell := IntToCell(Samples[Low(Samples)].Position);
           SecureCopy(Samples[Low(Samples)], FGrid[Cell[0], Cell[1]]);
         end else begin
           LatinRowToGridItems(SamplesRows, Samples);
         end;
         if FFixedComparison then begin
           LGridList := InvalidateGridList(False);
-          Cell := IntToCell(LGridList.First);
+          Comparisons[Low(Comparisons)].Position := LGridList.First;
+          Cell := IntToCell(Comparisons[Low(Comparisons)].Position);
           SecureCopy(Comparisons[Low(Comparisons)], FGrid[Cell[0], Cell[1]]);
         end else begin
           LatinRowToGridItems(ComparisonsRows, Comparisons);
@@ -329,6 +337,49 @@ begin
     if FGrid[Cell[0], Cell[1]].Item = AObject then begin
       Result:= i;
       Exit;
+    end;
+  end;
+end;
+
+function TGrid.Header: string;
+var
+  i: Integer;
+begin
+  with FRandomPositions do begin
+    Result := '';
+    for i := Low(Samples) to High(Samples) do begin
+      if i = 0 then begin
+        Result := String.Join('', [Result, 'Sample-Position.'+(i+1).ToString]);
+      end else begin
+        Result := String.Join(#9, [Result, 'Sample-Position.'+(i+1).ToString]);
+      end;
+    end;
+
+    for i := Low(Comparisons) to High(Comparisons) do begin
+        Result := String.Join(#9, [Result, 'Comparison-Position.'+(i+1).ToString]);
+    end;
+  end;
+end;
+
+function TGrid.ToData: string;
+var
+  i: Integer;
+  LIStimulus : IStimulus;
+begin
+  Result := '';
+  with FRandomPositions do begin
+    for i := Low(Samples) to High(Samples) do begin
+      LIStimulus := Samples[i].Item as IStimulus;
+      if i = 0 then begin
+        Result := String.Join('', [Result, LIStimulus.ToData]);
+      end else begin
+        Result := String.Join(#9, [Result, LIStimulus.ToData]);
+      end;
+    end;
+
+    for i := Low(Comparisons) to High(Comparisons) do begin
+      LIStimulus := Comparisons[i].Item as IStimulus;
+      Result := String.Join(#9, [Result, LIStimulus.ToData]);
     end;
   end;
 end;

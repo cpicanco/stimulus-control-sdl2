@@ -18,6 +18,7 @@ type
    TGridList = specialize TFPGList<Integer>;
    TGridItem = record
      Index : integer;
+     Position : integer;
      Rect : TSDL_Rect;
      Item : TObject;
    end;
@@ -25,6 +26,8 @@ type
    TGridItems = array of TGridItem;
 
    TMatrix = array of array of TGridItem;
+
+   { TRandomPositions }
 
    TRandomPositions = record
      Samples: TGridItems;
@@ -36,4 +39,3 @@ type
 implementation
 
 end.
-

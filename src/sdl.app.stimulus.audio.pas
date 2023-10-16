@@ -33,6 +33,7 @@ type
     FSound : ISound;
     FPicture : TPicture;
   protected
+    function GetStimulusName : string; override;
     function GetRect: TRectangule; override;
     procedure SetRect(AValue: TRectangule); override;
     procedure SoundFinished(Sender: TObject);
@@ -51,13 +52,23 @@ type
 implementation
 
 uses sdl.app.audio
-   , session.pool
    , sdl.app.renderer.custom
+   , session.loggers.writerow.timestamp
+   , session.pool
    , session.constants.mts
    , session.strutils
    , session.strutils.mts;
 
 { TAudioStimulus }
+
+function TAudioStimulus.GetStimulusName: string;
+begin
+  if IsSample then begin
+    Result := 'Audio.Sample' + #9 + FWord;
+  end else begin
+    Result := 'Audio.Comparison' + #9 + FWord;
+  end;
+end;
 
 function TAudioStimulus.GetRect: TRectangule;
 begin
@@ -72,6 +83,7 @@ end;
 procedure TAudioStimulus.SoundFinished(Sender: TObject);
 begin
   if IsSample then begin
+    Timestamp('Stop.' + GetStimulusName);
     DoResponse;
     FSound.SetOnStop(nil);
   end else begin
@@ -87,6 +99,8 @@ begin
   end else begin
     if Assigned(OnMouseDown) then
       OnMouseDown(Self, Shift, X, Y);
+
+    Timestamp('Start.' + GetStimulusName);
     FSound.Play;
   end;
 end;
@@ -120,8 +134,6 @@ procedure TAudioStimulus.Load(AParameters: TStringList; AParent: TObject;
   ARect: TSDL_Rect);
 const
   LAudioPicture : string = 'AudioPicture'+IMG_EXT;
-var
-  LWord: string;
 begin
   FPicture := TPicture.Create(Self);
   FPicture.LoadFromFile(Assets(LAudioPicture));
@@ -131,14 +143,15 @@ begin
   FPicture.OnMouseEnter := @MouseEnter;
   FPicture.OnMouseExit := @MouseExit;
 
-  LWord := GetWordValue(AParameters, IsSample, Index);
-  FSound := SDLAudio.LoadFromFile(LWord+'.wav');
+  FWord := GetWordValue(AParameters, IsSample, Index);
+  FSound := SDLAudio.LoadFromFile(FWord+'.wav');
   FSound.SetOnStop(@SoundFinished);
 end;
 
 procedure TAudioStimulus.Start;
 begin
   if IsSample then begin
+    Timestamp('Start.' + GetStimulusName);
     FSound.Play;
     FPicture.Show;
   end else begin
