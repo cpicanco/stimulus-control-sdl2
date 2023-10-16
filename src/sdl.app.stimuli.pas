@@ -61,7 +61,7 @@ implementation
 
 function TStimuli.CustomName: string;
 begin
-  Result := Self.ClassName.Replace('T', '');
+  Result := Self.ClassName.Replace('T', '', []);
 end;
 
 procedure TStimuli.Consequence(Sender: TObject);

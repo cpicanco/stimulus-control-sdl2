@@ -130,6 +130,7 @@ begin
   DataFilename := CreateLogger(LGData, LFirstFilename, LHeader);
   TimestampsFilename := CreateLogger(LGTimestamps, LFirstFilename, LHeader);
   session.loggers.writerow.timestamp.SaveData := GetSaveDataProc(LGTimestamps);
+  session.loggers.writerow.timestamp.InitializeBaseHeader;
   Pool.BaseFilename := GetBaseFilename;
   Pool.Session.ID := ExtractFileNameOnly(Pool.BaseFilename).ToInteger;
 end;
