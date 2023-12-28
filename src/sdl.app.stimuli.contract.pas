@@ -15,14 +15,15 @@ unit sdl.app.stimuli.contract;
 
 interface
 
-uses Classes, sdl.app.trials.types;
+uses Classes, sdl.app.trials.types, sdl.app.navigable.contract;
 
 type
   { IStimuli }
 
   IStimuli = interface
     ['{6B18F44A-7450-4871-A2BB-A109FC2ED005}']
-    function AsInterface : IStimuli;
+    function AsIStimuli : IStimuli;
+    function AsINavigable : INavigable;
     function CustomName : string;
     function GetTrial : TObject;
     function MyResult : TTrialResult;

@@ -61,7 +61,7 @@ implementation
 uses
   session.constants.dragdrop
   , sdl.app.moveable.contract
-  , sdl.app.renderer.custom
+  , sdl.app.controls.custom
   ;
 
 constructor TDragDrop.Create;
@@ -150,7 +150,7 @@ var
 begin
   if Visible then begin
     for Child in FChildren do begin
-      IChild := IMoveable(TCustomRenderer(Child));
+      IChild := IMoveable(TSDLControl(Child));
       IChild.MouseMove(Sender, Shift, X, Y);
     end;
   end;

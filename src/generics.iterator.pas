@@ -37,10 +37,10 @@ type
     function IsLast: boolean;
     function IndexOf(const Item: _GT): integer;
     procedure SetCurrent(AValue : integer);
-    procedure First;
-    procedure Next;
-    procedure Previous;
-    procedure Last;
+    procedure GoFirst;
+    procedure GoNext;
+    procedure GoPrevious;
+    procedure GoLast;
 
   end;
 
@@ -50,7 +50,7 @@ implementation
 
 function TIterator.LastIndex: integer;
 begin
-  Result := Pred(FAggregator.List.Count);
+  Result := FAggregator.List.Count-1;
 end;
 
 constructor TIterator.Create(AAggregator: IAggregatorSpec);
@@ -98,12 +98,12 @@ begin
   Result := FIndex = 0;
 end;
 
-procedure TIterator.First;
+procedure TIterator.GoFirst;
 begin
   FIndex := 0;
 end;
 
-procedure TIterator.Next;
+procedure TIterator.GoNext;
 begin
   if IsLast then begin
     { do nothing }
@@ -112,7 +112,7 @@ begin
   end;
 end;
 
-procedure TIterator.Previous;
+procedure TIterator.GoPrevious;
 begin
   if IsFirst then begin
     { do nothing }
@@ -121,7 +121,7 @@ begin
   end;
 end;
 
-procedure TIterator.Last;
+procedure TIterator.GoLast;
 begin
   FIndex := LastIndex;
 end;

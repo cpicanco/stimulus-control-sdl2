@@ -29,10 +29,10 @@ type
     function IsLast: boolean;
     function IndexOf(const Item: _GT): integer;
     procedure SetCurrent(AValue : integer);
-    procedure First;
-    procedure Next;
-    procedure Previous;
-    procedure Last;
+    procedure GoFirst;
+    procedure GoNext;
+    procedure GoPrevious;
+    procedure GoLast;
   end;
 
 implementation

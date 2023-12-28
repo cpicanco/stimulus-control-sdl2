@@ -84,7 +84,7 @@ var
 begin
   TTFFiles := TStringList.Create;
   try
-    FindAllFiles(TTFFiles, Pool.RootMedia+'fonts'+PathSep, '*.ttf', True);
+    FindAllFiles(TTFFiles, Pool.FontsRootBasePath, '*.ttf', True);
     for LFilename in TTFFiles do
       LoadFromFile(LFilename);
   finally

@@ -15,17 +15,15 @@ unit Generics.Aggregator.Contract;
 
 interface
 
-uses Classes, fgl, Generics.Iterator.Contract;
+uses Classes, Generics.Collections, Generics.Iterator.Contract;
 
 type
 
   { IAggregator }
 
   generic IAggregator<_GT> = interface
-    function List: specialize TFPGList<_GT>;
+    function List: specialize TList<_GT>;
     function Iterator: specialize IIterator<_GT>;
-    procedure AssignCurrent(AParameters : TStringList);
-    procedure AssignParameters(AParameters : TStringList);
   end;
 
 implementation

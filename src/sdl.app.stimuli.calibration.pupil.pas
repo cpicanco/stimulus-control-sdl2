@@ -46,7 +46,7 @@ type
 
 implementation
 
-uses sdl.app.video.methods, sdl.app.renderer.custom;
+uses sdl.app.video.methods, sdl.app.controls.custom;
 
 { TPupilCalibrationStimuli }
 
@@ -104,7 +104,7 @@ begin
   inherited Load(AParameters, AParent);
   FText.FontName := 'Raleway-Regular';
   FText.FontSize := 50;
-  FText.Parent := TCustomRenderer(AParent);
+  FText.Parent := TSDLControl(AParent);
 
   PupilClient.OnCalibrationSuccessful := @PupilCalibrationSuccessful;
   PupilClient.OnCalibrationFailed := @PupilCalibrationFailed;

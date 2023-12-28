@@ -39,7 +39,7 @@ type
 
 implementation
 
-uses sdl.app.renderer.custom;
+uses sdl.app.controls.custom;
 { TLastStimuli }
 
 constructor TLastStimuli.Create;
@@ -70,7 +70,7 @@ begin
   FText.FontName := 'Raleway-Regular';
   FText.FontSize := 150;
   FText.Load('Fim.');
-  FText.Parent := TCustomRenderer(AParent);
+  FText.Parent := TSDLControl(AParent);
   FText.Centralize;
 end;
 

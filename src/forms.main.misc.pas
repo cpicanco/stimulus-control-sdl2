@@ -16,6 +16,8 @@ type
     CheckBoxShowMarkers: TCheckBox;
     CheckBoxShowModalFormForSpeechResponses: TCheckBox;
     CheckBoxTestMode: TCheckBox;
+    ComboBoxController: TComboBox;
+    ComboBoxShouldRestartAt: TComboBox;
     ComboBoxEyeTracker: TComboBox;
     ComboBoxAudioFolder: TComboBox;
     ComboBoxAudioPromptForText: TComboBox;
@@ -24,6 +26,8 @@ type
     ComboBoxMonitor: TComboBox;
     IniPropStorage1: TIniPropStorage;
     Label1: TLabel;
+    LabelController: TLabel;
+    LabelShoudRestartAtBlockStart: TLabel;
     LabelMonitor: TLabel;
     LabelTestMode: TLabel;
     LabelEyeTracker: TLabel;
@@ -43,8 +47,10 @@ type
     SpinEditLimitedHold: TSpinEdit;
     SpinEditRecordingSeconds: TSpinEdit;
     SpinEditTimeOut: TSpinEdit;
+    TabSheetControllers: TTabSheet;
     TabSheetGeneral: TTabSheet;
     TabSheetEyeTracking: TTabSheet;
+    procedure ComboBoxDesignFolderChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
 
@@ -57,7 +63,7 @@ var
 
 implementation
 
-uses sdl.app, session.fileutils;
+uses sdl.app, session.pool, session.fileutils;
 
 {$R *.lfm}
 
@@ -89,6 +95,11 @@ begin
     LStringList.Clear;
     LStringList.Free;
   end;
+end;
+
+procedure TFormMisc.ComboBoxDesignFolderChange(Sender: TObject);
+begin
+
 end;
 
 { TFormMisc }

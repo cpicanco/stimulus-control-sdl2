@@ -103,13 +103,15 @@ begin
 end;
 
 procedure TChunk.LoadFromFile(AFilename: string);
+const
+  AUD_EXT = '.wav';
 var
   Media : PAnsiChar;
 begin
-  Media := PAnsiChar(Pool.RootMedia+AFilename);
+  Media := PAnsiChar(AFilename+AUD_EXT);
   FChunk := Mix_LoadWAV(Media);
   if FChunk <> nil then begin
-    FFilename := Pool.RootMedia+AFilename;
+    FFilename := AFilename+AUD_EXT;
   end;
 end;
 

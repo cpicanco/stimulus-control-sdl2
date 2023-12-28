@@ -52,7 +52,7 @@ implementation
 uses
   sdl.app.audio
   , session.parameters.global
-  , sdl.app.renderer.custom
+  , sdl.app.controls.custom
   , session.constants.mts;
 
 { TTextStimuli }
@@ -78,6 +78,8 @@ begin
   FText := TText.Create;
   FPrompt := nil;
   FHasPrompt := False;
+
+  Selectables.Add(FText.AsISelectable);
 end;
 
 destructor TTextStimulus.Destroy;
@@ -95,7 +97,7 @@ begin
   //FText.FontSize := 50;
   FText.Load(FCustomName);
   FText.CentralizeWith(ARect);
-  FText.Parent := TCustomRenderer(AParent);
+  FText.Parent := TSDLControl(AParent);
   FText.OnMouseDown := @MouseDown;
 
   FHasPrompt := HasPrompt(AParameters);

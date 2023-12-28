@@ -7,13 +7,13 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit Generics.Aggregator;
+unit generics.aggregator;
 
 {$mode ObjFPC}{$H+}
 
 interface
 
-uses Classes, SysUtils, fgl
+uses Classes, SysUtils, Generics.Collections
    , Generics.Aggregator.Contract
    , Generics.Iterator.Contract
    , Generics.Iterator;
@@ -22,40 +22,30 @@ type
 
   { TAggregator }
 
-  generic TAggregator<_GT> = class abstract (specialize IAggregator<_GT>)
+  generic TAggregator<_GT> = class (specialize IAggregator<_GT>)
   public type
     TIteratorSpec = specialize TIterator<_GT>;
-    TFPGListSpec  = specialize TFPGList<_GT>;
+    TListSpec  = specialize TList<_GT>;
     IIteratorSpec = specialize IIterator<_GT>;
   private
 
   protected
-    FList : TFPGListSpec;
+    FList : TListSpec;
     FIterator : TIteratorSpec;
-    function Loaded : Boolean;
-    procedure LoadFromFile(AFilename : string); virtual; abstract;
-    procedure LoadFromMock; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
-    function List: TFPGListSpec;
+    function List: TListSpec;
     function Iterator: IIteratorSpec;
-    procedure AssignCurrent(AParameters : TStringList); virtual; abstract;
-    procedure AssignParameters(AParameters : TStringList); virtual; abstract;
   end;
 
 implementation
 
 { TAggregator }
 
-function TAggregator.Loaded: Boolean;
-begin
-  Result := FList.Count > 0;
-end;
-
 constructor TAggregator.Create;
 begin
-  FList := TFPGListSpec.Create;
+  FList := TListSpec.Create;
   FIterator:=TIteratorSpec.Create(Self);
 end;
 
@@ -66,7 +56,7 @@ begin
   inherited Destroy;
 end;
 
-function TAggregator.List: TFPGListSpec;
+function TAggregator.List: TListSpec;
 begin
   Result := FList;
 end;

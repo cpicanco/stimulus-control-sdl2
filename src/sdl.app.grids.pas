@@ -23,8 +23,8 @@ type
     private
       FFixedComparison: Boolean;
       FFixedSample: Boolean;
-      FSampleGridList : TGridList;
-      FComparGridList : TGridList;
+      //FSampleGridList : TGridList;
+      //FComparGridList : TGridList;
       FSeed : integer;
       FCellsCount: integer;
       FCellsSize: real;
@@ -341,7 +341,9 @@ begin
 
         goCustom: begin
           if FFixedSample then begin
-            Cell := IntToCell(GlobalTrialParameters.FixedSamplePosition);
+            Samples[Low(Samples)].Position :=
+              GlobalTrialParameters.FixedSamplePosition;
+            Cell := IntToCell(Samples[Low(Samples)].Position);
             SecureCopy(Samples[Low(Samples)], FGrid[Cell[0], Cell[1]]);
           end else begin
             raise ENotImplemented.Create(
@@ -349,7 +351,9 @@ begin
           end;
 
           if FFixedComparison then begin
-            Cell := IntToCell(GlobalTrialParameters.FixedComparisonPosition);
+            Comparisons[Low(Comparisons)].Position :=
+              GlobalTrialParameters.FixedComparisonPosition;
+            Cell := IntToCell(Comparisons[Low(Comparisons)].Position);
             SecureCopy(Comparisons[Low(Comparisons)], FGrid[Cell[0], Cell[1]]);
           end else begin
             LatinRowToGridItems(ComparisonsRows, Comparisons);
@@ -358,15 +362,20 @@ begin
 
         else begin
           if FFixedSample then begin
-            Cell := IntToCell(GlobalTrialParameters.FixedSamplePosition);
+            Samples[Low(Samples)].Position :=
+              GlobalTrialParameters.FixedSamplePosition;
+            Cell := IntToCell(Samples[Low(Samples)].Position);
             SecureCopy(Samples[Low(Samples)], FGrid[Cell[0], Cell[1]]);
           end else begin
             LatinRowToGridItems(SamplesRows, Samples);
           end;
 
           if FFixedComparison then begin
-            InvalidateComparGridList(LGridList);
-            Comparisons[Low(Comparisons)].Position := LGridList.First;
+            //InvalidateComparGridList(LGridList);
+            //Comparisons[Low(Comparisons)].Position := LGridList.First;
+            //Cell := IntToCell(Comparisons[Low(Comparisons)].Position);
+            Comparisons[Low(Comparisons)].Position :=
+              GlobalTrialParameters.FixedComparisonPosition;
             Cell := IntToCell(Comparisons[Low(Comparisons)].Position);
             SecureCopy(Comparisons[Low(Comparisons)], FGrid[Cell[0], Cell[1]]);
           end else begin

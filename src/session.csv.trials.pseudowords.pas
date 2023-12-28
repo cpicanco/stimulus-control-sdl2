@@ -15,7 +15,6 @@ type
 
   TCSVPseudowordsTrials = class(TCSVTrialsMTS)
     private // registered parameters
-      FCycle       : integer;
       FCondition   : integer;
       FCode        : string;
       FName        : string;
@@ -24,6 +23,7 @@ type
       FWord : TWord;
       FPhase : TPhase;
     protected
+      FCycle       : integer;
       procedure AfterLoadingParameters(Sender: TObject); override;
     public
       constructor Create; override;

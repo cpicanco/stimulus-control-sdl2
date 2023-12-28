@@ -43,7 +43,7 @@ implementation
 
 function TLastTrial.GetIStimuli: IStimuli;
 begin
-  Result := FStimuli.AsInterface;
+  Result := FStimuli.AsIStimuli;
 end;
 
 constructor TLastTrial.Create;

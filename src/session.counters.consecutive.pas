@@ -22,14 +22,17 @@ type
 
   TConsecutivesCounter = class(TObject)
     strict private
+      FName : string;
       FCount : Word;
       FConsecutives : Word;
       FMaxConsecutives : Word;
     protected
-      function ToString: string; virtual;
       function GetCount : Word; virtual;
     public
       constructor Create;
+      function ToIni: string; virtual;
+      procedure LoadFromStream(AStream : TStream); virtual;
+      procedure SaveToStream(AStream : TStream); virtual;
       procedure Next; virtual;
       procedure NextConsecutive; virtual;
       procedure Reset; virtual;
@@ -39,6 +42,7 @@ type
       property MaxConsecutives : Word read FMaxConsecutives;
       property Consecutives : Word read FConsecutives;
       property Count : Word read GetCount;
+      property Name : string read FName write FName;
   end;
 
   { TUIDCounter }
@@ -46,12 +50,13 @@ type
   TUIDCounter = class(TConsecutivesCounter)
     strict private
       FUID : Word;
-    protected
-      function ToString : string; override;
     public
       constructor Create;
+      function ToIni : string; override;
+      procedure LoadFromStream(AStream : TStream); override;
+      procedure SaveToStream(AStream : TStream); override;
       procedure Next; override;
-      procedure Invalidate; virtual;
+      procedure Invalidate; override;
       property UID : Word read FUID;
   end;
 
@@ -59,12 +64,12 @@ implementation
 
 uses session.strutils;
 
-function TConsecutivesCounter.ToString: string;
+function TConsecutivesCounter.ToIni: string;
 begin
   Result :=
-    KeyValue('Count', FCount.ToString) +
-    KeyValue('Consecutives', FConsecutives.ToString) +
-    KeyValue('MaxConsecutives', FMaxConsecutives.ToString);
+    KeyValue(FName+'.Count', FCount.ToString) +
+    KeyValue(FName+'.Consecutives', FConsecutives.ToString) +
+    KeyValue(FName+'.MaxConsecutives', FMaxConsecutives.ToString);
 end;
 
 function TConsecutivesCounter.GetCount: Word;
@@ -72,8 +77,23 @@ begin
   Result := FCount;
 end;
 
+procedure TConsecutivesCounter.LoadFromStream(AStream: TStream);
+begin
+  FCount := AStream.ReadWord;
+  FConsecutives := AStream.ReadWord;
+  FMaxConsecutives := AStream.ReadWord;
+end;
+
+procedure TConsecutivesCounter.SaveToStream(AStream: TStream);
+begin
+  AStream.WriteWord(FCount);
+  AStream.WriteWord(FConsecutives);
+  AStream.WriteWord(FMaxConsecutives);
+end;
+
 constructor TConsecutivesCounter.Create;
 begin
+  FName := TConsecutivesCounter.ClassName;
   Invalidate;
 end;
 
@@ -114,15 +134,27 @@ end;
 
 { TUIDCounter }
 
-function TUIDCounter.ToString: string;
+function TUIDCounter.ToIni: string;
 begin
-  Result := KeyValue('UID', FUID.ToString) + inherited ToString;
+  Result := KeyValue('UID', FUID.ToString) + inherited ToIni;
 end;
 
 constructor TUIDCounter.Create;
 begin
   inherited Create;
   FUID := 0;
+end;
+
+procedure TUIDCounter.LoadFromStream(AStream: TStream);
+begin
+  inherited LoadFromStream(AStream);
+  FUID := AStream.ReadWord;
+end;
+
+procedure TUIDCounter.SaveToStream(AStream: TStream);
+begin
+  inherited SaveToStream(AStream);
+  AStream.WriteWord(FUID);
 end;
 
 procedure TUIDCounter.Next;
@@ -138,4 +170,3 @@ begin
 end;
 
 end.
-

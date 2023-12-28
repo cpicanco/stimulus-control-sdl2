@@ -59,7 +59,12 @@ type
 
 implementation
 
-uses sdl.app.video.methods, sdl.app.text, sdl.colors, session.pool;
+uses
+  sdl.app.video.methods,
+  sdl.app.text,
+  sdl.colors,
+  session.pool,
+  session.strutils;
 
 { TText }
 
@@ -151,14 +156,11 @@ var
   LFile : TStringList;
   LText : string;
 const
-  LDefaultExt = '.txt';
-  LDefaultSubFolder = 'instructions';
+  TXT_EXT = '.txt';
 begin
   LFile := TStringList.Create;
   try
-    AFilename := Pool.RootMedia+
-      LDefaultSubFolder+DirectorySeparator+AFilename+LDefaultExt;
-    LFile.LoadFromFile(AFilename);
+    LFile.LoadFromFile(AsInstruction(AFilename)+TXT_EXT);
     LText := LFile[0];
   finally
     LFile.Clear;

@@ -28,10 +28,10 @@ begin
   Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TFormBackground, FormBackground);
+  Application.CreateForm(TFormMisc, FormMisc);
   Application.CreateForm(
     TFormManualSpeechValidation, FormManualSpeechValidation);
-  Application.CreateForm(
-    TFormMisc, FormMisc);
+
   Application.Run;
 end.
 

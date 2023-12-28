@@ -18,7 +18,7 @@ uses
   , SDL2
   , sdl.app.stimulus.contract
   , sdl.app.stimulus
-  , sdl.app.renderer.custom
+  , sdl.app.controls.custom
   ;
 
 type

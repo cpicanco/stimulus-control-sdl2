@@ -289,10 +289,10 @@ end;
 
 function GetWordFilenames(ACaption: string) : TWordFilenames;
 begin
-  //Result.Audio  := Pool.RootMedia+DirectorySeparator+ACaption+'.wav';
-  //Result.Image  := Pool.RootMedia+DirectorySeparator+ACaption+'.jpg';
-  //Result.Text   := Pool.RootMedia+DirectorySeparator+ACaption+'.txt';
-  //Result.Speech := Pool.RootMedia+DirectorySeparator+ACaption+'-spoken';
+  //Result.Audio  := Pool.MediaRootBasePath+DirectorySeparator+ACaption+'.wav';
+  //Result.Image  := Pool.MediaRootBasePath+DirectorySeparator+ACaption+'.jpg';
+  //Result.Text   := Pool.MediaRootBasePath+DirectorySeparator+ACaption+'.txt';
+  //Result.Speech := Pool.MediaRootBasePath+DirectorySeparator+ACaption+'-spoken';
   Result.Audio  := ACaption;
   Result.Image  := ACaption;
   Result.Text   := ACaption;

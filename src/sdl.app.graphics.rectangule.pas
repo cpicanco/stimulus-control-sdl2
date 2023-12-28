@@ -18,14 +18,14 @@ uses
   , SDL2
   , ctypes
   , sdl.app.events.abstract
-  , sdl.app.renderer.custom
+  , sdl.app.controls.custom
   ;
 
 type
 
   { TRectangule }
 
-  TRectangule = class(TCustomRenderer)
+  TRectangule = class(TSDLControl)
   private
     FCanShade : Boolean;
     FShaded : Boolean;
@@ -41,9 +41,6 @@ type
     procedure SetTop(AValue: cint);
     procedure SetWidth(AValue: cint);
   protected
-    FRect    : TSDL_Rect;
-    function GetBoundsRect: TSDL_Rect; override;
-    procedure SetBoundsRect(AValue : TSDL_Rect); override;
     procedure MouseDown(Sender: TObject; Shift: TCustomShiftState;
       X, Y: Integer); override;
     procedure MouseEnter(Sender: TObject); override;
@@ -102,11 +99,6 @@ begin
   Result := FRect.w;
 end;
 
-procedure TRectangule.SetBoundsRect(AValue: TSDL_Rect);
-begin
-  FRect := AValue;
-end;
-
 procedure TRectangule.MouseDown(Sender: TObject; Shift: TCustomShiftState; X,
   Y: Integer);
 begin
@@ -137,11 +129,6 @@ procedure TRectangule.SetWidth(AValue: cint);
 begin
   if FRect.w=AValue then Exit;
   FRect.w:=AValue;
-end;
-
-function TRectangule.GetBoundsRect: TSDL_Rect;
-begin
-  Result:=FRect;
 end;
 
 procedure TRectangule.MouseEnter(Sender: TObject);

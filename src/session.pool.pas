@@ -24,62 +24,97 @@ type
 
   { TPool }
 
-  TPool = class
-  public
-    AppName : string;
-    RootData : string;
-    RootDataResponses: string;
-    RootMedia : string;
-    RootAudio : string;
-    BaseFileName : string;
-    BaseFilePath : string;
-    AssetsBasePath : string;
-    AudioBasePath : string;
-    ResponsesBasePath : string;
-    ConfigurationFilename : string;
-    TimeStart : TLargerFloat;
-    TestMode : Boolean;
-    MonitorToShow : Byte;
+  TPool = record
+    App : TSDLApplication;
     Counters : TCounters;
     Session : TSessionCounters;
     Trial : TTrialCounters;
     Block : TBlockCounters;
     EndCriteria : TEndCriteria;
-    App : TSDLApplication;
+    AppName : string;
+    AssetsRootBasePath : string;
+    AudioBasePath : string;
+    AudioRootBasePath : string;
+    BaseFileName : string;
+    BasePath : string;
+    ConfigurationFilename : string;
+    DataResponsesBasePath: string;
+    DataRootBasePath : string;
+    DesignBasePath : string;
+    DesignRootBasePath : string;
+    FontsRootBasePath : string;
+    ImageBasePath : string;
+    ImageRootBasePath : string;
+    MediaRootBasePath : string;
+    ResponsesBasePath : string;
+    RootAudio : string;
+    MonitorToShow : Byte;
+    TestMode : Boolean;
+    TimeStart : TLargerFloat;
   end;
+
 var
   Pool : TPool;
 
 implementation
 
-uses SysUtils, SDL2
-  , FileUtil
-  , session.strutils
-  ;
+uses SysUtils, SDL2, session.strutils;
 
 initialization
-  Pool := TPool.Create;
   with Pool do begin
     AppName := 'Stimulus Control';
+
+    BasePath := SDL_GetBasePath();
+
+    // data
+    DataRootBasePath   := ConcatPaths([BasePath, AsPath('data')]);
+    ForceDirectories(DataRootBasePath);
+
+    // data/{Participant}
     BaseFileName := '';
-    BaseFilePath := SDL_GetBasePath();
-    RootData := AsPath(BaseFilePath, 'data');
-    RootDataResponses := '';
-    RootMedia := AsPath('media');
-    AudioBasePath := AsPath('wav', 'rafael');
-    AssetsBasePath := AsPath('assets');
-    ResponsesBasePath:= AsPath('responses');
+
+    // data/{Participant}/{Filename}.ini
     ConfigurationFilename := '';
-    ForceDirectories(RootData);
-    ForceDirectories(RootMedia);
-    ForceDirectories(AsPath(RootMedia, AssetsBasePath));
+
+    // data/{Participant}/responses/
+    DataResponsesBasePath := '';
+    ResponsesBasePath:= AsPath('responses');
+
+    // design/
+    DesignRootBasePath := ConcatPaths([BasePath, AsPath('design')]);
+    ForceDirectories(DesignRootBasePath);
+    DesignBasePath := '';
+
+    // media/
+    MediaRootBasePath := ConcatPaths([BasePath, AsPath('media')]);
+    ForceDirectories(MediaRootBasePath);
+
+    // media/fonts/
+    FontsRootBasePath := ConcatPaths([MediaRootBasePath, AsPath('fonts')]);
+    ForceDirectories(FontsRootBasePath);
+
+    // media/assets/
+    AssetsRootBasePath := ConcatPaths([MediaRootBasePath, AsPath('assets')]);
+    ForceDirectories(AssetsRootBasePath);
+
+    // media/png/
+    ImageRootBasePath := ConcatPaths([MediaRootBasePath, AsPath('png')]);
+    ForceDirectories(ImageRootBasePath);
+
+    // media/png/{Participant}/
+    ImageBasePath := '';
+
+    // media/wav/
+    AudioRootBasePath := ConcatPaths([MediaRootBasePath, AsPath('wav')]);
+    ForceDirectories(AudioRootBasePath);
+
+    // media/wav/{CustomFolder}/
+    AudioBasePath := '';
+
     MonitorToShow := 0;
     TestMode := False;
     EndCriteria := nil;
   end
-
-finalization
-  Pool.Free;
 
 end.
 

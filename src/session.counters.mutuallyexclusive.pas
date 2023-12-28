@@ -34,6 +34,8 @@ type
     class function Header : string;
     constructor Create;
     destructor Destroy; override;
+    procedure LoadFromStream(AStream : TStream); virtual;
+    procedure SaveToStream(AStream : TStream); virtual;
     procedure Reset;
     procedure Invalidate;
     procedure Hit;
@@ -80,20 +82,43 @@ end;
 
 constructor TMutuallyExclusiveCounters.Create;
 var
-  i: TCounterType;
+  LCounterType: TCounterType;
+  LCounterTypeString : string;
+  LCounter : TConsecutivesCounter;
 begin
   FCounters := TCounters.Create;
-  for i := Low(TCounterType) to High(TCounterType) do begin
-    FCounters.Add(TConsecutivesCounter.Create);
+  for LCounterType in [Low(TCounterType)..High(TCounterType)] do begin
+    WriteStr(LCounterTypeString, LCounterType);
+    LCounter := TConsecutivesCounter.Create;
+    LCounter.Name := LCounterTypeString;
+    FCounters.Add(LCounter);
   end;
 end;
 
 destructor TMutuallyExclusiveCounters.Destroy;
-var
-  LCounter : TConsecutivesCounter;
 begin
   FCounters.Free;
   inherited Destroy;
+end;
+
+procedure TMutuallyExclusiveCounters.LoadFromStream(AStream: TStream);
+var
+  LCounter : TConsecutivesCounter;
+begin
+  AStream.Read(FLastCounter, SizeOf(TCounterType));
+  for LCounter in FCounters do begin
+    LCounter.LoadFromStream(AStream);
+  end;
+end;
+
+procedure TMutuallyExclusiveCounters.SaveToStream(AStream: TStream);
+var
+  LCounter : TConsecutivesCounter;
+begin
+  AStream.Write(FLastCounter, SizeOf(TCounterType));
+  for LCounter in FCounters do begin
+    LCounter.SaveToStream(AStream);
+  end;
 end;
 
 procedure TMutuallyExclusiveCounters.Hit;
@@ -169,14 +194,12 @@ var
   LCounterTypeString : string;
   LCounter : TConsecutivesCounter;
 begin
-  Result := '';
+  WriteStr(LCounterTypeString, FLastCounter);
+  Result := KeyValue('LastCounter', LCounterTypeString);
   for LCounterType in [Low(TCounterType)..High(TCounterType)] do begin
     WriteStr(LCounterTypeString, LCounterType);
     LCounter := FCounters[Ord(LCounterType)];
-    Result := Result +
-      KeyValue(LCounterTypeString, LCounter.Count.ToString) +
-      KeyValue(LCounterTypeString+'.MaxConsecutives',
-        LCounter.MaxConsecutives.ToString);
+    Result := Result + LCounter.ToIni;
   end;
 end;
 

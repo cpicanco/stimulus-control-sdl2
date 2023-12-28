@@ -13,69 +13,90 @@ unit picanco.experiments.images;
 
 interface
 
-uses
-  Classes, SysUtils, FileUtil;
-
+procedure E1CopyRandomImagesToParticipantFolder;
 
 implementation
 
-uses session.pool, sdl.app.graphics.picture, picanco.experiments.constants,
+uses
+  Classes,
+  SysUtils,
+  FileUtil,
+  session.pool,
+  session.strutils,
+  sdl.app.graphics.picture,
+  picanco.experiments.constants,
   picanco.experiments.words.types;
 
-function GetAllImages: TStringList;
+function GetSrcImages: TStringList;
 var
   LMediaPath : string = 'base';
 begin
-  LMediaPath := ConcatPaths([Pool.RootMedia, LMediaPath]);
+  LMediaPath := ConcatPaths([Pool.ImageRootBasePath, LMediaPath]);
   Result := FindAllFiles(LMediaPath, '*'+IMG_EXT, False);
 end;
 
-procedure CopyImagesToMediaPath(AFileNames: array of string);
+function HasDstImages: Boolean;
+var
+  LDstImages : TStringList;
+begin
+  LDstImages := FindAllFiles(MeaningfulImageFolder, '*'+IMG_EXT, False);
+  try
+    Result := LDstImages.Count = 0;
+  finally
+    LDstImages.Free;
+  end;
+end;
+
+procedure CopyImagesToMediaPath(ADstImages: TStringList);
 var
   i: integer;
   SrcFile, DstFile: string;
-  AllImages : TStringList;
+  LSrcImages : TStringList;
 begin
-  AllImages := GetAllImages;
-  if AllImages.Count < Length(AFileNames) then begin
-    AllImages.Free;
-    Exit;
-  end;
-
+  LSrcImages := GetSrcImages;
   try
-    for i := 0 to AllImages.Count-1 do
-      AllImages.Exchange(i, Random(AllImages.Count));
+    if LSrcImages.Count < ADstImages.Count then begin
+      raise ERangeError.Create('CopyImagesToMediaPath');
+    end;
 
-    for i := Low(AFileNames) to High(AFileNames) do begin
-      SrcFile := AllImages[i];
-      DstFile := ConcatPaths([Pool.RootMedia, AFileNames[i]]);
+    for i := 0 to LSrcImages.Count-1 do
+      LSrcImages.Exchange(i, Random(LSrcImages.Count));
+
+    for i := 0 to ADstImages.Count-1 do begin
+      SrcFile := LSrcImages[i];
+      DstFile := ADstImages[i];
       if FileExists(SrcFile) and (not FileExists(DstFile)) then
         CopyFile(SrcFile, DstFile);
     end;
+
+    CopyFile(MeaningfulImageFolder+'X1'+IMG_EXT, AsImage('X1')+IMG_EXT);
+    CopyFile(MeaningfulImageFolder+'X2'+IMG_EXT, AsImage('X2')+IMG_EXT);
   finally
-    AllImages.Clear;
-    AllImages.Free;
+    LSrcImages.Clear;
+    LSrcImages.Free;
   end;
 end;
 
-procedure E1NewImages;
+procedure E1CopyRandomImagesToParticipantFolder;
 var
-  LImages : array of string = nil;
-  n: Integer;
+  LDstImages : TStringList;
   Code : TAlphaNumericCode;
 begin
-  n := 0;
-  SetLength(LImages, n);
-  for Code in E1WordsWithImagesRange do begin
-      SetLength(LImages, Length(LImages)+1);
-      LImages[n] := E1WordsWithImages[Code] + IMG_EXT;
-      Inc(n);
+  if not HasDstImages then begin
+    if ForceDirectories(ImageFolder) then begin
+      LDstImages := TStringList.Create;
+      LDstImages.Sorted := False;
+      try
+        for Code in E1WordsWithImagesRange do begin
+          LDstImages.Append(AsImage(E1WordsWithImages[Code])+IMG_EXT);
+        end;
+        CopyImagesToMediaPath(LDstImages);
+      finally
+        LDstImages.Free;
+      end;
+    end;
   end;
-  CopyImagesToMediaPath(LImages);
 end;
-
-initialization
-  E1NewImages;
 
 end.
 

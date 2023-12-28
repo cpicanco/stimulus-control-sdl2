@@ -22,7 +22,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="1"/>
+      <BuildNr Value="8"/>
       <Language Value="0416"/>
       <Attributes pvaPrivateBuild="True"/>
       <StringTable Comments="Uma máquina de ensinar para experimentos comportamentais livres" InternalName="Stimulus Control" LegalCopyright="Carlos Rafael Fernandes Picanço" ProductName="Stimulus Control"/>
@@ -303,7 +303,7 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="src\sdl.app.renderer.custom.pas"/>
+        <Filename Value="src\sdl.app.controls.custom.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
@@ -587,7 +587,7 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="src\session.csv.pas"/>
+        <Filename Value="src\session.csv.enumerable.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
@@ -842,6 +842,113 @@
       <Unit>
         <Filename Value="src\session.parameters.global.pas"/>
         <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle1.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle2.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle3.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle4.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle5.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\session.csv.trials.pseudowords.cycle6.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.navigator.contract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.navigator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.mouse.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\generics.aggregator.table.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.selectable.contract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.navigable.contract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.navigator.lineiterator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.keyboard.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.contract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.factory.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.manager.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.types.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.mouse.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.system.keyboard.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.selectable.list.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\sdl.app.controller.ps4.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\generics.iterator.table.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Generics.Iterator.Table"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\generics.iterator.table.contract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Generics.Iterator.Table.Contract"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\generics.table.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Generics.Table"/>
       </Unit>
     </Units>
   </ProjectOptions>

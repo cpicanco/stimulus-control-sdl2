@@ -49,6 +49,7 @@ uses Classes
    , session.configurationfile
    , session.endcriteria
    , session.pool
+   , sdl.app.controller.manager
    , sdl.app.output
    , sdl.app.testmode
    , sdl.app.trials.mts
@@ -89,6 +90,7 @@ begin
   EndCriteria.InvalidateTrial(TrialData);
 
   CurrentTrial := TrialClass.Create;
+  CurrentTrial.Navigator := Controllers.FirstController.Navigator;
   //CurrentTrial.Parent := TSDLRenderer;
   CurrentTrial.Name := 'T' + (Pool.Session.Trial.UID+1).ToString;
   CurrentTrial.OnTrialEnd := InterTrial.OnBegin;

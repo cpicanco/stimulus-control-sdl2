@@ -183,7 +183,7 @@ begin
     Name:= ReadString(LBlockSection, NameKey, '');
 
     BackUpBlock := ReadInteger(
-      LBlockSection, BackUpBlockKey, 0);;
+      LBlockSection, BackUpBlockKey, 0);
 
     BackUpBlockErrors := ReadInteger(
       LBlockSection, BackUpBlockErrorsKey, 0);
@@ -446,6 +446,8 @@ constructor TConfigurationFile.Create(const AConfigurationFile: string;
   AEscapeLineFeeds: Boolean);
 begin
   inherited Create(AConfigurationFile, AEscapeLineFeeds);
+  BoolTrueStrings := TrueBoolStrs;
+  BoolFalseStrings := FalseBoolStrs;
   FBlockCount := 0;
   GetBlockCount;
   FPositions := TShuffler.Create;

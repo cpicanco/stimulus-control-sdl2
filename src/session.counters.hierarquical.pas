@@ -24,6 +24,8 @@ type
   TIDCounter = record
     Count : SmallInt;
     procedure Increment;
+    procedure SaveToStream(AStream : TStream);
+    procedure LoadFromStream(AStream : TStream);
   end;
 
   TIDTrialCounts = array of TIDCounter;
@@ -34,6 +36,8 @@ type
     Count : SmallInt;
     Trial : TIDTrialCounts;
     procedure Increment;
+    procedure SaveToStream(AStream : TStream);
+    procedure LoadFromStream(AStream : TStream);
   end;
 
   TIDBlockCounts = array of TIDBlockCounter;
@@ -43,6 +47,9 @@ type
   TIDSessionCounter = record
     Block : TIDBlockCounts;
     procedure Initialize;
+    procedure InitializeMock;
+    procedure SaveToStream(AStream : TStream);
+    procedure LoadFromStream(AStream : TStream);
   end;
 
 implementation
@@ -56,11 +63,50 @@ begin
   Inc(Count);
 end;
 
+procedure TIDCounter.SaveToStream(AStream: TStream);
+begin
+  AStream.Write(Count, SizeOf(SmallInt));
+end;
+
+procedure TIDCounter.LoadFromStream(AStream: TStream);
+begin
+  AStream.Read(Count, SizeOf(SmallInt));
+end;
+
 { TIDBlockCounter }
 
 procedure TIDBlockCounter.Increment;
 begin
   Inc(Count);
+end;
+
+procedure TIDBlockCounter.SaveToStream(AStream: TStream);
+var
+  LTrials , i: Integer;
+begin
+  AStream.Write(Count, SizeOf(SmallInt));
+  LTrials := Length(Trial);
+  AStream.Write(LTrials, SizeOf(Integer));
+  if LTrials > 0 then begin
+    for i := Low(Trial) to High(Trial) do begin
+      Trial[i].SaveToStream(AStream);
+    end;
+  end;
+end;
+
+procedure TIDBlockCounter.LoadFromStream(AStream: TStream);
+var
+  LTrials : Integer = 0;
+  i : Integer;
+begin
+  AStream.Read(Count, SizeOf(SmallInt));
+  AStream.Read(LTrials, SizeOf(Integer));
+  LTrials := Length(Trial);
+  if LTrials > 0 then begin
+    for i := Low(Trial) to High(Trial) do begin
+      Trial[i].LoadFromStream(AStream);
+    end;
+  end;
 end;
 
 { TIDSessionCounter }
@@ -76,6 +122,48 @@ begin
     SetLength(Block[i].Trial, ConfigurationFile.Block[i].TotalTrials);
     for j := Low(Block[i].Trial) to High(Block[i].Trial) do begin
       Block[i].Trial[j].Count := 0;
+    end;
+  end;
+end;
+
+procedure TIDSessionCounter.InitializeMock;
+var
+  i, j: Integer;
+begin
+  Block := Default(TIDBlockCounts);
+  SetLength(Block, 10);
+  for i := Low(Block) to High(Block) do begin
+    Block[i].Count := Random(Length(Block));
+    SetLength(Block[i].Trial, 6);
+    for j := Low(Block[i].Trial) to High(Block[i].Trial) do begin
+      Block[i].Trial[j].Count := Random(Length(Block[i].Trial));
+    end;
+  end;
+end;
+
+procedure TIDSessionCounter.SaveToStream(AStream: TStream);
+var
+  LBlocks , i: Integer;
+begin
+  LBlocks := Length(Block);
+  AStream.Write(LBlocks, SizeOf(Integer));
+  if LBlocks > 0 then begin
+    for i := Low(Block) to High(Block) do begin
+      Block[i].SaveToStream(AStream);
+    end;
+  end;
+end;
+
+procedure TIDSessionCounter.LoadFromStream(AStream: TStream);
+var
+  LBlocks : Integer = 0;
+  i: Integer;
+begin
+  AStream.Read(LBlocks, SizeOf(Integer));
+  LBlocks := Length(Block);
+  if LBlocks > 0 then begin
+    for i := Low(Block) to High(Block) do begin
+      Block[i].LoadFromStream(AStream);
     end;
   end;
 end;

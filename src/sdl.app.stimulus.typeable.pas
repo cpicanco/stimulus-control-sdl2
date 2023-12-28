@@ -74,7 +74,7 @@ type
 implementation
 
 uses session.pool
-   , sdl.app.renderer.custom
+   , sdl.app.controls.custom
    , session.constants.mts
    , session.strutils
    , session.strutils.mts;
@@ -229,7 +229,7 @@ begin
   end;
   FText.Load('teste');
   FText.CentralizeWith(FRect);
-  FText.Parent := TCustomRenderer(AParent);
+  FText.Parent := TSDLControl(AParent);
   {$IFDEF WINDOWS}
     //SetEnvironmentVariable(LKey, LValue);
   {$ENDIF}

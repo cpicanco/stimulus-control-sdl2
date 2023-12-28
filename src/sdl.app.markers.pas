@@ -39,12 +39,9 @@ type
 var
   Markers : TMarkers;
 
-const
-  IMG_EXT = '.png';
-
 implementation
 
-uses sdl.app.video.methods;
+uses sdl.app.video.methods, session.strutils;
 
 { TMarkers }
 
@@ -81,9 +78,9 @@ begin
   until FMarkers.Count = 4;
   FMonitor := MonitorFromWindow;
   for LMarkerID := 0 to FMarkers.Count -1 do begin
-    LFilename := Format('marker_%d.png', [LMarkerID]);
+    LFilename := Format('marker_%d', [LMarkerID]);
     LMarker := FMarkers.Items[LMarkerID];
-    LMarker.LoadFromFile('markers'+DirectorySeparator+LFilename);
+    LMarker.LoadFromFile(AsMarker(LFilename));
     LMarker.Width := 100;
     LMarker.Height := 100;
     LMarker.Parent := FMonitor;

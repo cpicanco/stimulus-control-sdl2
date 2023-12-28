@@ -9,7 +9,7 @@ uses
   , session.configurationfile
   , session.configurationfile.writer
   , session.parameters
-  , session.csv;
+  , session.csv.enumerable;
 
 type
   { TBaseExperimentWriter }
@@ -18,7 +18,6 @@ type
   private
     FProgressBar : TProgressBar;
     FDesignFilename : string;
-    FMultiTrialType: boolean;
     FWriter: TConfigurationWriter;
   protected
     procedure WriteBlocks; virtual;
@@ -30,8 +29,6 @@ type
       ADesignFilename: string);
     destructor Destroy; override;
     procedure Write;
-    property MultiTrialType : boolean
-      read FMultiTrialType write FMultiTrialType;
     property ProgressBar : TProgressBar read FProgressBar write FProgressBar;
   end;
 
@@ -62,7 +59,6 @@ constructor TBaseExperimentWriter.Create(
 begin
   FWriter := TConfigurationWriter.Create(AConfigurationFile);
   FDesignFilename := ADesignFilename;
-  FMultiTrialType := False;
 end;
 
 destructor TBaseExperimentWriter.Destroy;
@@ -95,10 +91,8 @@ begin
       FProgressBar.Max := LBlockParser.RowCount;
 
       for LRow in LBlockParser do begin
-        //Print(LineEnding+LineEnding+LRow.Text+LineEnding+LineEnding);
         LBlockParser.LoadParameters(LRow);
         LBlockParser.AssignParameters(FWriter.BlockConfig);
-        //Print(LineEnding+LineEnding+FWriter.BlockConfig.Text+LineEnding+LineEnding);
         FWriter.CurrentBlock := LBlockParser.ID;
         FWriter.WriteBlock;
 
@@ -143,49 +137,24 @@ begin
           FWriter.WriteBlock;
         end;
 
-        if FMultiTrialType then begin
-          // multi trial type
-        //if TrialsFileExists(LTrialSourceParser.TrialIDSource) then begin
-        //  LCSVTrial := TCSVTrialsFactory.New(
-        //    LTrialSourceParser.TrialIDSource);
-        //  try
-        //    LCSVTrial.LoadFromFile(
-        //      InsideTrialsSubFolder(LTrialSourceParser.TrialIDSource));
-        //    for LTrial in LCSVTrial then begin
-        //      LCSVTrial.LoadParameters(LTrial);
-        //      if LCSVTrial.TrialID = LTrialSourceParser.TrialID then begin
-        //        LCSVTrial.AssignParameters(FWriter.TrialConfig);
-        //        for i := 0 to LCSVTrial.TrialCount -1 do begin
-        //          FWriter.WriteTrial;
-        //        end;
-        //      end;
-        //    end;
-        //
-        //  finally
-        //    LCSVTrial.Free;
-        //  end;
-        //end;
-        end else begin
-          // single trial type
-          if TrialsFileExists(LTrialSourceParser.TrialIDSource) then begin
-            LCSVTrial := TCSVTrialsFactory.New(
-              LTrialSourceParser.TrialIDSource);
-            LCSVTrial.LoadFromFile(
-              InsideTrialsSubFolder(LTrialSourceParser.TrialIDSource));
-            try
-              LTrial :=
-                LCSVTrial.GetEnumerator.IndexOf[LTrialSourceParser.TrialID];
-              LCSVTrial.LoadParameters(LTrial);
-              if LCSVTrial.TrialID = LTrialSourceParser.TrialID then begin
-                LCSVTrial.AssignParameters(FWriter.TrialConfig);
-                for i := 0 to LCSVTrial.TrialCount -1 do begin
-                  FWriter.WriteTrial;
-                end;
+        if TrialsFileExists(LTrialSourceParser.TrialIDSource) then begin
+          LCSVTrial := TCSVTrialsFactory.New(
+            LTrialSourceParser.TrialIDSource);
+          LCSVTrial.LoadFromFile(
+            InsideTrialsSubFolder(LTrialSourceParser.TrialIDSource));
+          try
+            LTrial :=
+              LCSVTrial.GetEnumerator.IndexOf[LTrialSourceParser.TrialID];
+            LCSVTrial.LoadParameters(LTrial);
+            if LCSVTrial.TrialID = LTrialSourceParser.TrialID then begin
+              LCSVTrial.AssignParameters(FWriter.TrialConfig);
+              for i := 0 to LCSVTrial.TrialCount -1 do begin
+                FWriter.WriteTrial;
               end;
-
-            finally
-              LCSVTrial.Free;
             end;
+
+          finally
+            LCSVTrial.Free;
           end;
         end;
 

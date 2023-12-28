@@ -78,9 +78,9 @@ end;
 
 procedure AllocateDefaultAudioChannels;
 begin
-  SDLAudio.LoadFromFile(Assets('acerto'));
-  SDLAudio.LoadFromFile(Assets('erro'));
-  SDLAudio.LoadFromFile(Assets(GlobalTrialParameters.AudioPromptForText));
+  SDLAudio.LoadFromFile(AsAsset('acerto'));
+  SDLAudio.LoadFromFile(AsAsset('erro'));
+  SDLAudio.LoadFromFile(AsAsset(GlobalTrialParameters.AudioPromptForText));
 end;
 
 { TSDLAudio }
@@ -160,10 +160,9 @@ end;
 function TSDLAudio.LoadFromFile(AFilename: string): ISound;
 var
   LChannel : cint;
-  FEXT : string = '.wav';
 begin
   LChannel := FChannels.Add(TChunk.Create);
-  FChannels.Last.LoadFromFile(AFilename+FEXT);
+  FChannels.Last.LoadFromFile(AFilename);
   FChannels.Last.Channel := LChannel;
   AllocateChannels;
   Result := FChannels.Last.AsInterface;

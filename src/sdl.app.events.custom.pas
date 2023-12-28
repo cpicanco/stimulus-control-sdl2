@@ -17,6 +17,7 @@ uses
   Classes, SysUtils, ctypes
   , sdl2
   , sdl.app.events.abstract
+  , sdl.app.system.keyboard
   , eye.tracker.types;
 
 type
@@ -28,6 +29,7 @@ type
 
   TCustomEventHandler = class sealed(TEventHandler)
     private
+      FKeyboard: TSDLSystemKeyboard;
       FOnAudioChannelFinished: TOnAudioChannelFinished;
       function GetOnGazeOnScreen: TGazeOnScreenEvent;
       procedure SetOnAudioChannelFinished(AValue: TOnAudioChannelFinished);
@@ -39,6 +41,7 @@ type
       procedure AssignEvents;
       property OnAudioChannelFinished : TOnAudioChannelFinished read FOnAudioChannelFinished write SetOnAudioChannelFinished;
       property OnGazeOnScreen : TGazeOnScreenEvent read GetOnGazeOnScreen write SetOnGazeOnScreen;
+      property Keyboard : TSDLSystemKeyboard read FKeyboard write FKeyboard;
     public
       property OnMouseMotion;
       property OnMouseButtonDown;
@@ -48,6 +51,9 @@ type
       property OnUserEvent;
       property OnTextEditing;
       property OnTextInput;
+      property OnControllerAxisMotion;
+      property OnControllerButtonDown;
+      property OnControllerButtonUp;
   end;
 
 var
@@ -137,6 +143,8 @@ var
     (SESSION_TRIALEND, SESSION_ONTIMER, SESSION_CHUNK_STOPPED);
 begin
   inherited Create;
+  FKeyboard := TSDLSystemKeyboard.Create;
+  OnKeyDown := FKeyboard.OnKeyDown;
   for Event in SDLUserEvents do
     if not UserEventRegistered(Event) then
       raise Exception.Create('Event not registered:'+IntToStr(Event));
@@ -145,6 +153,7 @@ end;
 
 destructor TCustomEventHandler.Destroy;
 begin
+  FKeyboard.Free;
   FOnAudioChannelFinished:=nil;
   inherited Destroy;
 end;

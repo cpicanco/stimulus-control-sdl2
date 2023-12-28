@@ -96,10 +96,12 @@ begin
 end;
 
 procedure TChoiceablePicture.LoadFromFile(AFilename: string);
+const
+  IMG_EXT = '.png';
 var
   Media : PAnsiChar;
 begin
-  Media := PAnsiChar(Pool.RootMedia+AFilename);
+  Media := PAnsiChar(AFilename+IMG_EXT);
   FTexture := IMG_LoadTexture(PSDLRenderer, Media);
 end;
 

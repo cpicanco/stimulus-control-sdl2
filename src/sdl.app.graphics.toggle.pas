@@ -254,9 +254,9 @@ procedure TToggleButton.LoadFromFile(AFilename1, AFilename2: string);
 var
   Media : PAnsiChar;
 begin
-  Media := PAnsiChar(Pool.RootMedia+AFilename1);
+  Media := PAnsiChar(AFilename1+IMG_EXT);
   FTexture1 := IMG_LoadTexture(PSDLRenderer, Media);
-  Media := PAnsiChar(Pool.RootMedia+AFilename2);
+  Media := PAnsiChar(AFilename2+IMG_EXT);
   FTexture2 := IMG_LoadTexture(PSDLRenderer, Media);
 end;
 

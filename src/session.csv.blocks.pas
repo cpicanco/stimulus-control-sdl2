@@ -5,7 +5,7 @@ unit session.csv.blocks;
 interface
 
 uses
-  Classes, SysUtils, session.csv;
+  Classes, SysUtils, session.csv.enumerable;
 
 type
 

@@ -82,7 +82,7 @@ uses
   , StrUtils
   , math.bresenhamline.classes
   , sdl.colors
-  , sdl.app.renderer.custom
+  , sdl.app.controls.custom
   , sdl.app.trials
   , sdl.app.audio
   , session.constants.trials
@@ -178,7 +178,7 @@ begin
     Grid := TGrid.Create(3);
     Grid.FixedSample := False;
   //Cursor := StrToIntDef(AParameters.Values['Cursor'], -1);
-  FAnimation.Parent := TCustomRenderer(AParent);
+  FAnimation.Parent := TSDLControl(AParent);
   FSoundRight := SDLAudio.SoundFromName('acerto');
   FSoundWrong := SDLAudio.SoundFromName('erro');
 
@@ -206,7 +206,7 @@ begin
       LItem := Comparisons[i].Item as TDragDropablePicture;
       //LItem.Cursor := Cursor;
       LItem.LoadFromFile(ComparLetter+(i+1).ToString+LExt);
-      LItem.Parent := TCustomRenderer(AParent);
+      LItem.Parent := TSDLControl(AParent);
     end;
 
     for i := low(Samples) to high(Samples) do
@@ -215,7 +215,7 @@ begin
       //LItem.Cursor := Cursor;
       LItem.LoadFromFile(SampleLetter+(i+1).ToString+LExt);
       //LItem.DragMouseMoveMode:=DragMouseMoveMode;
-      LItem.Parent := TCustomRenderer(AParent);
+      LItem.Parent := TSDLControl(AParent);
       //with DragDropKeys do begin
       //  LItem.MoveToPoint(AParameters.Values[Distance].ToInteger);
       //end;

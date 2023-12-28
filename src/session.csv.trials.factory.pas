@@ -5,8 +5,7 @@ unit session.csv.trials.factory;
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections
-  , session.csv.trials.base;
+  Classes, SysUtils, Generics.Collections, session.csv.trials.base;
 
 type
   TCSVTrialClass = class of TCSVTrialsBase;
@@ -30,6 +29,12 @@ implementation
 
 uses
   session.csv.trials.pseudowords,
+  session.csv.trials.pseudowords.cycle1,
+  session.csv.trials.pseudowords.cycle2,
+  session.csv.trials.pseudowords.cycle3,
+  session.csv.trials.pseudowords.cycle4,
+  session.csv.trials.pseudowords.cycle5,
+  session.csv.trials.pseudowords.cycle6,
   session.csv.trials.dapaap;
 
 { TCSVTrialsFactory }
@@ -63,7 +68,21 @@ end;
 
 initialization
   TCSVTrialsFactory.RegisterCSVTrialClass(
-    'mts-pseudowords', TCSVPseudowordsTrials);
+    'mts-images', TCSVPseudowordsTrials);
+
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-1', TCSVPseudowordsCycle1);
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-2', TCSVPseudowordsCycle2);
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-3', TCSVPseudowordsCycle3);
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-4', TCSVPseudowordsCycle4);
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-5', TCSVPseudowordsCycle5);
+  TCSVTrialsFactory.RegisterCSVTrialClass(
+    'mts-pseudowords-6', TCSVPseudowordsCycle6);
+
   TCSVTrialsFactory.RegisterCSVTrialClass(
     'mts-dapa-ap', TCSVDAPAAPTrials);
 

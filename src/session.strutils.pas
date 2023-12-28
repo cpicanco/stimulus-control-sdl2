@@ -9,11 +9,20 @@ uses
 
   function KeyValue(AKey, AValue: string;
     ALineEnding : string = LineEnding) : string;
-  function Assets(ABasename: string) : string;
-  function AudioFile(ABasename: string) : string;
+  function AsAsset(ABasename: string) : string;
+  function AsImage(ABasename: string) : string;
+  function AsAudio(ABasename: string) : string;
+  function AsMarker(ABasename: string) : string;
+  function AsInstruction(ABasename: string) : string;
+
+  function ImageFolder : string;
+  function MeaningfulImageFolder : string;
+  function DesignFolder : string;
+
   function AsPath(A, B : string) : string; overload;
   function AsPath(A : string) : string; overload;
   function ArrayToStr(AChars: array of char; Len: SizeInt): string;
+
 
 implementation
 
@@ -24,19 +33,56 @@ begin
   Result := AKey + '=' + AValue + ALineEnding;
 end;
 
-function Assets(ABasename: string): string;
+function AsAsset(ABasename: string): string;
 begin
-  Result := Pool.AssetsBasePath+ABasename;
+  Result := Pool.AssetsRootBasePath+ABasename;
 end;
 
-function AudioFile(ABasename: string): string;
+function AsImage(ABasename: string): string;
 begin
-  Result := Pool.AudioBasePath+ABasename;
+  Result := ConcatPaths([
+    Pool.ImageRootBasePath, Pool.ImageBasePath]) + ABasename;
+end;
+
+function AsAudio(ABasename: string): string;
+begin
+  Result := ConcatPaths([
+    Pool.AudioRootBasePath, Pool.AudioBasePath]) + ABasename;
+end;
+
+function AsMarker(ABasename: string): string;
+begin
+  Result := ConcatPaths([
+    Pool.ImageRootBasePath, AsPath('markers')]) + ABasename;
+end;
+
+function AsInstruction(ABasename: string): string;
+begin
+  Result := ConcatPaths([
+    Pool.MediaRootBasePath, AsPath('instructions')]) + ABasename;
 end;
 
 function AsPath(A: string): string;
 begin
   Result := IncludeTrailingPathDelimiter(A);
+end;
+
+function ImageFolder: string;
+begin
+  Result := ConcatPaths([
+    Pool.ImageRootBasePath, Pool.ImageBasePath]);
+end;
+
+function MeaningfulImageFolder : string;
+begin
+  Result := ConcatPaths([
+    Pool.ImageRootBasePath, AsPath('meaningful')]);
+end;
+
+function DesignFolder: string;
+begin
+  Result := ConcatPaths([
+    Pool.DesignRootBasePath, Pool.DesignBasePath]);
 end;
 
 function AsPath(A, B: string): string;

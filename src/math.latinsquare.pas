@@ -49,7 +49,7 @@ procedure RandomizeArray(var arr: array of Integer);
 var
   i, j, temp: Integer;
 begin
-  Randomize;
+  //Randomize;
   for i := High(arr) downto 1 do
   begin
     j := Random(i + 1);

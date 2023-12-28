@@ -15,7 +15,9 @@ interface
 
 uses
   Classes, SysUtils, Controls, Schedules
-  , sdl.app.stimuli.contract, sdl.app.trials.types;
+  , sdl.app.stimuli.contract
+  , sdl.app.trials.types
+  , sdl.app.navigable.contract;
 
 type
 
@@ -51,7 +53,8 @@ type
     constructor Create(ASchedule : TSchedule); virtual; overload;
     destructor Destroy; override;
     function AsString : string; virtual;
-    function AsInterface: IStimuli;
+    function AsIStimuli: IStimuli;
+    function AsINavigable: INavigable; virtual;
     property Trial : TObject read GetTrial write SetTrial;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property OnStop : TNotifyEvent read FOnStop write SetOnStop;
@@ -170,9 +173,14 @@ begin
   Result := ClassName;
 end;
 
-function TStimuli.AsInterface: IStimuli;
+function TStimuli.AsIStimuli: IStimuli;
 begin
   Result := Self as IStimuli;
+end;
+
+function TStimuli.AsINavigable: INavigable;
+begin
+  Result := nil;
 end;
 
 

@@ -18,10 +18,12 @@ uses
   , SDL2
   , ctypes
   , sdl.app.video.types
+  , sdl.app.system.keyboard
   {$IFDEF NO_LCL}
   , sdl.app.events.nolcl
   {$ELSE}
   , sdl.app.events.custom
+  , sdl.app.events.abstract
   {$ENDIF}
   ;
 
@@ -31,7 +33,7 @@ type
 
   TSDLApplication = class
     private
-      //FKeyboardState : integer;
+      FKeyboard : TSDLSystemKeyboard;
       FTitle : PAnsichar;
       FCurrentMonitorIndex : cint;
       FOnClose: TNotifyEvent;
@@ -43,14 +45,13 @@ type
       function GetCurrentMonitor : TSDL_Rect;
       function GetEvents: TCustomEventHandler;
       function GetMonitor(i : cint): TSDL_Rect;
-      function GetMouse: TPoint;
       procedure SetCurrentMonitor(i : cint);
-      procedure SetMouse(AValue: TPoint);
-      procedure KeyDown(const event: TSDL_KeyboardEvent);
       procedure SetOnClose(AValue: TNotifyEvent);
     {$IFNDEF NO_LCL}
     private
+      FOnKeyDown: TOnKeyDownEvent;
       function GetShowMarkers: Boolean;
+      procedure SetOnKeyDown(AValue: TOnKeyDownEvent);
       procedure SetShowMarkers(AValue: Boolean);
     public
       procedure SetupAudio;
@@ -64,11 +65,10 @@ type
       destructor Destroy; override;
       procedure Run;
       procedure SetupVideo(AMonitor : cint = 0);
-      procedure SetupEvents;
+      procedure Terminate;
       property Running : Boolean read FRunning write FRunning;
       property Window  : PSDL_Window read FSDLWindow;
       property Monitor : TSDL_Rect read GetCurrentMonitor;
-      property Mouse   : TPoint read GetMouse write SetMouse;
       property Events  : TCustomEventHandler read GetEvents;
       property OnClose : TNotifyEvent read FOnClose write SetOnClose;
   end;
@@ -80,7 +80,9 @@ implementation
 
 uses sdl2_image
   , sdl.app.output
+  , sdl.app.controller.manager
   , sdl.app.video.methods
+  , sdl.app.mouse
 {$IFDEF NO_LCL}
   , sdl.app.renderer.nolcl
 {$ELSE}
@@ -103,16 +105,6 @@ begin
   end;
 end;
 
-procedure TSDLApplication.KeyDown(const event: TSDL_KeyboardEvent);
-begin
-  case Event.keysym.sym of
-    SDLK_ESCAPE: begin
-      FRunning:=False;
-      Print('SDLK_ESCAPE');
-    end;
-  end;
-end;
-
 procedure TSDLApplication.SetOnClose(AValue: TNotifyEvent);
 begin
   if FOnClose=AValue then Exit;
@@ -132,25 +124,18 @@ begin
 end;
 {$ENDIF}
 
-procedure TSDLApplication.SetMouse(AValue: TPoint);
-begin
-  SDL_WarpMouseInWindow(Window, AValue.X, AValue.Y)
-end;
-
-function TSDLApplication.GetMouse: TPoint;
-var
-  MouseX, MouseY : cint;
-begin
-  SDL_GetMouseState(@MouseX, @MouseY);
-  Result.X := MouseX;
-  Result.Y := MouseY;
-end;
-
 {$IFNDEF NO_LCL}
 function TSDLApplication.GetShowMarkers: Boolean;
 begin
   Result := Assigned(Markers);
 end;
+
+procedure TSDLApplication.SetOnKeyDown(AValue: TOnKeyDownEvent);
+begin
+  if FOnKeyDown = AValue then Exit;
+  FOnKeyDown := AValue;
+end;
+
 {$ENDIF}
 
 procedure TSDLApplication.SetCurrentMonitor(i: cint);
@@ -214,6 +199,12 @@ begin
   end;
   SDLAudio := TSDLAudio.Create;
 
+  if SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0  then begin
+    LError := SDL_GetError;
+    Print(LError);
+    raise Exception.Create(LError);
+  end;
+
   // text/font setup
   SDLText  := TSDLText.Create;
   {$ENDIF}
@@ -239,14 +230,26 @@ begin
     end;
   finally
     {$IFNDEF NO_LCL}
-    if Assigned(SDLText) then
+    if Assigned(SDLText) then begin
       SDLText.Free;
+      SDLText := nil;
+    end;
 
-    if Assigned(SDLAudio) then
+    if Assigned(SDLAudio) then begin
       SDLAudio.Free;
+      SDLAudio := nil;
+    end;
     {$ENDIF}
-    if Assigned(SDLEvents) then
+
+    if Assigned(SDLEvents) then begin
       SDLEvents.Free;
+      //SdlEvents := nil;
+    end;
+
+    if Assigned(Mouse) then begin
+      Mouse.Free;
+      Mouse := nil;
+    end;
 
     SDL_DestroyRenderer(FSDLRenderer);
     SDL_DestroyWindow(FSDLWindow);
@@ -290,7 +293,7 @@ begin
   LMonitor := FMonitors[AMonitor];
   FSDLWindow := SDL_CreateWindow(FTitle, LMonitor.x, LMonitor.y,
     LMonitor.w, LMonitor.h, 0);
-
+  Mouse := TSDLMouseHandler.Create(FSDLWindow);
   FSDLRenderer := SDL_CreateRenderer(FSDLWindow, -1, SDL_RENDERER_ACCELERATED);
   FSDLSurface  := SDL_GetWindowSurface(FSDLWindow);
   AssignVariables(FSDLWindow, FSDLRenderer, FSDLSurface);
@@ -302,9 +305,10 @@ begin
   {$ENDIF}
 end;
 
-procedure TSDLApplication.SetupEvents;
+procedure TSDLApplication.Terminate;
 begin
-  SDLEvents.OnKeyDown:=@KeyDown;
+  FRunning := False;
+  Print('Good bye');
 end;
 
 {$IFNDEF NO_LCL}

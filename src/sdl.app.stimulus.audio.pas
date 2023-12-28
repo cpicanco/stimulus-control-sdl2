@@ -57,7 +57,7 @@ type
 implementation
 
 uses sdl.app.audio
-   , sdl.app.renderer.custom
+   , sdl.app.controls.custom
    , session.parameters.global
    , session.loggers.writerow.timestamp
    , session.pool
@@ -179,7 +179,7 @@ end;
 procedure TAudioStimulus.Load(AParameters: TStringList; AParent: TObject;
   ARect: TSDL_Rect);
 const
-  LAudioPicture : string = 'AudioPicture'+IMG_EXT;
+  LAudioPicture : string = 'AudioPicture';
 begin
   FCustomName := GetWordValue(AParameters, IsSample, Index);
   FHasPrompt := HasDAPAAPPrompt(AParameters);
@@ -188,20 +188,24 @@ begin
     //FText.FontSize := 50;
     FText.Load(FCustomName);
     FText.CentralizeWith(ARect);
-    FText.Parent := TCustomRenderer(AParent);
+    FText.Parent := TSDLControl(AParent);
     FText.OnMouseDown := @MouseDown;
+
+    Selectables.Add(FText.AsISelectable);
   end else begin
-    FPicture.LoadFromFile(Assets(LAudioPicture));
+    FPicture.LoadFromFile(AsAsset(LAudioPicture));
     FPicture.BoundsRect := ARect;
-    FPicture.Parent := TCustomRenderer(AParent);
+    FPicture.Parent := TSDLControl(AParent);
     FPicture.OnMouseDown := @MouseDown;
     FPicture.OnMouseEnter := @MouseEnter;
     FPicture.OnMouseExit := @MouseExit;
+
+    Selectables.Add(FPicture.AsISelectable);
   end;
 
   FLoops.TotalLoops := GetTotalLoopsValue(AParameters);
   with FLoops do begin
-    Sound := SDLAudio.LoadFromFile(AudioFile(FCustomName));
+    Sound := SDLAudio.LoadFromFile(AsAudio(FCustomName));
     OnEveryLoopStart := @SoundStart;
     OnEveryLoopStop := @SoundFinished;
     //if TotalLoops > 1 then begin

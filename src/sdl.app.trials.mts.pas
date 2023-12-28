@@ -19,6 +19,7 @@ uses
   , sdl.app.trials
   , sdl.app.stimuli.contract
   , sdl.app.stimuli.mts
+  , sdl.app.navigable.contract
   ;
 
 type
@@ -60,7 +61,7 @@ end;
 
 function TMTS.GetIStimuli: IStimuli;
 begin
-  Result := FStimuli.AsInterface;
+  Result := FStimuli.AsIStimuli;
 end;
 
 procedure TMTS.EndTrial;

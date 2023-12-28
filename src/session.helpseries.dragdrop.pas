@@ -19,7 +19,7 @@ interface
 uses Classes, SysUtils
    //, sdl.app.graphics.picture.dragdrop
    , generics.aggregator.contract
-   , generics.aggregator
+   , generics.aggregator.helpseries
    ;
 
 type
@@ -59,7 +59,7 @@ type
   THelpSerie = (hsFromFile,
     hsDefault, hsPreTraining, hsIdentityTraining, hsArbitraryTraining);
 
-  TTDragDropHelp = specialize TAggregator<TDragDropData>;
+  TTDragDropHelp = specialize THelpSeriesAggregator<TDragDropData>;
 
   { TDragDropHelpSerie }
 
@@ -341,7 +341,7 @@ var
   end;
 begin
   if AFilename = '' then begin
-    Filename := Pool.BaseFilePath + DefaultComplexityFilename;
+    Filename := Pool.BasePath + DefaultComplexityFilename;
   end else begin
     Filename := AFilename;
   end;
