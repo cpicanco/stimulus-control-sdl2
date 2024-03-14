@@ -205,10 +205,12 @@ begin
     for i := Low(Result[j]) to High(Result[j]) do begin
       with Result[j][i] do begin
         Index := LIndex;
-        Rect.y := GetPositionFromSegment(
-          MonitorHeight, j, AN, LSquareSide, LInterSpaceH);
-        Rect.x := GetPositionFromSegment(
-          MonitorWidth, i, AN, LSquareSide, LInterSpaceW);
+        Rect.y := Min(Max(GetPositionFromSegment(
+          MonitorHeight, j, AN, LSquareSide, LInterSpaceH), 0),
+          MonitorHeight - LSquareSide);
+        Rect.x := Min(Max(GetPositionFromSegment(
+          MonitorWidth, i, AN, LSquareSide, LInterSpaceW), 0),
+          MonitorWidth - LSquareSide);
         Rect.w := LSquareSide;
         Rect.h := LSquareSide;
       end;

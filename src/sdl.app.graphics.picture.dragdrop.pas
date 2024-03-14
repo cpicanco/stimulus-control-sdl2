@@ -112,20 +112,20 @@ end;
 procedure TDragDropablePicture.BorderCollision;
 
 begin
-  if IntersectsWith(Border.Top) then begin
-    Top := Border.Top.Bottom + 1;
+  if Top < Border.Top.y then begin
+    Top := Border.Top.y;
   end;
 
   if IntersectsWith(Border.Bottom) then begin
-    Top := Border.Bottom.Top - Height - 1;
+    Top := Border.Bottom.y - Height - 1;
   end;
 
-  if IntersectsWith(Border.Left) then begin
-    Left := Border.Left.Right + 1;
+  if Left < Border.Left.x then begin
+    Left := Border.Left.x;
   end;
 
   if IntersectsWith(Border.Right) then begin
-    Left := Border.Right.Left - Width - 1;
+    Left := Border.Right.x - Width - 1;
   end;
 end;
 

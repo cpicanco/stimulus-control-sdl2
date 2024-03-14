@@ -1,7 +1,7 @@
 object FormMisc: TFormMisc
-  Left = 805
+  Left = 954
   Height = 629
-  Top = 45
+  Top = 131
   Width = 449
   HorzScrollBar.Page = 370
   VertScrollBar.Page = 431
@@ -17,9 +17,9 @@ object FormMisc: TFormMisc
     Height = 629
     Top = 0
     Width = 449
-    ActivePage = TabSheetOther
+    ActivePage = TabSheetGeneral
     Align = alClient
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 0
     object TabSheetGeneral: TTabSheet
       Caption = 'Geral'
@@ -180,6 +180,8 @@ object FormMisc: TFormMisc
         Width = 139
         Constraints.MaxHeight = 22
         DecimalPlaces = 3
+        MaxValue = 8
+        MinValue = 1
         TabOrder = 10
         Value = 6
       end
