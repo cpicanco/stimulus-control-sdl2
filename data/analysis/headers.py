@@ -91,3 +91,16 @@ session_name_dict = {
     'Probes-BC-CB-constant-words-6' : 'Ciclo6-4-Sondas-BC-CB-Palavras-reservadas.csv',
     'Probes-CD-generalization-and-constant-words-6' : 'Ciclo6-5-Sondas-CD-Palavras-generalizacao-reservadas.csv',
     'Probes-AC-generalization-and-constant-words-6' : 'Ciclo6-6-Sondas-AC-Palavras-generalizacao-reservadas.csv'}
+
+info_header = [
+    'Version:',
+    'Nome_do_sujeito:',
+    'Nome_da_sessao:',
+    'Grade_de_estimulos:',
+    'Monitor:',
+    'Data_Inicio:',
+    'Hora_Inicio:',
+    'Data_Termino:',
+    'Hora_Termino:',
+    'Duration:',
+    'Resultado:']

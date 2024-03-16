@@ -1,86 +1,113 @@
 ID,Name,EndSessionOnCriterion,EndSessionOnNotCriterionAfterBlockRepetitions,RepeatStyle,EndCriterionStyle,EndCriterionEvaluationTime,MaxBlockRepetitionConsecutives,MaxBlockRepetitionInSession,NextBlockOnCriterion,NextBlockOnNotCriterion,EndCriterionValue,Reinforcement
-1,Onset pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,0,0,,20,6,100
-2,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,0,0,5,,83,100
-3,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,0,0,,,83,100
-4,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,0,0,,,83,100
-5,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,,,8,,83,100
-6,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-7,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-8,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,,,11,,83,100
-9,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-10,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-11,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,,,14,,83,100
-12,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-13,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-14,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,,,17,,83,100
-15,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-16,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-17,Onset 1,F,F,None,HitPorcentage,OnBlockEnd,,,20,,83,100
-18,Onset 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-19,Onset 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-20,Rime pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,23,39,6,100
-21,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-22,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-23,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,26,,83,100
-24,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-25,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-26,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,29,,83,100
-27,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-28,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-29,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,32,,83,100
-30,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-31,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-32,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,35,,83,100
-33,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-34,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-35,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,38,,83,100
-36,Rime 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-37,Rime 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-38,Rime 3,F,F,None,HitPorcentage,OnBlockEnd,,,41,,83,100
-39,Coda pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,67,6,100
-40,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-41,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,44,,83,100
-42,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-43,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-44,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,47,,83,100
-45,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-46,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-47,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,50,,83,100
-48,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-49,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-50,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,53,,83,100
-51,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-52,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-53,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,56,,83,100
-54,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-55,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-56,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,59,,83,100
-57,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-58,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-59,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,62,,83,100
-60,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-61,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-62,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,65,,83,100
-63,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-64,Coda 1,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-65,Coda 2,F,F,None,HitPorcentage,OnBlockEnd,,,68,,83,100
-66,Coda 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-67,Vowel pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,86,6,100
-68,Vowel 1,F,F,None,HitPorcentage,OnBlockEnd,,,71,,83,100
-69,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-70,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-71,Vowel 1,F,F,None,HitPorcentage,OnBlockEnd,,,74,,83,100
-72,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-73,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-74,Vowel 1,F,F,None,HitPorcentage,OnBlockEnd,,,77,,83,100
-75,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-76,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-77,Vowel 1,F,F,None,HitPorcentage,OnBlockEnd,,,80,,83,100
-78,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-79,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-80,Vowel 1,F,F,None,HitPorcentage,OnBlockEnd,,,83,,83,100
-81,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-82,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-83,Vowel 1,T,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-84,Vowel 2,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
-85,Vowel 3,F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+1,Onset pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,26,6,100
+2,Onset 1 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,6,3,83,100
+3,Onset 1 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,5,4,83,100
+4,Onset 1 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,5,6,83,100
+5,Onset 1 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+6,Onset 2 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,10,7,83,100
+7,Onset 2 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,9,8,83,100
+8,Onset 2 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,9,10,83,100
+9,Onset 2 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+10,Onset 3 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,14,11,83,100
+11,Onset 3 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,13,12,83,100
+12,Onset 3 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,13,14,83,100
+13,Onset 3 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+14,Onset 4 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,18,15,83,100
+15,Onset 4 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,17,16,83,100
+16,Onset 4 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,17,18,83,100
+17,Onset 4 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+18,Onset 5 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,22,19,83,100
+19,Onset 5 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,21,20,83,100
+20,Onset 5 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,21,22,83,100
+21,Onset 5 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+22,Onset 6 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,26,23,83,100
+23,Onset 6 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,25,24,83,100
+24,Onset 6 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,25,26,83,100
+25,Onset 6 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+26,Rime pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,51,6,100
+27,Rime 1 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,31,28,83,100
+28,Rime 1 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,30,29,83,100
+29,Rime 1 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,30,31,83,100
+30,Rime 1 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+31,Rime 2 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,35,32,83,100
+32,Rime 2 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,34,33,83,100
+33,Rime 2 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,34,35,83,100
+34,Rime 2 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+35,Rime 3 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,39,36,83,100
+36,Rime 3 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,38,37,83,100
+37,Rime 3 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,38,39,83,100
+38,Rime 3 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+39,Rime 4 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,43,40,83,100
+40,Rime 4 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,42,41,83,100
+41,Rime 4 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,42,43,83,100
+42,Rime 4 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+43,Rime 5 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,47,44,83,100
+44,Rime 5 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,46,45,83,100
+45,Rime 5 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,46,47,83,100
+46,Rime 5 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+47,Rime 6 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,51,48,83,100
+48,Rime 6 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,50,49,83,100
+49,Rime 6 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,50,51,83,100
+50,Rime 6 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+51,Coda pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,88,6,100
+52,Coda 1 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,56,53,83,100
+53,Coda 1 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,55,54,83,100
+54,Coda 1 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,55,56,83,100
+55,Coda 1 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+56,Coda 2 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,60,57,83,100
+57,Coda 2 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,59,58,83,100
+58,Coda 2 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,59,60,83,100
+59,Coda 2 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+60,Coda 3 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,64,61,83,100
+61,Coda 3 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,63,62,83,100
+62,Coda 3 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,63,64,83,100
+63,Coda 3 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+64,Coda 4 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,68,65,83,100
+65,Coda 4 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,67,66,83,100
+66,Coda 4 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,67,68,83,100
+67,Coda 4 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+68,Coda 5 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,72,69,83,100
+69,Coda 5 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,71,70,83,100
+70,Coda 5 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,71,72,83,100
+71,Coda 5 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+72,Coda 6 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,76,73,83,100
+73,Coda 6 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,75,74,83,100
+74,Coda 6 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,75,76,83,100
+75,Coda 6 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+76,Coda 7 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,80,77,83,100
+77,Coda 7 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,79,78,83,100
+78,Coda 7 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,79,80,83,100
+79,Coda 7 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+80,Coda 8 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,84,81,83,100
+81,Coda 8 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,83,82,83,100
+82,Coda 8 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,83,84,83,100
+83,Coda 8 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+84,Coda 9 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,88,85,83,100
+85,Coda 9 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,87,86,83,100
+86,Coda 9 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,87,88,83,100
+87,Coda 9 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+88,Vowel pre-training,F,F,None,ConsecutiveHits,OnTrialEnd,,,,113,6,100
+89,Vowel 1 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,93,90,83,100
+90,Vowel 1 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,92,91,83,100
+91,Vowel 1 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,92,93,83,100
+92,Vowel 1 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+93,Vowel 2 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,97,94,83,100
+94,Vowel 2 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,96,95,83,100
+95,Vowel 2 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,96,97,83,100
+96,Vowel 2 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+97,Vowel 3 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,101,98,83,100
+98,Vowel 3 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,100,99,83,100
+99,Vowel 3 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,100,101,83,100
+100,Vowel 3 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+101,Vowel 4 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,105,102,83,100
+102,Vowel 4 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,104,103,83,100
+103,Vowel 4 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,104,105,83,100
+104,Vowel 4 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+105,Vowel 5 – Block 1,F,F,None,HitPorcentage,OnBlockEnd,,,109,106,83,100
+106,Vowel 5 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,108,107,83,100
+107,Vowel 5 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,108,109,83,100
+108,Vowel 5 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100
+109,Vowel 6 – Block 1,T,F,None,HitPorcentage,OnBlockEnd,,,113,110,83,100
+110,Vowel 6 – Block 2,F,F,None,HitPorcentage,OnBlockEnd,,,112,111,83,100
+111,Vowel 6 – Block 2 (2),F,F,None,HitPorcentage,OnBlockEnd,,,112,113,83,100
+112,Vowel 6 – Block 1 (2),F,F,None,HitPorcentage,OnBlockEnd,,,,,83,100

@@ -28,11 +28,14 @@ type
     FOnStart: TNotifyEvent;
     FOnStop : TNotifyEvent;
     FChunk : PMix_Chunk;
+    FCustomData : string;
     procedure DoOnStop;
     function GetShouldBeDeallocated: Boolean;
     procedure SetOnStart(AValue: TNotifyEvent);
     procedure SetOnStop(AValue: TNotifyEvent);
     procedure SetShouldBeDeallocated(AValue: Boolean);
+    procedure SetCustomData(AData : string);
+    function GetCustomData : string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -84,6 +87,16 @@ procedure TChunk.SetShouldBeDeallocated(AValue: Boolean);
 begin
   if FShouldBeDeallocated = AValue then Exit;
   FShouldBeDeallocated := AValue;
+end;
+
+procedure TChunk.SetCustomData(AData: string);
+begin
+  FCustomData := AData;
+end;
+
+function TChunk.GetCustomData: string;
+begin
+  Result := FCustomData;
 end;
 
 constructor TChunk.Create;

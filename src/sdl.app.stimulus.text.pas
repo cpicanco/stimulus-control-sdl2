@@ -61,10 +61,16 @@ uses
 { TTextStimuli }
 
 procedure TTextStimulus.PromptStopped(Sender: TObject);
+var
+  LCustomName : string;
+  LSound : ISound;
 begin
-  (Sender as ISound).SetOnStop(nil);
+  LSound := Sender as ISound;
+  LCustomName := LSound.GetCustomData;
 
-  Timestamp(GetStimulusNamePrefix+'.Prompt.Stop', FCustomName);
+  LSound.SetOnStop(nil);
+
+  Timestamp(GetStimulusNamePrefix+'.Prompt.Stop', LCustomName);
 
   // starts CD recording
   if Assigned(Sibling) then begin
@@ -74,8 +80,13 @@ begin
 end;
 
 procedure TTextStimulus.PromptStarted(Sender: TObject);
+var
+  LSound : ISound;
+  LCustomName : string;
 begin
-  Timestamp(GetStimulusNamePrefix+'.Prompt.Start', FCustomName);
+  LSound := Sender as ISound;
+  LCustomName := LSound.GetCustomData;
+  Timestamp(GetStimulusNamePrefix+'.Prompt.Start', LCustomName);
 end;
 
 function TTextStimulus.GetStimulusNamePrefix: string;
@@ -109,13 +120,13 @@ constructor TTextStimulus.Create;
 begin
   inherited Create;
   FText := TAnimatedText.Create;
-  FPrompt := nil;
+  //FPrompt := nil;
   FHasPrompt := False;
 end;
 
 destructor TTextStimulus.Destroy;
 begin
-  FPrompt := nil;
+  //FPrompt := nil;
   FText.Free;
   inherited Destroy;
 end;
@@ -138,6 +149,7 @@ begin
     FPrompt := GetAudioPromptForText(AParameters);
     FPrompt.SetOnStop(@PromptStopped);
     FPrompt.SetOnStart(@PromptStarted);
+    FPrompt.SetCustomData(FCustomName);
   end;
 end;
 

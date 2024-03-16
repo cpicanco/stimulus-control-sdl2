@@ -12,6 +12,7 @@
 *.or
 *.a
 *.ico
+*.yaml
 
 # compressed files
 *.zip
