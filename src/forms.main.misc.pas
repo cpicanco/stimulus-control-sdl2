@@ -151,10 +151,11 @@ procedure TFormMisc.ButtonTestDispenserClick(Sender: TObject);
 begin
   RS232 := TRS232.Create;
   case RadioGroupDispenser.ItemIndex of
-    0 : RS232.Dispenser(disp1);
-    1 : RS232.Dispenser(disp2);
-    2 : RS232.Dispenser(disp3);
-    3 : RS232.Dispenser(disp4);
+    0: {do nothing};
+    1 : RS232.Dispenser(disp1);
+    2 : RS232.Dispenser(disp2);
+    3 : RS232.Dispenser(disp3);
+    4 : RS232.Dispenser(disp4);
   end;
   RS232.Free;
 end;

@@ -54,6 +54,41 @@ type
 var
   DispenserCodes : array [TDispRange] of string = ('1', '2', '3', '4');
 
+//function TRS232.GetCommPortNumber: ShortInt;
+//{$IFDEF WINDOWS}
+//var
+//  Reg: TRegistry;
+//  LKey: string;
+//{$ENDIF}
+//begin
+//  Result := -1;
+//  {$IFDEF WINDOWS}
+//  Reg := TRegistry.Create;
+//  Reg.RootKey := HKEY_LOCAL_MACHINE;
+//  LKey := 'HARDWARE\DEVICEMAP\SERIALCOMM';
+//  if Reg.KeyExists(LKey) then
+//    begin
+//      Reg.OpenKeyReadOnly(LKey);
+//      if Reg.ValueExists('\Device\VCP0') then
+//      //if Reg.ValueExists('\Device\Serial2') then
+//        begin
+//          LKey := Reg.ReadString('\Device\VCP0');
+//          //LKey := Reg.ReadString('\Device\Serial2');
+//          Delete(LKey, 1, 3);
+//          case StrToIntDef(LKey, -1) of
+//            1..16: Result := StrToInt(LKey);
+//          end;
+//        end;
+//    end;
+//  Reg.CloseKey;
+//  Reg.Free;
+//  {$ENDIF}
+//
+//  {$IFDEF LINUX}
+//  Result := 0;
+//  {$ENDIF}
+//end;
+
 function TRS232.GetCommPortNumber: ShortInt;
 {$IFDEF WINDOWS}
 var
@@ -69,9 +104,25 @@ begin
   if Reg.KeyExists(LKey) then
     begin
       Reg.OpenKeyReadOnly(LKey);
-      if Reg.ValueExists('\Device\VCP0') then
+      if Reg.ValueExists('\Device\Serial0') then
         begin
-          LKey := Reg.ReadString('\Device\VCP0');
+          LKey := Reg.ReadString('\Device\Serial0');
+          Delete(LKey, 1, 3);
+          case StrToIntDef(LKey, -1) of
+            1..16: Result := StrToInt(LKey);
+          end;
+        end;
+      if Reg.ValueExists('\Device\Serial1') then
+        begin
+          LKey := Reg.ReadString('\Device\Serial1');
+          Delete(LKey, 1, 3);
+          case StrToIntDef(LKey, -1) of
+            1..16: Result := StrToInt(LKey);
+          end;
+        end;
+      if Reg.ValueExists('\Device\Serial2') then
+        begin
+          LKey := Reg.ReadString('\Device\Serial2');
           Delete(LKey, 1, 3);
           case StrToIntDef(LKey, -1) of
             1..16: Result := StrToInt(LKey);

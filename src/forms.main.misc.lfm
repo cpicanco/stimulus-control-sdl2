@@ -474,14 +474,14 @@ object FormMisc: TFormMisc
         Left = 20
         Height = 23
         Top = 20
-        Width = 169
+        Width = 168
         Caption = 'Controle'
       end
       object ComboBoxController: TComboBox
-        Left = 199
+        Left = 198
         Height = 23
         Top = 20
-        Width = 222
+        Width = 223
         ItemHeight = 15
         ItemIndex = 0
         Items.Strings = (
