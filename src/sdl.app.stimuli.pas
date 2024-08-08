@@ -61,6 +61,7 @@ type
     function AsString : string; virtual;
     function AsIStimuli: IStimuli;
     function AsINavigable: INavigable; virtual;
+    function IsStarter : Boolean; virtual;
     property Trial : TObject read GetTrial write SetTrial;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property OnStop : TNotifyEvent read FOnStop write SetOnStop;
@@ -205,6 +206,11 @@ end;
 function TStimuli.AsINavigable: INavigable;
 begin
   Result := nil;
+end;
+
+function TStimuli.IsStarter: Boolean;
+begin
+  Result := False;
 end;
 
 

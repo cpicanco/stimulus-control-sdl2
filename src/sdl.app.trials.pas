@@ -301,6 +301,12 @@ begin
       EndTrial;
     end;
   end;
+
+  if Sender is TSDLTimer then begin
+    FIStimuli.Stop;
+    FResult := TTrialResult.None;
+    EndTrial;
+  end;
 end;
 
 procedure TTrial.EndStarterCallBack(Sender: TObject);
@@ -493,9 +499,13 @@ begin
   end else begin
     UpdateNavigator;
     FIStimuli.Start;
-    if FLimitedHoldTimer.Interval > 0 then begin
+
+    if    (not FIStimuli.IsStarter)
+      and (FLimitedHoldTimer.Interval > 0) then begin
+      FLimitedHoldTimer.OnTimer := @EndTrialCallBack;
       FLimitedHoldTimer.Start;
     end;
+
     FVisible := True;
 
     with FIStimuli do begin

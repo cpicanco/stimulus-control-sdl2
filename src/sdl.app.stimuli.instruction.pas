@@ -43,6 +43,7 @@ type
       constructor Create; override;
       destructor Destroy; override;
       function AsINavigable: INavigable; override;
+      function IsStarter : Boolean; override;
       procedure DoExpectedResponse; override;
       procedure Load(AParameters : TStringList;
         AParent : TObject); override;
@@ -95,6 +96,11 @@ end;
 function TInstructionStimuli.AsINavigable: INavigable;
 begin
   Result := Self as INavigable;
+end;
+
+function TInstructionStimuli.IsStarter: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TInstructionStimuli.DoExpectedResponse;

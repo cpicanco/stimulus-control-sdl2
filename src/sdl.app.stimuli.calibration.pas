@@ -41,6 +41,7 @@ type
       destructor Destroy; override;
       function AsInterface : IStimuli;
       function AsINavigable: INavigable; override;
+      function IsStarter : Boolean; override;
       procedure DoExpectedResponse; override;
       procedure Load(AParameters : TStringList; AParent : TObject); override;
       procedure Start; override;
@@ -123,6 +124,11 @@ end;
 function TCalibrationStimuli.AsINavigable: INavigable;
 begin
   Result := Self as INavigable;
+end;
+
+function TCalibrationStimuli.IsStarter: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TCalibrationStimuli.DoExpectedResponse;
