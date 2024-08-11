@@ -75,6 +75,7 @@ type
     destructor Destroy; override;
     //procedure ResetGrid;
     function AsIStimuli : IStimuli;
+    procedure Reboot;
     procedure DoExpectedResponse; override;
     procedure Load(AParameters : TStringList; AParent: TObject); override;
     procedure Start; override;
@@ -607,6 +608,17 @@ end;
 function TDragDropStimuli.AsIStimuli: IStimuli;
 begin
   Result := Self as IStimuli;
+end;
+
+procedure TDragDropStimuli.Reboot;
+var
+  i: Integer;
+begin
+  with Grid.RandomPositions do begin
+    for i := Low(Comparisons) to High(Comparisons) do begin
+      (Comparisons[i].Item as TDragDropablePicture).ToOriginalBounds;
+    end;
+  end;
 end;
 
 end.

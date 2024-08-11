@@ -39,6 +39,7 @@ uses
   ctypes,
   eye.tracker,
   session.loggers.writerow.timestamp,
+  devices.RS232i,
   sdl.app,
   sdl.app.trials.factory,
   sdl.app.controller.manager,
@@ -85,26 +86,26 @@ begin
       SDLApp.Terminate;
     end;
 
-    SDLK_BACKSPACE: begin
-      SetLength(FTextInput, Length(FTextInput) - 1);
-      with FormSpeechValidationQueue do begin
-        EditSpeech.Text := FTextInput;
-      end;
-    end;
+    //SDLK_BACKSPACE: begin
+    //  SetLength(FTextInput, Length(FTextInput) - 1);
+    //  with FormSpeechValidationQueue do begin
+    //    EditSpeech.Text := FTextInput;
+    //  end;
+    //end;
 
-    SDLK_RETURN: begin
-      LKeyboardState := SDL_GetKeyboardState(nil);
-      if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
-        ToggleActiveTextInput;
-      end else begin
-        FTextInput := '';
-        LKey := #13;
-        with FormSpeechValidationQueue do begin
-          EditSpeechKeyPress(Self, LKey);
-          EditSpeech.Text := FTextInput;
-        end;
-      end;
-    end;
+    //SDLK_RETURN: begin
+    //  LKeyboardState := SDL_GetKeyboardState(nil);
+    //  if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
+    //    ToggleActiveTextInput;
+    //  end else begin
+    //    FTextInput := '';
+    //    LKey := #13;
+    //    with FormSpeechValidationQueue do begin
+    //      EditSpeechKeyPress(Self, LKey);
+    //      EditSpeech.Text := FTextInput;
+    //    end;
+    //  end;
+    //end;
 
     SDLK_c: begin
       LKeyboardState := SDL_GetKeyboardState(nil);
@@ -125,19 +126,35 @@ begin
       end;
     end;
 
-    SDLK_s: begin
+    //SDLK_s: begin
+    //  LKeyboardState := SDL_GetKeyboardState(nil);
+    //  if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
+    //    if EyeTracker <> nil then begin
+    //      EyeTracker.CalibrationSuccessful;
+    //    end;
+    //  end;
+    //end;
+
+    //SDLK_n: begin
+    //  LKeyboardState := SDL_GetKeyboardState(nil);
+    //  if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
+    //    TTrialFactory.CurrentTrial.DoExpectedResponse;
+    //  end;
+    //end;
+
+    SDLK_SPACE : begin
       LKeyboardState := SDL_GetKeyboardState(nil);
       if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
-        if EyeTracker <> nil then begin
-          EyeTracker.CalibrationSuccessful;
-        end;
+        TTrialFactory.CurrentTrial.Reboot;
       end;
     end;
 
-    SDLK_n: begin
+    SDLK_RETURN2: begin
       LKeyboardState := SDL_GetKeyboardState(nil);
       if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
-        TTrialFactory.CurrentTrial.DoExpectedResponse;
+        if Assigned(RS232) then begin
+          RS232.Dispenser;
+        end;
       end;
     end;
 

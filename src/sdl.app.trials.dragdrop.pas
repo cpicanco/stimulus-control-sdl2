@@ -40,6 +40,7 @@ type
     FStimuli : TDragDropStimuli;
   protected
     function GetIStimuli: IStimuli; override;
+    procedure Reboot; override;
     procedure MouseMove(Sender: TObject;
       Shift: TCustomShiftState; X, Y: Integer); override;
   public
@@ -77,6 +78,11 @@ end;
 function TDragDrop.GetIStimuli: IStimuli;
 begin
   Result := FStimuli.AsIStimuli;
+end;
+
+procedure TDragDrop.Reboot;
+begin
+  FStimuli.Reboot;
 end;
 
 procedure TDragDrop.MouseMove(Sender: TObject; Shift: TCustomShiftState; X,

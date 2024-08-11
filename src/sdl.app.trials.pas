@@ -66,6 +66,7 @@ type
       FStimuliList : TStimuliList;
       FOnTrialEnd : TNotifyEvent;
       FConfiguration : TTrialConfiguration;
+      procedure Reboot; virtual;
       procedure Paint; override;
       procedure EndTrialCallBack(Sender : TObject);
       procedure MouseMove(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
@@ -421,6 +422,11 @@ begin
     LNaviable.SetNavigator(Navigator);
     LNaviable.UpdateNavigator;
   end;
+end;
+
+procedure TTrial.Reboot;
+begin
+
 end;
 
 procedure TTrial.SetNavigator(AValue: ITableNavigator);
