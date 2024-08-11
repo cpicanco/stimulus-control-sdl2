@@ -66,6 +66,7 @@ type
       FStimuliList : TStimuliList;
       FOnTrialEnd : TNotifyEvent;
       FConfiguration : TTrialConfiguration;
+      procedure Reboot; virtual;
       procedure Paint; override;
       procedure EndTrialCallBack(Sender : TObject);
       procedure MouseMove(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
@@ -301,6 +302,12 @@ begin
       EndTrial;
     end;
   end;
+
+  if Sender is TSDLTimer then begin
+    FIStimuli.Stop;
+    FResult := TTrialResult.None;
+    EndTrial;
+  end;
 end;
 
 procedure TTrial.EndStarterCallBack(Sender: TObject);
@@ -417,6 +424,11 @@ begin
   end;
 end;
 
+procedure TTrial.Reboot;
+begin
+
+end;
+
 procedure TTrial.SetNavigator(AValue: ITableNavigator);
 begin
   if FNavigator = AValue then Exit;
@@ -493,9 +505,13 @@ begin
   end else begin
     UpdateNavigator;
     FIStimuli.Start;
-    if FLimitedHoldTimer.Interval > 0 then begin
+
+    if    (not FIStimuli.IsStarter)
+      and (FLimitedHoldTimer.Interval > 0) then begin
+      FLimitedHoldTimer.OnTimer := @EndTrialCallBack;
       FLimitedHoldTimer.Start;
     end;
+
     FVisible := True;
 
     with FIStimuli do begin

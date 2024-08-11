@@ -33,6 +33,7 @@ type
     function MyResult : TTrialResult;
     function ToData : string;
     function Header : string;
+    function IsStarter : Boolean;
     function Selectables : TSelectables;
     procedure DoExpectedResponse;
     procedure Load(AParameters : TStringList; AParent : TObject);

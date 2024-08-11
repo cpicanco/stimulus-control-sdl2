@@ -39,6 +39,7 @@ type
     //function Header : string;
     function ToData : string;
     procedure DoExpectedResponse;
+    procedure Reboot;
     procedure EndTrial;
     procedure Hide;
     procedure SetOnTrialEnd(ANotifyEvent: TNotifyEvent);
