@@ -39,6 +39,7 @@ type
     procedure Load(AParameters : TStringList; AParent : TObject);
     procedure Start;
     procedure Stop;
+    procedure Finalize;
   end;
 
 implementation

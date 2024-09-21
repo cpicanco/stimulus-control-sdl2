@@ -54,6 +54,7 @@ type
     procedure Start; virtual; abstract;
     procedure Stop; virtual; abstract;
     procedure SetSchedule(AValue: TSchedule); virtual;
+    procedure Finalize;
   public
     constructor Create; virtual; overload;
     constructor Create(ASchedule : TSchedule); virtual; overload;
@@ -157,6 +158,13 @@ begin
   with FSchedule do begin
     OnConsequence:= AValue.OnConsequence;
     OnResponse:= AValue.OnResponse;
+  end;
+end;
+
+procedure TStimuli.Finalize;
+begin
+  if Assigned(OnFinalize) then begin
+    OnFinalize(Self);
   end;
 end;
 

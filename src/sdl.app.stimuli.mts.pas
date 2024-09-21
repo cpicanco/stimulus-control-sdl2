@@ -232,8 +232,7 @@ begin
         FSoundWrong.Play;
       end;
     end else begin
-      if Assigned(OnFinalize) then
-        OnFinalize(Self);
+      Finalize;
     end;
   end;
 end;
@@ -250,8 +249,7 @@ begin
 
   FSoundCorrect.SetOnStop(nil);
   FSoundWrong.SetOnStop(nil);
-  if Assigned(OnFinalize) then
-    OnFinalize(Self);
+  Finalize;
 end;
 
 procedure TMTSStimuli.ConsequenceStart(Sender: TObject);
@@ -419,8 +417,7 @@ begin
   FResult := None;
   Pool.Counters.None;
   //Pool.Counters.Miss;
-  if Assigned(OnFinalize) then
-    OnFinalize(Self);
+  Finalize;
 end;
 
 
@@ -464,9 +461,8 @@ begin
         end;
       end;
     end;
+    Finalize;
 
-    if Assigned(OnFinalize) then
-      OnFinalize(Self);
   end else begin
     case FState of
       startNone: ;
@@ -494,8 +490,7 @@ begin
     //    end;
     //  end;
     //end;
-    //if Assigned(OnFinalize) then
-    //  OnFinalize(Self);
+    //Finalize;
   end;
 end;
 
