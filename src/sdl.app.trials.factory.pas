@@ -137,7 +137,6 @@ begin
   FCurrentTrial.OnTrialEnd := nil;
   FCurrentTrial.Name := 'LastTrial';
   FCurrentTrial.Data := LMockData;
-  FCurrentTrial.Show;
   Result := FCurrentTrial as ITrial;
 end;
 

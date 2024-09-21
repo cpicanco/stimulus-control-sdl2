@@ -76,7 +76,7 @@ begin
   EyeTracker.StopCalibration;
   Timestamp(EyeTracker.TrackerClassName+'.StopCalibration');
   RaiseWindow;
-  OnFinalize(Self);
+  Finalize;
 end;
 
 procedure TCalibrationStimuli.CalibrationFailed(Sender: TObject);

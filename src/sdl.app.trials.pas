@@ -257,8 +257,9 @@ begin
       SDLPoint.x := X;
       SDLPoint.y := Y;
       IChild := IClickable(TSDLControl(Child));
-      if IChild.PointInside(SDLPoint) then
+      if IChild.PointInside(SDLPoint) then begin
         IChild.MouseDown(Sender, Shift, X, Y);
+      end;
     end;
   end;
 end;
@@ -275,8 +276,9 @@ begin
       SDLPoint.x := X;
       SDLPoint.y := Y;
       IChild := IClickable(TSDLControl(Child));
-      if IChild.PointInside(SDLPoint) then
+      if IChild.PointInside(SDLPoint) then begin
         IChild.MouseUp(Sender, Shift, X, Y);
+      end;
     end;
   end;
 end;
@@ -304,7 +306,6 @@ begin
   end;
 
   if Sender is TSDLTimer then begin
-    FIStimuli.Stop;
     FResult := TTrialResult.None;
     EndTrial;
   end;

@@ -389,9 +389,7 @@ begin
     FAnimation.Stop;
     FAnimation.Hide;
     Timestamp(ClassName+'.DragDropDone');
-    if Assigned(OnFinalize) then begin
-      OnFinalize(Self);
-    end;
+    Finalize;
   end;
 end;
 
@@ -615,10 +613,11 @@ var
   i: Integer;
 begin
   with Grid.RandomPositions do begin
-    for i := Low(Comparisons) to High(Comparisons) do begin
-      (Comparisons[i].Item as TDragDropablePicture).ToOriginalBounds;
+    for i := Low(Samples) to High(Samples) do begin
+      (Samples[i].Item as TDragDropablePicture).ToOriginalBounds;
     end;
   end;
+  Timestamp('KeyPressed.Samples.ToOriginalBounds');
 end;
 
 end.

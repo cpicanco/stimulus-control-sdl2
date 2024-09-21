@@ -105,8 +105,7 @@ end;
 
 procedure TInstructionStimuli.DoExpectedResponse;
 begin
-  if Assigned(OnFinalize) then
-    OnFinalize(Self);
+  Finalize;
 end;
 
 procedure TInstructionStimuli.Load(AParameters: TStringList; AParent: TObject);
