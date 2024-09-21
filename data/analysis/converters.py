@@ -1,5 +1,4 @@
 import csv
-
 import pandas as pd
 
 from headers import info_header, data_header, timestamps_header, session_name_dict
@@ -64,6 +63,26 @@ def get_comparison_latency(events, events_next_row=None):
     latency = end_timestamp - start_timestamp
     return str(latency).replace('.', ',')
 
+def override_info_result(entry):
+    new_line = info_header[10]+'Cancelada'
+    info_filename = as_info(entry)
+    with open(info_filename, 'r') as file:
+        lines = file.readlines()
+
+    found = False
+
+    for i, line in enumerate(lines):
+        if line.startswith(info_header[10]):
+            found = True
+            lines[i] = new_line
+            break
+
+    if not found:
+        lines.append(new_line)
+
+    with open(info_filename, 'w') as file:
+        file.writelines(lines)
+
 def save_processed_file(entry, processed_lines):
     if len(processed_lines) > 0:
         with open(entry+'.processed', 'w', encoding='utf-8', newline='') as outfile:
@@ -71,7 +90,8 @@ def save_processed_file(entry, processed_lines):
             writer.writerows(processed_lines)
         print(f'Processed file {entry} saved to {entry}.processed')
     else:
-        print(f'Processed lines contanainer of file {entry} is empty after processing')
+        print(f'Processed lines container of file {entry} is empty after processing. Result will be overriden in .info.')
+        override_info_result(entry)
 
 def convert_data_file(entry, override=False):
 
@@ -138,11 +158,46 @@ def convert_data_file(entry, override=False):
                 row[23] = row[21]
                 row[21] = 'NA'
 
+            else:
+                if comparisons == '1C':
+                    row[23] = row[21]
+                    row[21] = 'NA'
+
+                if comparisons == '2C':
+                    row[23] = row[22]
+                    row[22] = 'NA'
+
+                if comparisons == '3C':
+                    pass
+
+
             # Add the processed row to the list
             processed_lines.append(row)
             row = next_row
 
     save_processed_file(entry, processed_lines)
+
+def override_timestamps_file(entry, override=False):
+    if override:
+        with open(entry, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file, delimiter='\t')
+            processed_lines = []
+
+            for row in reader:
+                num_columns = len(row)
+                if num_columns == 0:
+                    continue
+
+                if num_columns == 4:
+                    row.append('')
+                    print(f'Added empty column to timestamps file {entry}.')
+                processed_lines.append(row)
+
+        with open(entry, 'w', encoding='utf-8', newline='') as outfile:
+            writer = csv.writer(outfile, delimiter='\t')
+            writer.writerows(processed_lines)
+
+        print(f'Timestamps file {entry} overriden and saved to {entry}.')
 
 def get_data_file(entry):
     try:
@@ -196,13 +251,19 @@ def convert_info_file(entry, override=False):
         if file_exists(as_info(entry, processed=True)):
             print(f'Processed info file {entry} already exists. Skipping...')
             return
-
+    default_conclusion = 'Concluida'
     version = 0
     with open(entry, 'r', encoding='utf-8') as file:
         first_line = file.readline().strip()
+
+        if first_line == 'Version:2':
+            version = 2
+            default_conclusion = 'Cancelada'
+
         if first_line == 'Version:1':
             version = 1
 
+        if (version == 1) or (version == 2):
             # replace header in each line for header+tab
             lines = [first_line] + file.readlines()
             processed_lines = [line.strip().replace(header, header + '\t').split('\t') \
@@ -324,7 +385,7 @@ def convert_info_file(entry, override=False):
                     processed_lines.append([header, duration])
 
                 elif header == info_header[10]: # Resultado:
-                    processed_lines.append([header, 'Concluida'])
+                    processed_lines.append([header, default_conclusion])
 
     save_processed_file(entry, processed_lines)
 

@@ -53,8 +53,23 @@ def prepare_for_transcription():
     fix_cycles()
     save_probes_by_participant(False)
 
+def prepare_for_transcription_v2(override=False):
+    """
+    One must manually add transcripts to probes_CD_{participant}.data files
+    """
+    make_safety_copy()
+    exclude_list = [
+        # desistências
+        # '2-FEB',
+        # ''
+    ]
+
+    convert_all(exclude_list=exclude_list, override=override)
+    fix_cycles()
+    save_probes_by_participant(False)
+
 if __name__ == "__main__":
-    # prepare_for_transcription()
+    prepare_for_transcription_v2(override=True)
     # do manual transcription
     # concatenate_probes()
     # calculate_similarity()

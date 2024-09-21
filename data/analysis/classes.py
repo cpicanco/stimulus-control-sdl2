@@ -27,7 +27,7 @@ class Grid:
         return '{'+'grid:{'+','.join(str(i)+':'+str(p) for i, p in enumerate(self.positions))+'}'+'}'
 
 class Information:
-    __version__ = '1'
+    __supported_versions__ = ['1', '2']
     __header_version__ = 'Version:'
     __participant_name__ = 'Nome_do_sujeito:'
     __session_name__ = 'Nome_da_sessao:'
@@ -115,7 +115,7 @@ class Information:
     def __get_version__(self):
         try:
             version = self.__info_file__.loc[self.__header_version__][1]
-            if version != self.__version__:
+            if version not in self.__supported_versions__:
                 print(f'Version {version} is not supported.')
                 return None
         except KeyError:

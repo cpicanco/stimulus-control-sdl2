@@ -6,6 +6,7 @@ import shutil
 import pandas as pd
 
 from anonimizator import anonimize
+from headers import info_header
 
 def file_exists(entry):
     return os.path.exists(entry)
@@ -49,7 +50,7 @@ def load_file(entry):
 
 def list_data_folders(include_list=[], exclude_list=[]):
     if len(include_list) == 0:
-        exclude_list += ['__pycache__', 'analysis', '.vscode', 'output', '0-Rafael', '3-Teste', '7-Teste2']
+        exclude_list += ['__pycache__', 'analysis', 'dados-brasil', '.vscode', 'output', '0-Rafael', '3-Teste', '7-Teste2']
         # Get all entries in the current directory
         all_entries = os.listdir('.')
         # Filter out files and excluded folders
@@ -72,14 +73,21 @@ def get_data_folders(anonimized=False):
     participant_folders.sort(key=folder_sorter)
     return participant_folders
 
-def list_files(extension=''):
+def list_files(extension='', except_name=''):
+    def has_not_except_name(astring):
+        if except_name:
+            return except_name not in astring
+        else:
+            return True
+
     # Get all entries in the current directory except 'ID' and 'LastValidBaseFilename' files
     all_entries = os.listdir('.')
-    all_entries = [e for e in all_entries if e != 'ID' and e != 'LastValidBaseFilename']
     # Filter out folders and files with different extensions
     return [entry for entry in all_entries \
                if os.path.isfile(entry) \
+               and has_not_except_name(entry) \
                and entry != 'ID' \
+               and entry != 'LastValidBaseFilename' \
                and entry.endswith(extension)]
 
 def get_readable_creation_date(real_filepath):
@@ -103,10 +111,30 @@ def get_creation_date(real_filepath, format='%Y-%m-%d'):
     # Format the date as YYYY-MM-DD
     return date_time_obj.strftime(format)
 
-def safety_copy(entry):
+def get_cycle(entry):
+    info_filename = as_info(entry)
+    with open(info_filename, 'r') as file:
+        lines = file.readlines()
+
+    for line in lines:
+        if line.startswith(info_header[2]):
+            session_name = line.split(':')[1].split('-')
+            condition = int(session_name[1].replace('a', '').replace('b', ''))
+            cycle = int(session_name[0].replace('Ciclo', ''))
+            if condition == 7:
+                if cycle == 6:
+                    pass
+                else:
+                    cycle += 1
+            else:
+                pass
+            return str(cycle)
+
+def safety_copy(entry, cycle):
     source = get_real_filepath(entry)
     creation_date = get_creation_date(source)
-    destination = os.path.join(os.getcwd(), 'analysis', creation_date, entry)
+
+    destination = os.path.join(os.getcwd(), 'analysis', creation_date, cycle, entry)
 
     # Extract the directory part of the destination path
     destination_dir = os.path.dirname(destination)
@@ -156,12 +184,16 @@ def walk_and_execute(entry, function, *args):
         cd('..')
         return
 
-    safety_copy_folders = list_data_folders()
-    for data_folder in safety_copy_folders:
-        cd(data_folder)
-        function(*args)
-        cd('..')
+    safety_copy_folders_by_date = list_data_folders()
+    for date_folder in safety_copy_folders_by_date:
+        cd(date_folder)
 
+        safety_copy_folders_by_cycle = list_data_folders()
+        for cycle_folder in safety_copy_folders_by_cycle:
+            cd(cycle_folder)
+            function(*args)
+            cd('..')
+        cd('..')
     cd('..')
     cd('..')
 

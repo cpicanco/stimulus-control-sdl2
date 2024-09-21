@@ -21,6 +21,7 @@ participants_natural = [
     '38-ORT', # Matemática/Estatística
     '43-ARJ', # Matemática/Estatística
     '46-CMR', # Matemática/Estatística
+    '38-ORT', # Matemática/Estatística
 ]
 
 participants_social = [
