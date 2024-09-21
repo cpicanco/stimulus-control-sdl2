@@ -1,3 +1,7 @@
+# pre teaching words
+bolo = 'bolo'
+bala = 'bala'
+
 # teaching words
 nibo = 'nibo'
 fale = 'fale'
@@ -154,3 +158,23 @@ pre_test_hardcoded_order = [
     nole,
     bifa
     ]
+
+all = [
+    'Fim.'
+]
+
+def recombine_letters(consonants='bfln', vowels='aeio'):
+    sylables = []
+    for c in consonants:
+        for v in vowels:
+            sylables.append(c + v)
+
+    for syllable in sylables:
+        for syllable2 in sylables:
+            yield syllable + syllable2
+
+for word in recombine_letters():
+    all.append(word)
+
+if __name__ == '__main__':
+    print(len([word for word in recombine_letters()]))
