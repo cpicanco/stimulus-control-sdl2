@@ -149,7 +149,7 @@ begin
       end;
     end;
 
-    SDLK_RETURN2: begin
+    SDLK_KP_ENTER: begin
       LKeyboardState := SDL_GetKeyboardState(nil);
       if GetKeyState(SDL_SCANCODE_LCTRL, LKeyboardState) then begin
         if Assigned(RS232) then begin
