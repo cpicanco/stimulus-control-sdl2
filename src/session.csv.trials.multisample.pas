@@ -10,6 +10,8 @@ uses
 
 type
 
+  TNames = array of string;
+
   { TCSVMultiSample }
 
   TCSVMultiSample = class(TCSVTrialsMTS)
@@ -25,6 +27,10 @@ type
       FRefName : string;
       FName : string;
       FStimuliFolder : string;
+      FSampleNames : TNames;
+      FComparisonNames : TNames;
+      procedure RegisterDynamicParameters(Sender: TObject);
+    protected
       procedure AfterLoadingParameters(Sender: TObject); override;
     public
       constructor Create(ASource: string); override;
@@ -36,11 +42,35 @@ implementation
 
 uses
   sdl.app.trials.dragdrop,
+  session.constants.mts,
   session.constants.trials,
   session.constants.trials.dragdrop,
   session.pool;
 
 { TCSVMultiSample }
+
+procedure TCSVMultiSample.RegisterDynamicParameters(Sender: TObject);
+var
+  LParametersList : TStringList;
+  i : integer = 0;
+  LSamples : integer;
+  LComparisons : integer;
+begin
+  LParametersList := Sender as TStringList;
+  with MTSKeys do begin
+    LSamples := LParametersList.Values[SamplesKey].ToInteger;
+    SetLength(FSampleNames, LSamples);
+    for i := Low(FSampleNames) to High(FSampleNames) do begin
+      RegisterParameter(SampleKey+(i+1).ToString, @FSampleNames[i], '');
+    end;
+
+    LComparisons := LParametersList.Values[ComparisonsKey].ToInteger;
+    SetLength(FComparisonNames, LComparisons);
+    for i := Low(FComparisonNames) to High(FComparisonNames) do begin
+      RegisterParameter(ComparisonKey+(i+1).ToString, @FComparisonNames[i], '');
+    end;
+  end;
+end;
 
 procedure TCSVMultiSample.AfterLoadingParameters(Sender: TObject);
 begin
@@ -67,6 +97,7 @@ end;
 constructor TCSVMultiSample.Create(ASource: string);
 begin
   inherited Create(ASource);
+  OnBeforeLoadingParameters := @RegisterDynamicParameters;
   FKind := TDragDrop.ClassName;
   FDragDropOrientation := '';
   FAutoAnimateOnstart := False;
