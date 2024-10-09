@@ -25,8 +25,8 @@ const
     ReferenceNameKey : HeaderReferenceName;
     NameKey          : HeaderName;
     SampleKey        : HeaderSample;
-    ComparisonsKey   : HeaderCompasisons;
-    ComparisonKey    : HeaderCompasison;
+    ComparisonsKey   : HeaderComparisons;
+    ComparisonKey    : HeaderComparison;
     RelationKey      : HeaderRelation;
     CycleKey         : 'Cycle';
     ConditionKey     : 'Condition';
