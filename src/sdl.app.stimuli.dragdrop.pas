@@ -92,7 +92,6 @@ uses
   Math
   , StrUtils
   , Devices.RS232i
-  , math.bresenhamline.classes
   , sdl.app.stimuli.dragdrop.types
   , sdl.colors
   , sdl.app.controls.custom
@@ -113,15 +112,24 @@ begin
 end;
 
 procedure TDragDropStimuli.Load(AParameters: TStringList; AParent: TObject);
+type
+  TParametersDictionary = specialize TDictionary<string, string>;
 var
   S1           : string;
+  LSampleKey   : string;
+  LComparKey   : string;
   SampleLetter : string;
   ComparLetter : string;
-  GridSize     : Byte;
+  SomeKeyIsMissing : Boolean;
+  GridSize      : Byte;
   LSamples      : integer;
   LComparisons  : integer;
   LItem : TDragDropablePicture;
   i: Integer;
+
+  Name : string;
+  Value : string;
+  Parameters : TParametersDictionary;
 
   function DragDropToGridOrientation(
       ADragDropOrientation : TDragDropOrientation) : TGridOrientation;
@@ -197,7 +205,6 @@ begin
   inherited Load(AParameters, AParent);
   Grid.FixedSample := False;
   Grid.FixedComparison := False;
-  //Cursor := StrToIntDef(AParameters.Values['Cursor'], -1);
 
   FAnimation.Parent := TSDLControl(AParent);
 
@@ -209,50 +216,113 @@ begin
   FSoundWrong.SetOnStart(@SoundStart);
   FSoundWrong.SetOnStop(@SoundStop);
 
-  with DragDropKeys, MTSKeys do begin
-    //ChannelDragMouseMoveFactor :=
-      //AParameters.Values[DragMoveFactor].ToInteger;
-    //DragMouseMoveMode :=
-    //  AParameters.Values[SamplesDragMode].ToDragMouseMoveMode;
-
-    case AParameters.Values[GridSizeKey].ToInteger of
-      1..255: GridSize := Byte(AParameters.Values[GridSizeKey].ToInteger);
-      otherwise
-        raise Exception.Create('GridSize not supported.');
+  Parameters := TParametersDictionary.Create;
+  try
+    for i := 0 to AParameters.Count-1 do begin
+      AParameters.GetNameValue(i, Name, Value);
+      Parameters.Add(Name, Value);
     end;
 
-    S1 := AParameters.Values[RelationKey];
-    SampleLetter := ExtractDelimited(1,S1,['-']);
-    ComparLetter := ExtractDelimited(2,S1,['-']);
+    //Cursor := StrToIntDef(Parameters['Cursor'], -1);
 
-    LSamples := AParameters.Values[SamplesKey].ToInteger;
-    LComparisons := AParameters.Values[ComparisonsKey].ToInteger;
-    FGridOrientation := DragDropToGridOrientation(
-      AParameters.Values[DragDropOrientationKey].ToDragDropOrientation);
-    FAutoAnimateOnStart := AParameters.Values[AutoAnimateOnStartKey].ToBoolean;
-  end;
+    with DragDropKeys, MTSKeys do begin
+      //ChannelDragMouseMoveFactor :=
+        //Parameters[DragMoveFactor].ToInteger;
+      //DragMouseMoveMode :=
+      //  Parameters[SamplesDragMode].ToDragMouseMoveMode;
 
-  NewGridItems(LSamples, LComparisons, FGridOrientation);
-  with Grid.RandomPositions do begin
-    for i := low(Comparisons) to high(Comparisons) do
-    begin
-      LItem := Comparisons[i].Item as TDragDropablePicture;
-      //LItem.Cursor := Cursor;
-      LItem.LoadFromFile(AsImage(ComparLetter+(i+1).ToString));
-      LItem.Parent := TSDLControl(AParent);
-    end;
+      case Parameters[GridSizeKey].ToInteger of
+        1..255: GridSize := Byte(Parameters[GridSizeKey].ToInteger);
+        otherwise
+          raise Exception.Create('GridSize not supported.');
+      end;
 
-    for i := low(Samples) to high(Samples) do
-    begin
-      LItem := Samples[i].Item as TDragDropablePicture;
-      //LItem.Cursor := Cursor;
-      LItem.LoadFromFile(AsImage(SampleLetter+(i+1).ToString));
-      LItem.UpdateDistance;
-      LItem.Parent := TSDLControl(AParent);
-      with DragDropKeys do begin
-        LItem.MoveToPoint(AParameters.Values[DistanceKey].ToInteger);
+      FGridOrientation := DragDropToGridOrientation(
+        Parameters[DragDropOrientationKey].ToDragDropOrientation);
+      FAutoAnimateOnStart := Parameters[AutoAnimateOnStartKey].ToBoolean;
+
+      LSamples := Parameters[SamplesKey].ToInteger;
+      LComparisons := Parameters[ComparisonsKey].ToInteger;
+
+      SomeKeyIsMissing := False;
+      for i := 0 to LSamples - 1 do begin
+        LSampleKey := SampleKey+(i+1).ToString;
+        SomeKeyIsMissing := not Parameters.ContainsKey(LSampleKey);
+        if SomeKeyIsMissing then begin
+          raise Exception.Create('TDragDropStimuli.Load: Missing Sn key.');
+          Break;
+        end;
+      end;
+
+      if not SomeKeyisMissing then begin
+        for i := 0 to LComparisons - 1 do begin
+          LComparKey := ComparisonKey+(i+1).ToString;
+          SomeKeyIsMissing := not Parameters.ContainsKey(LComparKey);
+          if SomeKeyIsMissing then begin
+            raise Exception.Create('TDragDropStimuli.Load: Missing Cn key.');
+            Break;
+          end;
+        end;
+      end;
+
+      if (LSamples*LComparisons) < (GridSize*2) then begin
+        raise Exception.Create('Gridsize smaller than samples+comparisons');
+        Exit;
+      end;
+
+      // instatiate grid objects
+      NewGridItems(LSamples, LComparisons, FGridOrientation);
+
+      // populate grid objects
+      // if no Sn, Cn key is missing, then use them to load media files
+      // else use Relation parameter
+      if not SomeKeyisMissing then begin
+        with Grid.RandomPositions do begin
+          for i := Low(Comparisons) to High(Comparisons) do begin
+            LItem := Comparisons[i].Item as TDragDropablePicture;
+            //LItem.Cursor := Cursor;
+            LComparKey := ComparisonKey+(i+1).ToString;
+            LItem.LoadFromFile(AsImage(Parameters[LComparKey]));
+            LItem.Parent := TSDLControl(AParent);
+          end;
+
+          for i := Low(Samples) to High(Samples) do begin
+            LItem := Samples[i].Item as TDragDropablePicture;
+            //LItem.Cursor := Cursor;
+            LSampleKey := SampleKey+(i+1).ToString;
+            LItem.LoadFromFile(AsImage(Parameters[LSampleKey]));
+            LItem.UpdateDistance;
+            LItem.Parent := TSDLControl(AParent);
+            LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);
+          end;
+        end;
+
+      end else begin
+        S1 := AParameters.Values[RelationKey];
+        SampleLetter := ExtractDelimited(1,S1,['-']);
+        ComparLetter := ExtractDelimited(2,S1,['-']);
+
+        with Grid.RandomPositions do begin
+          for i := Low(Comparisons) to High(Comparisons) do begin
+            LItem := Comparisons[i].Item as TDragDropablePicture;
+            //LItem.Cursor := Cursor;
+            LItem.LoadFromFile(AsImage(ComparLetter+(i+1).ToString));
+            LItem.Parent := TSDLControl(AParent);
+          end;
+
+          for i := Low(Samples) to High(Samples) do begin
+            LItem := Samples[i].Item as TDragDropablePicture;
+            //LItem.Cursor := Cursor;
+            LItem.LoadFromFile(AsImage(SampleLetter+(i+1).ToString));
+            LItem.UpdateDistance;
+            LItem.Parent := TSDLControl(AParent);
+            LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);
+          end;
+        end;
       end;
     end;
+  finally
+    Parameters.Free;
   end;
 end;
 

@@ -564,10 +564,12 @@ end;
 function TFormMain.ParticipantFolderName: string;
 begin
   if ComboBoxParticipant.Items.Count > 0 then begin
-    Pool.Counters.Subject := ComboBoxParticipant.ItemIndex;
-    Result := Pool.Counters.Subject.ToString +'-'+
-        ComboBoxParticipant.Items[Pool.Counters.Subject] +
-        DirectorySeparator;
+    if ComboBoxParticipant.ItemIndex > -1 then begin
+      Pool.Counters.Subject := ComboBoxParticipant.ItemIndex;
+      Result := Pool.Counters.Subject.ToString +'-'+
+          ComboBoxParticipant.Items[Pool.Counters.Subject] +
+          DirectorySeparator;
+    end;
   end;
 end;
 

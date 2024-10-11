@@ -68,6 +68,7 @@ type
       FConfiguration : TTrialConfiguration;
       procedure Reboot; virtual;
       procedure Paint; override;
+      procedure EndLimitedHold(Sender : TObject);
       procedure EndTrialCallBack(Sender : TObject);
       procedure MouseMove(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
       procedure MouseDown(Sender:TObject; Shift: TCustomShiftState; X, Y: Integer); override;
@@ -293,6 +294,11 @@ begin
   SDL_PushEvent(@event);
 end;
 
+procedure TTrial.EndLimitedHold(Sender: TObject);
+begin
+  FIStimuli.Finalize;
+end;
+
 procedure TTrial.EndTrialCallBack(Sender: TObject);
 var
   LStimuli : IStimuli;
@@ -303,11 +309,6 @@ begin
       FResult := LStimuli.MyResult;
       EndTrial;
     end;
-  end;
-
-  if Sender is TSDLTimer then begin
-    FResult := TTrialResult.None;
-    EndTrial;
   end;
 end;
 
@@ -509,7 +510,7 @@ begin
 
     if    (not FIStimuli.IsStarter)
       and (FLimitedHoldTimer.Interval > 0) then begin
-      FLimitedHoldTimer.OnTimer := @EndTrialCallBack;
+      FLimitedHoldTimer.OnTimer := @EndLimitedHold;
       FLimitedHoldTimer.Start;
     end;
 

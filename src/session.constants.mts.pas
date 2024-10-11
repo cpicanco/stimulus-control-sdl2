@@ -28,8 +28,8 @@ type
 
 const
   HeaderSample = 'S';
-  HeaderCompasisons = 'Comparisons';
-  HeaderCompasison = 'C';
+  HeaderComparisons = 'Comparisons';
+  HeaderComparison = 'C';
   HeaderRelation = 'Relation';
   HeaderHasPrompt = 'HasPrompt';
 
@@ -37,8 +37,8 @@ const
     RelationKey    : HeaderRelation;
     SamplesKey     : 'Samples';
     SampleKey      : HeaderSample;
-    ComparisonsKey : HeaderCompasisons;
-    ComparisonKey  : HeaderCompasison;
+    ComparisonsKey : HeaderComparisons;
+    ComparisonKey  : HeaderComparison;
     HasPromptKey   : HeaderHasPrompt;
     HasTextPromptKey  : 'HasTextPrompt';
     PromptKey      : 'Prompt';

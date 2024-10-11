@@ -23,7 +23,7 @@ const
     ReferenceNameKey : HeaderReferenceName;
     NameKey          : HeaderName;
     SampleKey        : HeaderSample;
-    ComparisonKey    : HeaderCompasison;
+    ComparisonKey    : HeaderComparison;
     RelationKey      : HeaderRelation;
     SubsetKey        : 'Subset';
     HasPromptKey     : HeaderHasPrompt;
