@@ -157,8 +157,11 @@ var
       Grid.FixedSample, Grid.FixedComparison);
     with Grid.RandomPositions do begin
       LComparisons := TDragDropablePictures.Create;
-      for i := low(Comparisons) to high(Comparisons) do
-      begin
+      for i := Low(Comparisons) to High(Comparisons) do begin
+        LComparKey := MTSKeys.ComparisonKey+(i+1).ToString;
+        if Parameters[LComparKey].IsEmpty then begin
+          Continue;
+        end;
         LItem := TDragDropablePicture.Create;
         LItem.BoundsRect := Comparisons[i].Rect;
         LItem.SetOriginalBounds;
@@ -169,8 +172,11 @@ var
         LComparisons.Add(LItem);
       end;
 
-      for i := low(Samples) to high(Samples) do
-      begin
+      for i := Low(Samples) to High(Samples) do begin
+        LSampleKey := MTSKeys.SampleKey+(i+1).ToString;
+        if Parameters[LSampleKey].IsEmpty then begin
+          Continue;
+        end;
         LItem := TDragDropablePicture.Create;
         LItem.OnMouseDown := @SetFocus;
         LItem.OnRightDragDrop:=@RightDragDrop;
@@ -187,8 +193,9 @@ var
             LComparisons.Exchange(0, i); // the right comparison as the first one
           end;                           // inside the sample targets
         end;
-        for LComparison in LComparisons do
+        for LComparison in LComparisons do begin
           LItem.AddOrderedChoice(LComparison);
+        end;
 
         LItem.Position := Samples[i].Position;
         Samples[i].Item := LItem as TObject;
@@ -265,8 +272,8 @@ begin
         end;
       end;
 
-      if (LSamples*LComparisons) < (GridSize*2) then begin
-        raise Exception.Create('Gridsize smaller than samples+comparisons');
+      if (GridSize*GridSize) < (LSamples+LComparisons) then begin
+        raise Exception.Create('Gridsize squared smaller than samples+comparisons');
         Exit;
       end;
 
@@ -279,17 +286,23 @@ begin
       if not SomeKeyisMissing then begin
         with Grid.RandomPositions do begin
           for i := Low(Comparisons) to High(Comparisons) do begin
+            LComparKey := ComparisonKey+(i+1).ToString;
+            if Parameters[LComparKey].IsEmpty then begin
+              Continue;
+            end;
             LItem := Comparisons[i].Item as TDragDropablePicture;
             //LItem.Cursor := Cursor;
-            LComparKey := ComparisonKey+(i+1).ToString;
             LItem.LoadFromFile(AsImage(Parameters[LComparKey]));
             LItem.Parent := TSDLControl(AParent);
           end;
 
           for i := Low(Samples) to High(Samples) do begin
+            LSampleKey := SampleKey+(i+1).ToString;
+            if Parameters[LSampleKey].IsEmpty then begin
+              Continue;
+            end;
             LItem := Samples[i].Item as TDragDropablePicture;
             //LItem.Cursor := Cursor;
-            LSampleKey := SampleKey+(i+1).ToString;
             LItem.LoadFromFile(AsImage(Parameters[LSampleKey]));
             LItem.UpdateDistance;
             LItem.Parent := TSDLControl(AParent);
@@ -304,16 +317,24 @@ begin
 
         with Grid.RandomPositions do begin
           for i := Low(Comparisons) to High(Comparisons) do begin
+            LComparKey := ComparisonKey+(i+1).ToString;
+            if Parameters[LComparKey].IsEmpty then begin
+              Continue;
+            end;
             LItem := Comparisons[i].Item as TDragDropablePicture;
             //LItem.Cursor := Cursor;
-            LItem.LoadFromFile(AsImage(ComparLetter+(i+1).ToString));
+            LItem.LoadFromFile(AsImage(Parameters[LComparKey]));
             LItem.Parent := TSDLControl(AParent);
           end;
 
           for i := Low(Samples) to High(Samples) do begin
+            LSampleKey := SampleKey+(i+1).ToString;
+            if Parameters[LSampleKey].IsEmpty then begin
+              Continue;
+            end;
             LItem := Samples[i].Item as TDragDropablePicture;
             //LItem.Cursor := Cursor;
-            LItem.LoadFromFile(AsImage(SampleLetter+(i+1).ToString));
+            LItem.LoadFromFile(AsImage(Parameters[LSampleKey]));
             LItem.UpdateDistance;
             LItem.Parent := TSDLControl(AParent);
             LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);

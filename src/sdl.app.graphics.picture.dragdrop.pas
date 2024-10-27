@@ -263,18 +263,22 @@ procedure TDragDropablePicture.UpdateDistance;
 var
   LTarget : TDragDropablePicture;
 begin
-  LTarget := TargetChoice as TDragDropablePicture;
-  FBresenhamLine.Update(BoundsRect, LTarget.BoundsRect);
+  if Assigned(TargetChoice) then begin
+    LTarget := TargetChoice as TDragDropablePicture;
+    FBresenhamLine.Update(BoundsRect, LTarget.BoundsRect);
+  end;
 end;
 
 procedure TDragDropablePicture.MoveToPoint(APorcentage: Float);
 var
   Point : TPoint;
 begin
-  Point := FBresenhamLine.GetPoint(APorcentage);
-  Left := Point.X;
-  Top := Point.Y;
-  SetOriginalBounds;
+  if Assigned(TargetChoice) then begin
+    Point := FBresenhamLine.GetPoint(APorcentage);
+    Left := Point.X;
+    Top := Point.Y;
+    SetOriginalBounds;
+  end;
 end;
 
 function TDragDropablePicture.GetID: TStimulusID;
