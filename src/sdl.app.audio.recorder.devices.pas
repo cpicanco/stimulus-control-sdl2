@@ -42,7 +42,8 @@ type
     function BytesPerSample : cint;
     function FileSize : cint;
     procedure Execute; override;
-    procedure ListDevices(AIsCapture : cint; var ADevices: TDevices);
+    procedure ListDevices(AIsCapture: cint; ATargetDeviceName: string;
+      var ADevices: TDevices; out AIndex: integer);
     procedure StartDevice(AStarter : TObject);
     procedure DeviceFinished(Sender: TObject); virtual;
     procedure DeviceStopped(Sender: TObject); virtual;
@@ -177,13 +178,18 @@ begin
   Inc(GBufferBytePosition, ALen);
 end;
 
-procedure TAudioDevice.ListDevices(AIsCapture : cint; var ADevices: TDevices);
+procedure TAudioDevice.ListDevices(
+  AIsCapture : cint;
+  ATargetDeviceName : string;
+  var ADevices: TDevices;
+  out AIndex : integer);
 var
   LDeviceName: PAnsiChar;
   i: Integer;
   LRecordingDeviceCount: cint;
-  //LString : string;
+  LString : string;
 begin
+  AIndex := 0;
   LRecordingDeviceCount := SDL_GetNumAudioDevices(AIsCapture);
   if LRecordingDeviceCount < 0 then begin
     raise
@@ -192,7 +198,12 @@ begin
   end;
   for i := 0 to LRecordingDeviceCount-1 do begin
     LDeviceName := SDL_GetAudioDeviceName(i, AIsCapture);
-    //LString := StrPas(LDeviceName);
+    LString := StrPas(LDeviceName);
+    if not ATargetDeviceName.IsEmpty then begin
+      if LString.Contains(ATargetDeviceName) then begin
+        AIndex := i;
+      end;
+    end;
     SDL_GetAudioDeviceSpec(i, AIsCapture, @FDesiredAudioSpec);
     FDesiredAudioSpec.format := AUDIO_S16SYS;
     FDesiredAudioSpec.freq:= 44100;
@@ -396,10 +407,16 @@ end;
 function TAudioRecorderComponent.Open: Boolean;
 var
   LBytesPerSecond: cint;
+  LTargetDeviceName : string = 'Headset (JBL TUNE520BT)';
+  LTargetDevice : integer;
 begin
-  ListDevices(1, FDevices);
-  FDeviceID := SDL_OpenAudioDevice(FDevices.Keys.ToArray[0], 1,
-    FDevices.Values.ToArray[0], @FAudioSpec, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
+  ListDevices(1, LTargetDeviceName, FDevices, LTargetDevice);
+  FDeviceID :=
+    SDL_OpenAudioDevice(
+    FDevices.Keys.ToArray[LTargetDevice],
+    1,
+    FDevices.Values.ToArray[LTargetDevice],
+    @FAudioSpec, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
 
   //Print('Name:'+StrPas(FDevices.Keys.ToArray[0]));
   //Print('Channels:' + FAudioSpec.channels.ToString);
@@ -505,11 +522,17 @@ begin
 end;
 
 function TAudioPlaybackComponent.Open: Boolean;
+var
+  LTargetDeviceName : string = '';
+  LTargetDevice : integer;
 begin
-  ListDevices(0, FDevices);
-  //Print(StrPas(FDevices.Keys.ToArray[0]));
-  FDeviceID := SDL_OpenAudioDevice(FDevices.Keys.ToArray[0], 0,
-    FDevices.Values.ToArray[0], @FAudioSpec, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
+  ListDevices(0, LTargetDeviceName, FDevices, LTargetDevice);
+  FDeviceID := SDL_OpenAudioDevice(
+    FDevices.Keys.ToArray[LTargetDevice],
+    0,
+    FDevices.Values.ToArray[LTargetDevice],
+    @FAudioSpec,
+    SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
   Result := FDeviceID <> 0;
   if Result then begin
     { do nothing }
