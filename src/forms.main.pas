@@ -7,6 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
+{%RunFlags BUILD-}
 unit forms.main;
 
 {$mode objfpc}{$H+}
@@ -57,8 +58,10 @@ type
     procedure ButtonRunNewSessionClick(Sender: TObject);
     procedure ButtonNewParticipantClick(Sender: TObject);
     procedure BeginSession(Sender: TObject);
-    procedure ComboBoxDesignFolderEditingDone(Sender: TObject);
-    procedure ComboBoxParticipantEditingDone(Sender: TObject);
+    procedure ComboBoxDesignFolderChange(Sender: TObject);
+    //procedure ComboBoxDesignFolderEditingDone(Sender: TObject);
+    procedure ComboBoxParticipantChange(Sender: TObject);
+    //procedure ComboBoxParticipantEditingDone(Sender: TObject);
     procedure EndSession(Sender : TObject);
     procedure CloseSDLApp(Sender : TObject);
     procedure FormCreate(Sender: TObject);
@@ -113,6 +116,7 @@ uses
   , session.fileutils
   , session.csv.experiments
   , session.design.conversion
+  , session.loggers.types
   , sdl.app
   , sdl.app.controller.manager
   , sdl.app.grids.types
@@ -237,30 +241,38 @@ begin
   end;
 end;
 
-procedure TFormMain.ComboBoxDesignFolderEditingDone(Sender: TObject);
+procedure TFormMain.ComboBoxDesignFolderChange(Sender: TObject);
 begin
   with ComboBoxDesignFolder do begin
     if ItemIndex > 0 then begin
       if ComboBoxDesignFolder.Items.Count > 0 then begin
         ListBoxCondition.Clear;
         Pool.DesignBasePath := Items[ItemIndex];
-        SaveProtocolIndex(ParticipantFolderName, ItemIndex);
+        SaveProtocol(ParticipantFolderName, Pool.DesignBasePath);
         GetDesignFilesFor(ListBoxCondition.Items);
       end;
     end;
   end;
 end;
 
-procedure TFormMain.ComboBoxParticipantEditingDone(Sender: TObject);
+procedure TFormMain.ComboBoxParticipantChange(Sender: TObject);
 var
   LInformation : TInformation;
   LCondition : integer;
+  LDesignFolderIndex : integer;
 begin
   if ComboBoxParticipant.Items.Count > 0 then begin
     SetupFolders;
-    ComboBoxDesignFolder.ItemIndex := LoadProtocolIndex(ParticipantFolderName);
-    ComboBoxDesignFolderEditingDone(ComboBoxParticipant);
-    //IniPropStorageProtocol.Save;
+
+    LDesignFolderIndex :=
+      ComboBoxDesignFolder.Items.IndexOf(LoadProtocol(ParticipantFolderName));
+    if LDesignFolderIndex > -1 then begin
+      ComboBoxDesignFolder.ItemIndex := LDesignFolderIndex;
+      ComboBoxDesignFolderChange(ComboBoxParticipant);
+    end else begin
+      Exit;
+    end;
+
     //LConfiguration := ConcatPaths([
     //  Pool.ConfigurationsRootBasePath,
     //  ParticipantFolderName, 'protocol.ini']);
@@ -296,6 +308,7 @@ begin
         ListBoxCondition.ItemIndex := LCondition;
       end;
     end;
+    IniPropStorage1.Save;
   end;
 end;
 
@@ -341,22 +354,28 @@ end;
 procedure TFormMain.IniPropStorage1StoredValues0Restore(
   Sender: TStoredValue; var Value: TStoredType);
 var
-  LValue : integer;
+  LValue : string;
 begin
   GetDesignFoldersFor(ComboBoxDesignFolder.Items);
   with Pool, ComboBoxDesignFolder do begin
-    LValue := Value.ToInteger;
-    if (LValue < Items.Count) and (LValue <> -1) then begin
-      DesignBasePath := Items[LValue];
-    end;
+    LValue := Value;
+    DesignBasePath := Items[Items.IndexOf(LValue)];
   end;
 end;
 
+
 procedure TFormMain.IniPropStorage1StoredValues0Save(
   Sender: TStoredValue; var Value: TStoredType);
+var
+  LValue : string;
 begin
-  SaveProtocolIndex(ParticipantFolderName, ComboBoxDesignFolder.ItemIndex);
-  Value := ComboBoxDesignFolder.ItemIndex.ToString;
+  with ComboBoxDesignFolder do begin
+    LValue := Items[ItemIndex];
+  end;
+  SaveProtocol(
+    ParticipantFolderName,
+    LValue);
+  Value := LValue;
 end;
 
 procedure TFormMain.IniPropStorage1StoredValues1Restore(

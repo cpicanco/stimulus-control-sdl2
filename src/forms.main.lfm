@@ -9,7 +9,7 @@ object FormMain: TFormMain
   DefaultMonitor = dmPrimary
   PopupMenu = PopupMenuMisc
   SessionProperties = 'ComboBoxCondition.ItemIndex;ComboBoxParticipant.ItemIndex;ComboBoxParticipant.Items;ComboBoxParticipant.Text;Height;IniPropStorage1.IniFileName;IniPropStorageProtocol.IniFileName;LabelLastSessionName.Caption;LabelLastSessionName.Color;LabelSessionEndCriteria.Caption;LabelSessionEndCriteria.Color;Left;OpenDialog1.InitialDir;Top;Width;ComboBoxDesignFolder.ItemIndex'
-  LCLVersion = '3.99.0.0'
+  LCLVersion = '4.99.0.0'
   OnCreate = FormCreate
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
@@ -35,7 +35,7 @@ object FormMain: TFormMain
       ReadOnly = True
       TabOrder = 1
       Text = 'Participante'
-      OnEditingDone = ComboBoxParticipantEditingDone
+      OnChange = ComboBoxParticipantChange
     end
     object ButtonRunInterruptedSession: TButton
       Left = 16
@@ -96,7 +96,7 @@ object FormMain: TFormMain
       ReadOnly = True
       TabOrder = 7
       Text = 'Nome da Pasta'
-      OnEditingDone = ComboBoxDesignFolderEditingDone
+      OnChange = ComboBoxDesignFolderChange
     end
     object ListBoxCondition: TListBox
       Left = 16

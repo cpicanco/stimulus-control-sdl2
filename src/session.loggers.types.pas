@@ -13,7 +13,7 @@ unit session.loggers.types;
 
 interface
 
-uses Math;
+uses Math, SDL2, sdl.app.grids.types;
 
 type
   { TDataProcedure }
@@ -31,6 +31,19 @@ type
     Annotation : string;
   end;
 
+  TInformation = record
+    Version : UInt8;
+    Basename : string;
+    ParticipantName : string;
+    SessionDesignFolder: string;
+    SessionName : string;
+    SessionResult : string;
+    Grid : TMatrix;
+    Monitor : TSDL_Rect;
+    SessionStart : TDateTime;
+    SessionEnd : TDateTime;
+    SessionDuration : TDateTime;
+  end;
 
 implementation
 
