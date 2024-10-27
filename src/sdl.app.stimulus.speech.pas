@@ -126,8 +126,9 @@ begin
   Timestamp(LEvent);
 
   LName := 'Speech-'+GetID.ToSpeechString;
+  FRecorder.SaveToFile(Pool.DataResponsesBasePath+LName);
+
   if AHuman then begin
-    FRecorder.SaveToFile(Pool.DataResponsesBasePath+LName);
     if FHasConsequence then begin
       FormManualSpeechValidation.ExpectedText := FCustomName;
     end else begin
