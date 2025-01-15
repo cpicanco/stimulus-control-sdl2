@@ -160,14 +160,23 @@ class Circle(Component):
             cv2.LINE_AA)
 
 class Rectangle(Component):
-    def __init__(self, parent=None, width=25, height=25, color=(0, 0, 0), length=1):
+    def __init__(self,
+                 parent=None,
+                 x=0, y=0,
+                 width=25, height=25,
+                 color=(0, 0, 0),
+                 length=1):
         super().__init__(parent)
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
         self.width = width
         self.height = height
         self.color = color
         self.length = length
+
+    @property
+    def area(self):
+        return self.width * self.height
 
     def draw(self, buffer):
         cv2.rectangle(
@@ -177,6 +186,40 @@ class Rectangle(Component):
             self.color,
             self.length,
             cv2.LINE_AA)
+
+    def contains(self, x, y):
+        return self.x <= x <= (self.x + self.width) and self.y <= y <= (self.y + self.height)
+
+    def to_relative_coordenates(self, x, y):
+        return x - self.x, y - self.y
+
+    @staticmethod
+    def from_dict(dictionary):
+        rect = Rectangle()
+        rect.x = dictionary['x']
+        rect.y = dictionary['y']
+        rect.width = dictionary['w']
+        rect.height = dictionary['h']
+        return rect
+
+    def split_horizontally(self, times=4):
+        width = round(self.width / times)
+        rects = []
+
+        for i in range(times):
+            if i < times:
+                rect_width = width -1
+            else:
+                rect_width = width
+
+            rects.append(Rectangle(
+                x=round(self.x + (i * width)),
+                y=self.y,
+                width=rect_width,
+                height=self.height
+            ))
+
+        return rects
 
 class Background(Component):
     def __init__(self, parent=None, color=(0, 0, 0)):
@@ -327,8 +370,8 @@ class BehaviorDrawingFactory:
         ]
 
     def update(self, line):
-        event: str = line['Event'].decode('utf-8')
-        event_annotation: str = line['Event.Annotation'].decode('utf-8')
+        event: str = line['Event']
+        event_annotation: str = line['Event.Annotation']
 
         if event.startswith('CalibrationStimuli'):
             # self.calibration.load(key, bounds_rect)
@@ -356,13 +399,13 @@ class BehaviorDrawingFactory:
             self.timeout.enabled = True
 
         if event.startswith('MTSStimuli') \
-         and event.endswith('.Show'):
+          and event.endswith('.Show'):
             if self.timeout.enabled:
                 self.timeout.enabled = False
                 self.timeout.visible = False
 
         elif event.startswith('MTSStimuli') \
-         and event.endswith('.Hide'):
+          and event.endswith('.Hide'):
             if self.timeout.enabled:
                 self.timeout.visible = True
 
@@ -372,7 +415,7 @@ class BehaviorDrawingFactory:
 
 
 class GazeDrawingFactory:
-    def __init__(self, session, screen : Screen):
+    def __init__(self, session):
         self.x_label = session.gaze.__FixationX__
         self.y_label = session.gaze.__FixationY__
         self.v_label = session.gaze.__FixationValid__
@@ -386,7 +429,7 @@ class GazeDrawingFactory:
         # self.fd_label = session.gaze.__FixationDuration__
         # self.fv_label = session.gaze.__FixationValid__
 
-        self.screen = screen
+        self.screen = session.screen
         self.gaze = Circle(parent=self.screen)
 
     def update(self, line):

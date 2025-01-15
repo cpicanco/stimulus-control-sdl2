@@ -1,5 +1,6 @@
 import numpy as np
 from player_events import BaseEvents
+from player_eye_math import SCREEN_W_CM, SCREEN_H_CM
 
 class GazeEvents(BaseEvents):
     __extension__ = '.gaze'
@@ -77,6 +78,28 @@ class GazeEvents(BaseEvents):
         first_timestamp = self.events[self.__Timestamp__][0]
         self.events[self.__Timestamp__] = self.events[self.__Timestamp__] - first_timestamp
         self.events[self.__Timestamp__] = self.events[self.__Timestamp__] / self.info.TimeTickFrequency
+
+    def denormalize(self, measurement='best_gaze', metric='centimeter'):
+        if measurement == 'best_gaze':
+            m_x = self.__BestGazeX__
+            m_y = self.__BestGazeY__
+        elif measurement == 'left_gaze':
+            m_x = self.__LeftGazeX__
+            m_y = self.__LeftGazeY__
+        elif measurement == 'right_gaze':
+            m_x = self.__RightGazeX__
+            m_y = self.__RightGazeY__
+        elif measurement == 'fixations':
+            m_x = self.__FixationX__
+            m_y = self.__FixationY__
+
+        if metric == 'pixel':
+            x = self.events[m_x] * self.info.ScreenWidth
+            y = self.events[m_y] * self.info.ScreenHeight
+        elif metric == 'centimeter':
+            x = self.events[m_x] * SCREEN_W_CM
+            y = self.events[m_y] * SCREEN_H_CM
+        return (x, y)
 
 if __name__ == '__main__':
     from player_information import GazeInfo

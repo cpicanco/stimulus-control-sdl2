@@ -1,6 +1,7 @@
+import pandas as pd
 import numpy as np
 
-def load_from_file(filename, dtype, converters):
+def load_from_file(filename, dtype, converters) -> np.ndarray:
     try:
         return np.loadtxt(filename,
                           delimiter='\t',
@@ -20,6 +21,7 @@ class BaseEvents:
     __converters__ = None
 
     def __init__(self, info):
+        self.events = None
         self.info = info
         self.base_filename = self.info.base_filename
         self._label = None
@@ -54,3 +56,7 @@ class BaseEvents:
     @property
     def labels(self):
         return np.full(len(self.events[self.__class__.__Timestamp__]), self._label, dtype=np.uint8)
+
+    @property
+    def DataFrame(self):
+        return pd.DataFrame(self.events)

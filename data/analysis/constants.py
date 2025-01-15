@@ -39,4 +39,29 @@ participants_social = [
     '58-AIS'  # Arquitetura/Urbanismo
 ]
 
+participants_pt = [
+    "1-JOP",
+    "3-PVV",
+    "4-FES",
+    "5-NUN",
+    "7-DVV",
+    "8-AFO",
+    "9-ISC",
+    "10-TGG",
+    "12-HUM",
+    "13-VRA",
+    "14-AJF",
+    "15-DNL",
+    "16-VNS",
+    "17-MRS",
+    "19-JAB",
+    "20-HLD",
+    "22-CVA",
+    "23-MQN",
+    "25-JDR",
+    "26-MSS",
+    "27-CLD",
+    "28-DGO"
+]
+
 participant_folders = participants_natural + participants_social

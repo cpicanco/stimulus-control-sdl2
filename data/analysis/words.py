@@ -163,6 +163,65 @@ all = [
     'Fim.'
 ]
 
+words_per_file = {
+    'Ciclo0-0-Pre-treino': ['X1', 'X2', 'bala', 'bolo'],
+    'Ciclo1-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo1-1-Treino-AB': words_per_cycle[1]['teaching'] + constant,
+    'Ciclo1-2a-Treino-AC-CD': words_per_cycle[1]['teaching'],
+    'Ciclo1-2b-Treino-AC-Ref-Intermitente': words_per_cycle[1]['teaching'],
+    'Ciclo1-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[1]['teaching'],
+    'Ciclo1-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo1-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[1]['generalization'] + constant,
+    'Ciclo1-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[1]['generalization'] + constant,
+
+    'Ciclo2-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo2-1-Treino-AB': words_per_cycle[2]['teaching'] + constant,
+    'Ciclo2-2a-Treino-AC-CD': words_per_cycle[2]['teaching'],
+    'Ciclo2-2b-Treino-AC-Ref-Intermitente': words_per_cycle[2]['teaching'],
+    'Ciclo2-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[2]['teaching'],
+    'Ciclo2-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo2-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[2]['generalization'] + constant,
+    'Ciclo2-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[2]['generalization'] + constant,
+
+    'Ciclo3-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo3-1-Treino-AB': words_per_cycle[3]['teaching'] + constant,
+    'Ciclo3-2a-Treino-AC-CD': words_per_cycle[3]['teaching'],
+    'Ciclo3-2b-Treino-AC-Ref-Intermitente': words_per_cycle[3]['teaching'],
+    'Ciclo3-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[3]['teaching'],
+    'Ciclo3-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo3-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[3]['generalization'] + constant,
+    'Ciclo3-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[3]['generalization'] + constant,
+
+    'Ciclo4-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo4-1-Treino-AB': words_per_cycle[4]['teaching'] + constant,
+    'Ciclo4-2a-Treino-AC-CD': words_per_cycle[4]['teaching'],
+    'Ciclo4-2b-Treino-AC-Ref-Intermitente': words_per_cycle[4]['teaching'],
+    'Ciclo4-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[4]['teaching'],
+    'Ciclo4-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo4-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[4]['generalization'] + constant,
+    'Ciclo4-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[4]['generalization'] + constant,
+
+    'Ciclo5-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo5-1-Treino-AB': words_per_cycle[5]['teaching'] + constant,
+    'Ciclo5-2a-Treino-AC-CD': words_per_cycle[5]['teaching'],
+    'Ciclo5-2b-Treino-AC-Ref-Intermitente': words_per_cycle[5]['teaching'],
+    'Ciclo5-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[5]['teaching'],
+    'Ciclo5-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo5-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[5]['generalization'] + constant,
+    'Ciclo5-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[5]['generalization'] + constant,
+
+    'Ciclo6-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo6-1-Treino-AB': words_per_cycle[6]['teaching'] + constant,
+    'Ciclo6-2a-Treino-AC-CD': words_per_cycle[6]['teaching'],
+    'Ciclo6-2b-Treino-AC-Ref-Intermitente': words_per_cycle[6]['teaching'],
+    'Ciclo6-3-Sondas-BC-CB-Palavras-de-ensino': words_per_cycle[6]['teaching'],
+    'Ciclo6-4-Sondas-BC-CB-Palavras-reservadas': constant,
+    'Ciclo6-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[6]['generalization'] + constant,
+    'Ciclo6-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[6]['generalization'] + constant,
+
+    'Ciclo6-7-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:]
+}
+
 def recombine_letters(consonants='bfln', vowels='aeio'):
     sylables = []
     for c in consonants:

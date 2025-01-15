@@ -4,16 +4,16 @@ if __name__ == '__main__':
     import numpy as np
     import cv2
 
-    def histogram(data, detail, sh, sw, rh, rw):
-        """ Create a blurred histogram from gaze points. """
+    def heatmap(data, detail, bins_h, bins_w, range_h, range_w):
+        """ Create a blurred heatmap from gaze points. """
         xvals = data[:, 0]
         yvals = data[:, 1]
 
         # Create a 2D histogram
         hist, x_edges, y_edges = np.histogram2d(
             yvals, xvals,
-            bins=[sh, sw],
-            range=[[0, rh], [0, rw]]
+            bins=[bins_h, bins_w],
+            range=[[0, range_h], [0, range_w]]
         )
 
         # Apply Gaussian blur to the histogram
@@ -43,10 +43,10 @@ if __name__ == '__main__':
 
 
     # Detail level (kernel size for Gaussian blur)
-    detail = 15
+    detail = 30
 
     # Generate the histogram and apply Gaussian blur
-    blurred_hist = histogram(gaze_points, detail, sh, sw, 1., 1.)
+    blurred_hist = heatmap(gaze_points, detail, sh, sw, 1., 1.)
 
     # Normalize the result for visualization
     norm_hist = cv2.normalize(blurred_hist, None, 0, 255, cv2.NORM_MINMAX)

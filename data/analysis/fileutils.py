@@ -8,24 +8,49 @@ import pandas as pd
 from anonimizator import anonimize
 from headers import info_header
 
-def file_exists(entry):
-    return os.path.exists(entry)
+data_folder_name = 'data'
+design_folder_name = 'design'
+project_folder_name = 'pseudowords'
 
-def data_dir():
+def cache_folder():
+    return os.path.join(data_dirname(), 'analysis', 'cache')
+
+def design_pseudowords_dirname():
+    # get script path
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    # go up two folders
+    script_path = os.path.dirname(script_path)
+    script_path = os.path.dirname(script_path)
+    return os.path.join(script_path, design_folder_name, project_folder_name)
+
+def data_dirname():
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    script_path = os.path.dirname(script_path)
+    script_path = os.path.dirname(script_path)
+    return os.path.join(script_path, data_folder_name)
+
+def return_to(directory, verbose=True):
     # check if current directory is data
-    if os.getcwd().endswith('data'):
+    if os.getcwd().endswith(directory):
         return
     else:
         # recursively return until reach data directory
-        cd('..')
-        data_dir()
+        cd('..', verbose)
+        data_dir(verbose)
+
+def file_exists(entry):
+    return os.path.exists(entry)
+
+def data_dir(verbose=True):
+    return_to(data_folder_name, verbose)
 
 def directory_exists(directory):
     return os.path.isdir(directory)
 
-def cd(directory):
+def cd(directory, verbose=True):
     os.chdir(directory)
-    print("Current Working Directory: ", os.getcwd())
+    if verbose:
+        print("Current Working Directory: ", os.getcwd())
 
 def get_real_filepath(entry):
     return os.path.join(os.getcwd(), entry)
@@ -48,24 +73,38 @@ def load_file(entry):
 
     return df
 
-def list_data_folders(include_list=[], exclude_list=[]):
+def folder_sorter(x):
+    return int(x.split('-')[0])
+
+def list_data_folders(include_list=[], exclude_list=[], directory_name='.'):
+    all_entries = os.listdir(directory_name)
     if len(include_list) == 0:
-        exclude_list += ['__pycache__', 'analysis', 'dados-brasil', '.vscode', 'output', '0-Rafael', '3-Teste', '7-Teste2']
-        # Get all entries in the current directory
-        all_entries = os.listdir('.')
-        # Filter out files and excluded folders
-        return [entry for entry in all_entries \
-                if os.path.isdir(entry) \
+        exclude_list += [
+            '.vscode',
+            '__pycache__',
+            'analysis',
+            'dados-brasil',
+            'dados-brasil-geovana',
+            'dados-portugal',
+            'dados-portugal-geovana',
+            'output',
+            '0-Rafael',
+            '3-Teste',
+            '7-Teste2']
+
+        entries = [entry for entry in all_entries \
+                if os.path.isdir(os.path.join(directory_name, entry)) \
                 and entry not in exclude_list]
+        entries.sort(key=folder_sorter)
+        return entries
     else:
-        all_entries = os.listdir('.')
-        return [entry for entry in all_entries \
-                if os.path.isdir(entry) \
-                and entry in include_list]
+        entries = [entry for entry in all_entries \
+                if os.path.isdir(os.path.join(directory_name, entry)) \
+                and entry in include_list].sort(key=folder_sorter)
+        entries.sort(key=folder_sorter)
+        return entries
 
 def get_data_folders(anonimized=False):
-    def folder_sorter(x):
-        return int(x.split('-')[0])
     data_dir()
     participant_folders = list_data_folders()
     if anonimized:

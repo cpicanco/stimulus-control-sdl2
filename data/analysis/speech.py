@@ -258,42 +258,45 @@ def override_CD_probes_in_data_file(must_not_override=True):
         for data_folder_by_day in safety_copy_data_folders:
             cd(data_folder_by_day)
 
-            filtered_data = None
-            for entry in list_files('.info.processed'):
-                data_file = as_data(entry, processed=True)
-                if not file_exists(data_file):
-                    continue
-
-                info = Information(entry)
-                if info.has_valid_result():
-                    if not '-CD-' in info.session_name:
+            for cycle in list_data_folders():
+                cd(cycle)
+                filtered_data = None
+                for entry in list_files('.info.processed'):
+                    data_file = as_data(entry, processed=True)
+                    if not file_exists(data_file):
                         continue
 
-                    if file_exists(data_file.replace('.data', '.probes')):
-                        if must_not_override:
+                    info = Information(entry)
+                    if info.has_valid_result():
+                        if not '-CD-' in info.session_name:
                             continue
-                    # print a message idenifying participant, folder, and file
-                    print(f'Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}')
-                    data_to_override = load_file(data_file)
 
-                    filtered_data = data[data['File'] == data_file]
+                        if file_exists(data_file.replace('.data', '.probes')):
+                            if must_not_override:
+                                continue
+                        # print a message idenifying participant, folder, and file
+                        print(f'Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}')
+                        data_to_override = load_file(data_file)
 
-                    participant = filtered_data['Participant'].str.replace(r'\\', '')
-                    filtered_data = filtered_data[participant == anonimize(participant_folder, as_path=False)]
+                        filtered_data = data[data['File'] == data_file]
 
-                    # check if count is the same
-                    if filtered_data.shape[0] != data_to_override.shape[0]:
-                        print(f'Count is different for {data_file}')
-                        raise Exception('Count is different')
-                    else:
-                        data_to_override['Result'] = filtered_data['Result'].values
-                        data_to_override['Response'] = filtered_data['Speech-3'].values
-                        data_to_override.to_csv(data_file, sep='\t', index=False)
-                        filtered_data['Levenshtein'].to_csv(data_file.replace('.data', '.probes'), sep='\t', index=False)
+                        participant = filtered_data['Participant'].str.replace(r'\\', '')
+                        filtered_data = filtered_data[participant == anonimize(participant_folder, as_path=False)]
+
+                        # check if count is the same
+                        if filtered_data.shape[0] != data_to_override.shape[0]:
+                            print(f'Count is different for {data_file}')
+                            raise Exception('Count is different')
+                        else:
+                            data_to_override['Result'] = filtered_data['Result'].values
+                            data_to_override['Response'] = filtered_data['Speech-3'].values
+                            data_to_override.to_csv(data_file, sep='\t', index=False)
+                            filtered_data['Levenshtein'].to_csv(data_file.replace('.data', '.probes'), sep='\t', index=False)
+                cd('..')
             cd('..')
         cd('..')
         cd('..')
 
 
 if __name__ == "__main__":
-    correlate_latency_levenshtein()
+    override_CD_probes_in_data_file(must_not_override=False)

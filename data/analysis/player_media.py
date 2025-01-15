@@ -74,7 +74,7 @@ def load_pictures(participant_id):
         with open(pictures_path, 'rb') as f:
             pictures = pickle.load(f)
     else:
-        raise Exception('Pictures not found')
+        raise Exception(f'Pictures not found: {pictures_path}')
 
     return pictures
 
@@ -103,6 +103,7 @@ def load_fonts():
 
         elif filename == 'Arimo-Regular.ttf':
             arimo = ImageFont.truetype(filepath, 230)
+
 
 def get_wrapped_text(text: str, font: ImageFont.ImageFont, line_length: int):
     lines = ['']

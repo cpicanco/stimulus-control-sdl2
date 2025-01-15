@@ -32,6 +32,12 @@ def convert_all(exclude_list=[], override=False):
 
     cd('analysis')
 
+def convert_one(folder, override=False):
+    cd('..')
+    print('*****************************   Conversion started...')
+    walk_and_execute(folder, convert, override)
+    cd('analysis')
+
 def override_timestamps(override=True):
     for entry in list_files('.timestamps'):
         override_timestamps_file(entry, override)
@@ -52,4 +58,5 @@ def override_all_timestamps():
 
 
 if __name__ == "__main__":
+    # convert_one('26-MSS', override=True)
     override_all_timestamps()

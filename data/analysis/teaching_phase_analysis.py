@@ -1,7 +1,3 @@
-from constants import participant_folders
-from constants import participants_natural as folders_natural
-from constants import participants_social as folders_social
-
 from fileutils import cd, walk_and_execute
 from metadata import Metadata
 from metadata_calculator import collect_metadata
@@ -502,6 +498,8 @@ def multiple_probes_procedure_lines(participants_list, plot_type='line', group=F
     # must join Files "049.data.processed" and "050.data.processed" ONLY for for Participant "20-CAM"
     CD_probes.loc[(CD_probes['Participant'] == '20-CAM') & (CD_probes['File'] == '050.data.processed'), 'File'] = '049.data.processed'
 
+    # must join Files "034.data.processed" and "037.data.processed" ONLY for for Participant "3-PVV "
+    CD_probes.loc[(CD_probes['Participant'] == '3-PVV') & (CD_probes['File'] == '037.data.processed'), 'File'] = '034.data.processed'
 
     data_to_plot = {}
     for participant in participants_list:
@@ -563,6 +561,11 @@ def multiple_probes_procedure_lines(participants_list, plot_type='line', group=F
         ax.axhline(y=0, color='gray', linewidth=0.5, linestyle='--')
         ax.axhline(y=50, color='gray', linewidth=0.5, linestyle='--')
         ax.axhline(y=100, color='gray', linewidth=0.5, linestyle='--')
+
+        # write participant name at the top/left of the plot
+        if i == 0:
+            ax.text(0, 125, participant)
+
         if plot_type == 'line':
             data_x = []
             data_y = []
@@ -607,17 +610,113 @@ def multiple_probes_procedure_lines(participants_list, plot_type='line', group=F
     cd('..')
 
 
+def sort_lines(participants_list):
+    w1_filter = r'(nibo|fale)'
+    w2_filter = r'(bofa|leni)'
+    w3_filter = r'(lebo|fani)'
+    w4_filter = r'(boni|lefa)'
+    w5_filter = r'(fabo|nile)'
+    w6_filter = r'(bole|nifa)'
+
+    w7_filter = r'(bona|lefi)'
+    w8_filter = r'(fabe|nilo)'
+    w9_filter = r'(lani|febo)'
+    w10_filter = r'(nole|bifa)'
+
+    filters = [
+        w1_filter, w2_filter, w3_filter, w4_filter, w5_filter, w6_filter,
+        w7_filter, w8_filter, w9_filter, w10_filter]
+
+    cd('output')
+    filename = 'probes_CD.data.processed'
+    CD_probes = load_probes_file(filename)
+    CD_probes = CD_probes[CD_probes['Condition'] == 7]
+
+    # need to treat some exceptions
+    # must join Files "002.data.processed" and "006.data.processed" ONLY for for Participant "13-AND"
+    CD_probes.loc[(CD_probes['Participant'] == '13-AND') & (CD_probes['File'] == '006.data.processed'), 'File'] = '002.data.processed'
+
+    # must join Files "049.data.processed" and "050.data.processed" ONLY for for Participant "20-CAM"
+    CD_probes.loc[(CD_probes['Participant'] == '20-CAM') & (CD_probes['File'] == '050.data.processed'), 'File'] = '049.data.processed'
+
+    # must join Files "034.data.processed" and "037.data.processed" ONLY for for Participant "3-PVV "
+    CD_probes.loc[(CD_probes['Participant'] == '3-PVV') & (CD_probes['File'] == '037.data.processed'), 'File'] = '034.data.processed'
+
+    participants_data = {}
+    for participant in participants_list:
+        data_to_plot = {'hits':[], 'trials':[], 'probes':[]}
+        participant_probes = CD_probes[CD_probes['Participant'] == participant]
+        unique_files = participant_probes['File'].unique()
+        for file in unique_files:
+            file_probes = participant_probes[participant_probes['File'] == file]
+            # use the file index as a tag
+            file_tag = unique_files.tolist().index(file) + 1
+            if file_tag == 8:
+                raise ValueError(f'index 8 not allowed: {participant}, {file}')
+            # if file_tag not in data_to_plot:
+            #     data_to_plot[file_tag] = {}
+
+            for filter in filters:
+                word_probes = file_probes[file_probes['Name'].str.match(filter)]
+                if word_probes.empty:
+                    raise ValueError(f'No probes for {filter} in {file} for participant {participant}')
+
+                # if filter not in data_to_plot[file_tag]:
+                #     data_to_plot[file_tag][filter] = []
+
+                # count trials and hits for each filter
+                trials = word_probes['Result'].count()
+
+                # count Hit in Result column
+                hits = word_probes[word_probes['Result'] == 'Hit']['Result'].count()
+
+                # data_to_plot[file_tag][filter].append((hits, trials))
+                data_to_plot['hits'].append(hits)
+                data_to_plot['trials'].append(trials)
+                data_to_plot['probes'].append(word_probes)
+        participants_data[participant] = {
+            'hits': np.sum(data_to_plot['hits']),
+            'trials': np.sum(data_to_plot['trials']),
+            'proportion': np.sum(data_to_plot['hits']) / np.sum(data_to_plot['trials']),
+            'probes': data_to_plot['probes']}
+
+    # for participant in participants_data:
+    #     data = []
+    #     for file_tag in participants_data[participant]:
+    #         for filter in participants_data[participant][file_tag]:
+    #             data.append(participants_data[participant][file_tag][filter])
+    #     participants_data[participant]['unfiltered'] = np.sum(np.array(data))
+
+    return participants_data
+
 if __name__ == '__main__':
+    from constants import participants_pt as participants_folders
+
     # multiple_probes_procedure(
     #     participants_list=participant_folders,
     #     group=True,
     #     append_to_filename='_all')
 
-    for participant in participant_folders:
-        multiple_probes_procedure_lines(
-            participants_list=[participant],
-            group=False,
-            append_to_filename=f'_{participant}')
+    # for participant in participants_folders:
+    #     multiple_probes_procedure_lines(
+    #         participants_list=[participant],
+    #         group=False,
+    #         append_to_filename=f'_{participant}')
+
+    participants_data = sort_lines(participants_list=participants_folders)
+    sorted_participants = sorted(participants_data, key=lambda x: participants_data[x]['proportion'], reverse=True)
+    for participant in sorted_participants:
+        print(participant, participants_data[participant]['trials'], participants_data[participant]['proportion'])
+
+    # sort participant_data by participants_data[participant]['unfiltered']
+    # sorted_participants = sorted(participants_data, key=lambda x: participants_data[x]['unfiltered'], reverse=True)
+    # for participant in sorted_participants:
+    #     print(participant, participants_data[participant]['unfiltered'])
+    
+    # for participant in participants_data:
+    #     print(participant, participants_data[participant]['unfiltered'])
+
+
 
     # line_plot_AB_AC_CD()
     # data = get_hits_trials_per_participant_per_cycle_per_phase(participants_list=participant_folders)
