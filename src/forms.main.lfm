@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 768
+  Left = 973
   Height = 697
-  Top = 33
+  Top = 15
   Width = 377
   Caption = 'Stimulus Control'
   ClientHeight = 697
