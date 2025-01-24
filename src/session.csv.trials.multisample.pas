@@ -17,6 +17,7 @@ type
   TCSVMultiSample = class(TCSVTrialsMTS)
     private // registered parameters
       FDragDropOrientation: string;
+      FReleaseFoodForIntermediateHits : Boolean;
       FAutoAnimateOnstart: Boolean;
       FUseHelpProgression: Boolean;
       FDistance: Integer;
@@ -101,6 +102,7 @@ begin
   FKind := TDragDrop.ClassName;
   FDragDropOrientation := '';
   FAutoAnimateOnstart := False;
+  FReleaseFoodForIntermediateHits := False;
   FUseHelpProgression := False;
   FDistance := 0;
   FDragMode := '';
@@ -112,6 +114,8 @@ begin
   FRefName     := '';
 
   with TrialKeys, DragDropKeys do begin
+    RegisterParameter(ReleaseFoodForIntermediateHitsKey,
+      @FReleaseFoodForIntermediateHits, FReleaseFoodForIntermediateHits);
     RegisterParameter(AutoAnimateOnStartKey,
       @FAutoAnimateOnstart, FAutoAnimateOnstart);
     RegisterParameter(DragDropOrientationKey,

@@ -36,6 +36,7 @@ type
 
   TDragDropStimuli = class(TStimuli)
   private
+    FReleaseFoodForIntermediateHits : Boolean;
     FAutoAnimateOnStart : Boolean;
     FWrongDragDrops : integer;
     FRenderer : TRendererThread;
@@ -247,6 +248,8 @@ begin
       FGridOrientation := DragDropToGridOrientation(
         Parameters[DragDropOrientationKey].ToDragDropOrientation);
       FAutoAnimateOnStart := Parameters[AutoAnimateOnStartKey].ToBoolean;
+      FReleaseFoodForIntermediateHits :=
+        Parameters[ReleaseFoodForIntermediateHitsKey].ToBoolean;
 
       LSamples := Parameters[SamplesKey].ToInteger;
       LComparisons := Parameters[ComparisonsKey].ToInteger;
@@ -256,7 +259,7 @@ begin
         LSampleKey := SampleKey+(i+1).ToString;
         SomeKeyIsMissing := not Parameters.ContainsKey(LSampleKey);
         if SomeKeyIsMissing then begin
-          raise Exception.Create('TDragDropStimuli.Load: Missing Sn key.');
+          raise Exception.Create('TDragDropStimuli.Load: Missing Sn key in configuration file of trials.');
           Break;
         end;
       end;
@@ -266,7 +269,7 @@ begin
           LComparKey := ComparisonKey+(i+1).ToString;
           SomeKeyIsMissing := not Parameters.ContainsKey(LComparKey);
           if SomeKeyIsMissing then begin
-            raise Exception.Create('TDragDropStimuli.Load: Missing Cn key.');
+            raise Exception.Create('TDragDropStimuli.Load: Missing Cn key in configuration file of trials.');
             Break;
           end;
         end;
@@ -408,8 +411,10 @@ var
   S1 : string;
 begin
   FSoundRight.Play;
-  if Assigned(RS232) then begin
-    RS232.Dispenser;
+  if FReleaseFoodForIntermediateHits then begin
+    if Assigned(RS232) then begin
+      RS232.Dispenser;
+    end;
   end;
 
   Sample := Source as TDragDropablePicture;
@@ -463,7 +468,12 @@ begin
   for Sample in FSamples do
     if Sample.Draggable then begin
       FDragDropDone := False;
-      Animate(Sample);
+      if FAutoAnimateOnStart then begin
+        Animate(Sample);
+      end else begin
+        FAnimation.Stop;
+        FAnimation.Hide;
+      end;
       Break;
     end else begin
       //Sample.EdgeColor:=clInactiveCaption;
@@ -474,6 +484,13 @@ begin
     OnRightDragDrop(Sender, Source, X, Y);
 
   if FDragDropDone then begin
+    if FReleaseFoodForIntermediateHits then begin
+      // do nothing
+    end else begin
+      if Assigned(RS232) then begin
+        RS232.Dispenser;
+      end;
+    end;
     //FResult := Hit; todo: dragdrop trial have different hit types
     Pool.Counters.Hit;
     FResult := Hit;
@@ -659,6 +676,7 @@ end;
 constructor TDragDropStimuli.Create;
 begin
   inherited Create;
+  FReleaseFoodForIntermediateHits := False;
   FAutoAnimateOnStart := False;
   FWrongDragDrops := 0;
   FSamples := TDragDropablePictures.Create;
