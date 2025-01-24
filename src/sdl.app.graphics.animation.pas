@@ -30,6 +30,7 @@ type
     procedure Join(ASample, AComparison : TRectangule;
       AGridOrientation : TGridOrientation);
     procedure Stop;
+    procedure Hide; override;
     property Sibling : TRectangule read FSibling;
     property Visible : Boolean read FVisible write FVisible;
   end;
@@ -181,6 +182,12 @@ end;
 procedure TAnimation.Stop;
 begin
   // change color
+end;
+
+procedure TAnimation.Hide;
+begin
+  inherited Hide;
+  FVisible := False;
 end;
 
 constructor TAnimation.Create;
