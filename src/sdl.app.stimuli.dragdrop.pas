@@ -354,6 +354,9 @@ procedure TDragDropStimuli.Start;
 var
   LItem : TDragDropablePicture;
 begin
+  // todo: refactor to avoid using a global var
+  TDragDropablePicture.Reset;
+
   for LItem in FComparisons do LItem.Show;
   for LItem in FSamples do LItem.Show;
 

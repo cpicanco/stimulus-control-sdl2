@@ -58,6 +58,7 @@ type
     procedure MouseExit(Sender: TObject); override;
     procedure Paint; override;
   public
+    class procedure Reset;
     constructor Create; override;
     destructor Destroy; override;
     procedure Load(AParameters : TStringList;
@@ -223,6 +224,11 @@ end;
 procedure TDragDropablePicture.Paint;
 begin
   inherited Paint;
+end;
+
+class procedure TDragDropablePicture.Reset;
+begin
+  SomeInstanceIsDragging := False;
 end;
 
 constructor TDragDropablePicture.Create;
