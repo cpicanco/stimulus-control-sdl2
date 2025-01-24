@@ -44,6 +44,7 @@ O arquivo "exemplo.csv" contém os seguintes parâmetros para configurar os bloc
 - **EndCriterionValue**: valor do critério de desempenho. Ver EndCriterionStyle.
 - **Reinforcement**: Porcentagem de tentativas do bloco com reforçamento diferencial.
 
+
 ### **2.2. Diretório "instructions"**
 O arquivo "exemplo.csv" neste diretório inclui parâmetros para as instruções da sessão, como:
 
@@ -73,8 +74,11 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
     - Se **RightToLeft**, orientação é do tipo "direita para esquerda".
     - Se **Custom**, orientação é do tipo customizada.
 - **AutoAnimatedOnStart**: Controla a ativação da animação da borda do estímulo modelo.
-  - Se **T** (True,) a animação é ativada assim que a tentativa é iniciada, automaticamente  em um dos estímulos modelos.
+  - Se **T** (True), a animação é ativada assim que a tentativa é iniciada, automaticamente  em um dos estímulos modelos.
   - Se **F** (False), a animação é ativada somente depois que um estímulo modelo for selecionado.
+- **ReleaseFoodForIntermediateHits**: controla a liberação de comida (ativação do dispensador) para acertos intermediários.
+  - Se **T** (True), há liberação.
+  - Se **F** (False), não há liberação.
 
 ### **2.4. Arquivo "exemplo.csv"**
 
