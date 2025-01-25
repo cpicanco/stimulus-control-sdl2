@@ -1,7 +1,7 @@
 {
   Schedules
   Copyright (C) 2007 Drausio Capobianco, Universidade Federal de São Carlos.
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
