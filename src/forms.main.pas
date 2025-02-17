@@ -718,6 +718,7 @@ end;
 
 procedure TFormMain.RunSession;
 begin
+  SetSessionResult('');
   SDLApp := TSDLApplication.Create(@Pool.AppName[1]);
   SDLApp.SetupVideo(FormMisc.ComboBoxMonitor.ItemIndex);
   //SDLApp.PrintRendererSetup;

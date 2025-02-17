@@ -43,6 +43,7 @@ type
       class procedure UpdateNavigator;
       class function CurrentTrial : ITrial;
       class function GetLastTrial : ITrial; static;
+      class function IsLastTrial : Boolean;
       class procedure FreeCurrentTrial;
       class function ToData : string; static;
   end;
@@ -138,6 +139,16 @@ begin
   FCurrentTrial.Name := 'LastTrial';
   FCurrentTrial.Data := LMockData;
   Result := FCurrentTrial as ITrial;
+end;
+
+class function TTrialFactory.IsLastTrial: Boolean;
+begin
+  Result := False;
+  if Assigned(FCurrentTrial) then begin
+    if FCurrentTrial is TLastTrial then begin
+      Result := True;
+    end;
+  end;
 end;
 
 class procedure TTrialFactory.FreeCurrentTrial;

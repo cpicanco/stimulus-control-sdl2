@@ -23,6 +23,7 @@ type
   TFormQuestion = class(TForm)
     ButtonCancel: TButton;
     ButtonInterrupt: TButton;
+    LabelInfo: TLabel;
     procedure ButtonCancelKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure ButtonInterruptKeyDown(Sender: TObject; var Key: Word;

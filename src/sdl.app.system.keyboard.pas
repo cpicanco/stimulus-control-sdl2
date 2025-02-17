@@ -44,6 +44,8 @@ type
 implementation
 
 uses
+  Controls,
+  forms.question,
   sdl.app.video.methods,
   ctypes,
   eye.tracker,
@@ -92,7 +94,31 @@ begin
 
   case Event.keysym.sym of
     SDLK_ESCAPE: begin
-      SDLApp.Terminate;
+      if TTrialFactory.IsLastTrial then begin
+        SDLApp.Terminate;
+      end else begin
+        FormQuestion := TFormQuestion.Create(nil);
+        FormQuestion.LabelInfo.Caption :=
+          'A sessão ainda não terminou, deseja mesmo sair?';
+        FormQuestion.ButtonInterrupt.Caption :=
+          'Continuar';
+        FormQuestion.ButtonCancel.Caption :=
+          'Sair';
+        try
+          case FormQuestion.ShowModal of
+            mrCancel : begin
+              SDLApp.Terminate;
+            end;
+
+            otherwise begin
+              RaiseWindow;
+            end;
+          end;
+        finally
+          FormQuestion.Free;
+          FormQuestion := nil;
+        end;
+      end;
     end;
 
     //SDLK_BACKSPACE: begin
