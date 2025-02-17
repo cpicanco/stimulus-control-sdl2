@@ -33,7 +33,9 @@ type
     procedure SetOnStop(ANotifyEvent: TNotifyEvent);
     procedure SetOnStart(ANotifyEvent: TNotifyEvent);
     procedure SetCustomData(AData : string);
+    procedure SetParent(AParent : TObject);
     function GetCustomData : string;
+    function GetParent : TObject;
     procedure LoadFromFile(AFilename : string);
     procedure Play;
     procedure Stop;

@@ -31,6 +31,7 @@ type
 
   TSDLAudio = class
   private
+    FParent : TObject;
     FRecorderDevice : TRecorderDevice;
     //FOnChannelFinished: TMix_Channel_Finished;
     FVolume : int32;
@@ -50,6 +51,7 @@ type
     property Volume : int32 read GetSetVolume write FVolume;
     property Playing : Boolean read GetPlaying;
     property RecorderDevice : TRecorderDevice read FRecorderDevice;
+    property Parent : TObject read FParent write FParent;
   end;
 
   procedure AllocateDefaultAudioChannels;
@@ -92,6 +94,7 @@ var
 begin
   LSound := FChannels[AChannel] as ISound;
   LSound.DoOnStop;
+  //LSound.SetOnStop(nil);
 end;
 
 function TSDLAudio.GetSetVolume: int32;
@@ -151,6 +154,7 @@ begin
   Result := nil;
   for LSound in FChannels do begin
     if LSound.ShortName.ToUpper = AName.ToUpper then begin
+      LSound.SetParent(FParent);
       Result := LSound;
       Exit;
     end;
