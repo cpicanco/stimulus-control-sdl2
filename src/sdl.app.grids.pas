@@ -127,46 +127,79 @@ begin
       goNone: begin
         for i := 0 to FCellsCount - 1 do AGridList.Add(i);
       end;
+
       goLeftToRight: begin
-        //AGridList.Add(0);
-        //AGridList.Add(3);
-        //AGridList.Add(6);
-        AGridList.Add(0);
-        AGridList.Add(5);
-        AGridList.Add(10);
-        AGridList.Add(15);
-        AGridList.Add(20);
+        case FSeed of
+          3 : begin
+            AGridList.Add(0);
+            AGridList.Add(3);
+            AGridList.Add(6);
+          end;
+
+          4 : begin
+            AGridList.Add(0);
+            AGridList.Add(5);
+            AGridList.Add(10);
+            AGridList.Add(15);
+            AGridList.Add(20);
+          end;
+        end;
       end;
+
       goRightToLeft: begin
-        //AGridList.Add(2);
-        //AGridList.Add(5);
-        //AGridList.Add(8);
-        AGridList.Add(4);
-        AGridList.Add(9);
-        AGridList.Add(14);
-        AGridList.Add(19);
-        AGridList.Add(24);
+        case FSeed of
+          3 : begin
+            AGridList.Add(2);
+            AGridList.Add(5);
+            AGridList.Add(8);
+          end;
+
+          4 : begin
+            AGridList.Add(4);
+            AGridList.Add(9);
+            AGridList.Add(14);
+            AGridList.Add(19);
+            AGridList.Add(24);
+          end;
+        end;
       end;
+
       goBottomToTop: begin
-        //AGridList.Add(6);
-        //AGridList.Add(7);
-        //AGridList.Add(8);
-        AGridList.Add(20);
-        AGridList.Add(21);
-        AGridList.Add(22);
-        AGridList.Add(23);
-        AGridList.Add(24);
+        case FSeed of
+          3 : begin
+            AGridList.Add(6);
+            AGridList.Add(7);
+            AGridList.Add(8);
+          end;
+
+          4 : begin
+            AGridList.Add(20);
+            AGridList.Add(21);
+            AGridList.Add(22);
+            AGridList.Add(23);
+            AGridList.Add(24);
+          end;
+        end;
       end;
+
       goTopToBottom: begin
-        //AGridList.Add(0);
-        //AGridList.Add(1);
-        //AGridList.Add(2);
-        AGridList.Add(0);
-        AGridList.Add(1);
-        AGridList.Add(2);
-        AGridList.Add(3);
-        AGridList.Add(4);
+        case FSeed of
+          3 : begin
+            AGridList.Add(0);
+            AGridList.Add(1);
+            AGridList.Add(2);
+          end;
+
+          4 : begin
+            AGridList.Add(0);
+            AGridList.Add(1);
+            AGridList.Add(2);
+            AGridList.Add(3);
+            AGridList.Add(4);
+          end;
+        end;
       end;
+
       goCustom : begin
         raise ENotImplemented.Create(LOrientation)
       end;
@@ -194,44 +227,79 @@ begin
         for i := 0 to FCellsCount - 1 do AGridList.Add(i);
       end;
       goLeftToRight: begin
-        //AGridList.Add(2);
-        //AGridList.Add(5);
-        //AGridList.Add(8);
-        AGridList.Add(4);
-        AGridList.Add(9);
-        AGridList.Add(14);
-        AGridList.Add(19);
-        AGridList.Add(24);
+        case FSeed of
+          3 : begin
+            AGridList.Add(2);
+            AGridList.Add(5);
+            AGridList.Add(8);
+          end;
+
+          4 : begin
+            AGridList.Add(4);
+            AGridList.Add(9);
+            AGridList.Add(14);
+            AGridList.Add(19);
+            AGridList.Add(24);
+          end;
+        end;
+
+
       end;
       goRightToLeft: begin
-        //AGridList.Add(0);
-        //AGridList.Add(3);
-        //AGridList.Add(6);
-        AGridList.Add(0);
-        AGridList.Add(5);
-        AGridList.Add(10);
-        AGridList.Add(15);
-        AGridList.Add(20);
+        case FSeed of
+          3 : begin
+            AGridList.Add(0);
+            AGridList.Add(3);
+            AGridList.Add(6);
+          end;
+
+          4 : begin
+            AGridList.Add(0);
+            AGridList.Add(5);
+            AGridList.Add(10);
+            AGridList.Add(15);
+            AGridList.Add(20);
+          end;
+        end;
+
+
       end;
       goBottomToTop: begin
-        //AGridList.Add(0);
-        //AGridList.Add(1);
-        //AGridList.Add(2);
-        AGridList.Add(0);
-        AGridList.Add(1);
-        AGridList.Add(2);
-        AGridList.Add(3);
-        AGridList.Add(4);
+        case FSeed of
+          3 : begin
+            AGridList.Add(0);
+            AGridList.Add(1);
+            AGridList.Add(2);
+          end;
+
+          4 : begin
+            AGridList.Add(0);
+            AGridList.Add(1);
+            AGridList.Add(2);
+            AGridList.Add(3);
+            AGridList.Add(4);
+          end;
+        end;
+
+
       end;
       goTopToBottom: begin
-        //AGridList.Add(6);
-        //AGridList.Add(7);
-        //AGridList.Add(8);
-        AGridList.Add(20);
-        AGridList.Add(21);
-        AGridList.Add(22);
-        AGridList.Add(23);
-        AGridList.Add(24);
+        case FSeed of
+          3 : begin
+            AGridList.Add(6);
+            AGridList.Add(7);
+            AGridList.Add(8);
+          end;
+
+          4 : begin
+            AGridList.Add(20);
+            AGridList.Add(21);
+            AGridList.Add(22);
+            AGridList.Add(23);
+            AGridList.Add(24);
+          end;
+        end;
+
       end;
       goCustom: begin
         with GlobalTrialParameters do

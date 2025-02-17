@@ -426,38 +426,40 @@ begin
   Timestamp(ClassName+'.RightDragDrop', ToJSON(Sample, Comparison));
 
   //Sample.Color := clGreen;
-  case FGridOrientation of
-    TGridOrientation.goTopToBottom : begin
-      Sample.Left := Comparison.Left;
-      Sample.Top := Comparison.Top - Sample.Height - 10;
-    end;
-
-    TGridOrientation.goBottomToTop : begin
-      Sample.Left := Comparison.Left;
-      Sample.Top := Comparison.Top + Sample.Height + 10;
-    end;
-
-    TGridOrientation.goLeftToRight : begin
-      Sample.Left := Comparison.Left - Sample.Width - 10;
-      Sample.Top := Comparison.Top;
-    end;
-
-    TGridOrientation.goRightToLeft : begin
-      Sample.Left := Comparison.Left + Sample.Width + 10;
-      Sample.Top := Comparison.Top;
-    end;
-
-    TGridOrientation.goNone : begin
-      Sample.Hide;
-      Comparison.Hide;
-    end;
-
-    otherwise begin
-      WriteStr(S1, FGridOrientation);
-      raise Exception.Create(
-        'TDragDropStimuli.RightDragDrop: ' + S1);
-    end;
-  end;
+  //case FGridOrientation of
+  //  TGridOrientation.goTopToBottom : begin
+  //    Sample.Left := Comparison.Left;
+  //    Sample.Top := Comparison.Top - Sample.Height - 10;
+  //  end;
+  //
+  //  TGridOrientation.goBottomToTop : begin
+  //    Sample.Left := Comparison.Left;
+  //    Sample.Top := Comparison.Top + Sample.Height + 10;
+  //  end;
+  //
+  //  TGridOrientation.goLeftToRight : begin
+  //    Sample.Left := Comparison.Left - Sample.Width - 10;
+  //    Sample.Top := Comparison.Top;
+  //  end;
+  //
+  //  TGridOrientation.goRightToLeft : begin
+  //    Sample.Left := Comparison.Left + Sample.Width + 10;
+  //    Sample.Top := Comparison.Top;
+  //  end;
+  //
+  //  TGridOrientation.goNone : begin
+  //    Sample.Hide;
+  //    Comparison.Hide;
+  //  end;
+  //
+  //  otherwise begin
+  //    WriteStr(S1, FGridOrientation);
+  //    raise Exception.Create(
+  //      'TDragDropStimuli.RightDragDrop: ' + S1);
+  //  end;
+  //end;
+  Sample.Hide;
+  Comparison.Hide;
 
   LAnimation := TAnimation.Create;
   // LAnimation.Parent := FAnimation.Parent;
