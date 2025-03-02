@@ -25,16 +25,32 @@ type
   TDragDropOrientationRange =
     TDragDropOrientation.None..TDragDropOrientation.Random;
 
+  TFoodDispensingRule = (
+    FoodDisabled,
+    FoodOnFirstTryOnly,
+    FoodOnRetryAllowedOnCompletionOnly,
+    FoodOnRetryAllowed
+    );
+
+
   { TDragDropOrientationHelper }
 
   TDragDropOrientationHelper = type helper for TDragDropOrientation
     function ToString : string;
   end;
 
+  { TFoodDispensingRuleToStringHelper }
+
+  TFoodDispensingRuleToStringHelper = type helper for TFoodDispensingRule
+  public
+    function ToString: string;
+  end;
+
   { THelpSeriesStringHelper }
 
   THelpSeriesStringHelper = type helper(TStringHelper) for string
     function ToDragDropOrientation : TDragDropOrientation;
+    function ToFoodDispensingRule: TFoodDispensingRule;
   end;
 
 implementation
@@ -42,6 +58,13 @@ implementation
 { TDragDropOrientationHelper }
 
 function TDragDropOrientationHelper.ToString: string;
+begin
+  WriteStr(Result, Self);
+end;
+
+{ TFoodDispensingRuleToStringHelper }
+
+function TFoodDispensingRuleToStringHelper.ToString: string;
 begin
   WriteStr(Result, Self);
 end;
@@ -59,6 +82,19 @@ begin
     end;
   end;
   raise Exception.CreateFmt('TDragDropOrientation %s not found', [Self]);
+end;
+
+function THelpSeriesStringHelper.ToFoodDispensingRule: TFoodDispensingRule;
+var
+  LValue: string = '';
+begin
+  for Result in TFoodDispensingRule do begin
+    WriteStr(LValue, Result);
+    if LValue = Self then begin
+      Exit;
+    end;
+  end;
+  raise Exception.CreateFmt('TFoodDispensingRule value "%s" not found', [Self]);
 end;
 
 end.

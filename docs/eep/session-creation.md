@@ -76,9 +76,11 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
 - **AutoAnimatedOnStart**: Controla a ativação da animação da borda do estímulo modelo.
   - Se **T** (True), a animação é ativada assim que a tentativa é iniciada, automaticamente  em um dos estímulos modelos.
   - Se **F** (False), a animação é ativada somente depois que um estímulo modelo for selecionado.
-- **ReleaseFoodForIntermediateHits**: controla a liberação de comida (ativação do dispensador) para acertos intermediários.
-  - Se **T** (True), há liberação.
-  - Se **F** (False), não há liberação.
+- **FoodDispensingRule**: define a regra para a liberação de comida (ativação do dispensador).
+  - Se **FoodDisabled**, não há liberação.
+  - Se **FoodOnFirstTryOnly**, há liberação apenas para acertos de primeira.
+  - Se **FoodOnRetryAllowedOnCompletionOnly**, há liberação apenas para acertos na última relação.
+  - Se **FoodOnRetryAllowed**, há liberação para acertos.
 
 ### **2.4. Arquivo "exemplo.csv"**
 

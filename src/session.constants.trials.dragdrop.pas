@@ -17,7 +17,7 @@ uses session.constants.trials;
 
 type
   TDragDropKeys = record
-    ReleaseFoodForIntermediateHitsKey : string;
+    FoodDispensingRuleKey : string;
     AutoAnimateOnStartKey : string;
     DragDropOrientationKey : string;
     UseHelpProgressionKey : string;
@@ -33,7 +33,7 @@ type
 
 const
   DragDropKeys : TDragDropKeys = (
-    ReleaseFoodForIntermediateHitsKey : 'ReleaseFoodForIntermediateHits';
+    FoodDispensingRuleKey : 'FoodDispensingRule';
     AutoAnimateOnStartKey : 'AutoAnimateOnStart';
     DragDropOrientationKey : 'Orientation';
     UseHelpProgressionKey : 'UseHelpProgression';

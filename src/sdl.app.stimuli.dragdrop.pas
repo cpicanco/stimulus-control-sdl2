@@ -14,9 +14,10 @@ unit sdl.app.stimuli.dragdrop;
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections
+  Classes, SysUtils, Generics.Collections, Generics.Map
   , sdl.app.stimuli.contract
   , sdl.app.stimuli
+  , sdl.app.stimuli.dragdrop.types
   , sdl.app.events.abstract
   , sdl.app.graphics.animation
   , sdl.app.graphics.picture.dragdrop
@@ -31,14 +32,15 @@ type
 
   TDragDropablePictures = specialize TList<TDragDropablePicture>;
   TAnimations = specialize TList<TAnimation>;
+  TWrongDragDrops = specialize TObjectToIntegerMap<TDragDropablePicture>;
 
   { TDragDropStimuli }
 
   TDragDropStimuli = class(TStimuli)
   private
-    FReleaseFoodForIntermediateHits : Boolean;
+    FFoodDispensingRule : TFoodDispensingRule;
     FAutoAnimateOnStart : Boolean;
-    FWrongDragDrops : integer;
+    FWrongDragDrops : TWrongDragDrops;
     FRenderer : TRendererThread;
     FResult : TTrialResult;
     FSoundRight : ISound;
@@ -93,7 +95,6 @@ uses
   Math
   , StrUtils
   , Devices.RS232i
-  , sdl.app.stimuli.dragdrop.types
   , sdl.colors
   , sdl.app.controls.custom
   , sdl.app.audio
@@ -136,12 +137,18 @@ var
       ADragDropOrientation : TDragDropOrientation) : TGridOrientation;
   begin
     case ADragDropOrientation of
-      None : Result := TGridOrientation.goNone;
-      TopToBottom : Result := TGridOrientation.goTopToBottom;
-      BottomToTop : Result := TGridOrientation.goBottomToTop;
-      LeftToRight : Result := TGridOrientation.goLeftToRight;
-      RightToLeft : Result := TGridOrientation.goRightToLeft;
-      Random : Result:= Grid.GetRandomGridOrientation;
+      TDragDropOrientation.None :
+        Result := TGridOrientation.goNone;
+      TDragDropOrientation.TopToBottom :
+        Result := TGridOrientation.goTopToBottom;
+      TDragDropOrientation.BottomToTop :
+        Result := TGridOrientation.goBottomToTop;
+      TDragDropOrientation.LeftToRight :
+        Result := TGridOrientation.goLeftToRight;
+      TDragDropOrientation.RightToLeft :
+        Result := TGridOrientation.goRightToLeft;
+      TDragDropOrientation.Random :
+        Result:= Grid.GetRandomGridOrientation;
     end;
   end;
 
@@ -248,8 +255,8 @@ begin
       FGridOrientation := DragDropToGridOrientation(
         Parameters[DragDropOrientationKey].ToDragDropOrientation);
       FAutoAnimateOnStart := Parameters[AutoAnimateOnStartKey].ToBoolean;
-      FReleaseFoodForIntermediateHits :=
-        Parameters[ReleaseFoodForIntermediateHitsKey].ToBoolean;
+      FFoodDispensingRule :=
+        Parameters[FoodDispensingRuleKey].ToFoodDispensingRule;
 
       LSamples := Parameters[SamplesKey].ToInteger;
       LComparisons := Parameters[ComparisonsKey].ToInteger;
@@ -341,6 +348,7 @@ begin
             LItem.UpdateDistance;
             LItem.Parent := TSDLControl(AParent);
             LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);
+            FWrongDragDrops.Add(LItem, 0);
           end;
         end;
       end;
@@ -414,11 +422,6 @@ var
   S1 : string;
 begin
   FSoundRight.Play;
-  if FReleaseFoodForIntermediateHits then begin
-    if Assigned(RS232) then begin
-      RS232.Dispenser;
-    end;
-  end;
 
   Sample := Source as TDragDropablePicture;
   Comparison := Sender as TDragDropablePicture;
@@ -458,6 +461,7 @@ begin
   //      'TDragDropStimuli.RightDragDrop: ' + S1);
   //  end;
   //end;
+
   Sample.Hide;
   Comparison.Hide;
 
@@ -488,14 +492,32 @@ begin
   if Assigned(OnRightDragDrop) then
     OnRightDragDrop(Sender, Source, X, Y);
 
-  if FDragDropDone then begin
-    if FReleaseFoodForIntermediateHits then begin
-      // do nothing
-    end else begin
-      if Assigned(RS232) then begin
+
+  if Assigned(RS232) then begin
+    case FFoodDispensingRule of
+      FoodDisabled: begin
+        { Do nothing }
+      end;
+
+      FoodOnFirstTryOnly: begin
+        if FWrongDragDrops[Sample] = 0 then begin
+          RS232.Dispenser;
+        end;
+      end;
+
+      FoodOnRetryAllowedOnCompletionOnly: begin
+        if FDragDropDone then begin
+          RS232.Dispenser;
+        end;
+      end;
+
+      FoodOnRetryAllowed : begin
         RS232.Dispenser;
       end;
     end;
+  end;
+
+  if FDragDropDone then begin
     //FResult := Hit; todo: dragdrop trial have different hit types
     Pool.Counters.Hit;
     FResult := Hit;
@@ -617,7 +639,6 @@ procedure TDragDropStimuli.WrongDragDrop(Sender, Source: TObject;
 var
   Comparison, Sample : TDragDropablePicture;
 begin
-  Inc(FWrongDragDrops);
   FSoundWrong.Play;
   Comparison := Sender as TDragDropablePicture;
   Sample := Source as TDragDropablePicture;
@@ -625,6 +646,7 @@ begin
 
   Sample.ToOriginalBounds;
   //FAnimation.Animate(Sample);
+  FWrongDragDrops[Sample] := FWrongDragDrops[Sample] + 1;
   if Assigned(OnWrongDragDrop) then begin
     OnWrongDragDrop(Sender, Source, X, Y);
   end;
@@ -675,19 +697,19 @@ end;
 
 function TDragDropStimuli.ToData: string;
 begin
-  Result := FWrongDragDrops.ToString;
+  Result := FWrongDragDrops.Sum.ToString;
 end;
 
 constructor TDragDropStimuli.Create;
 begin
   inherited Create;
-  FReleaseFoodForIntermediateHits := False;
+  FFoodDispensingRule := FoodDisabled;
   FAutoAnimateOnStart := False;
-  FWrongDragDrops := 0;
   FSamples := TDragDropablePictures.Create;
   FComparisons := TDragDropablePictures.Create;
   FAnimation := TAnimation.Create;
   FDoneAnimations := TAnimations.Create;
+  FWrongDragDrops := TWrongDragDrops.Create;
   FRenderer := TRendererThread.Create;
 end;
 
@@ -699,6 +721,7 @@ begin
   FRenderer.Close;
   FRenderer.Terminate;
   FAnimation.Free;
+  FWrongDragDrops.Free;
 
   for LAnimation in FDoneAnimations do begin
     LAnimation.Free;
