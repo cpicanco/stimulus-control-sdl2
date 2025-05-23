@@ -107,3 +107,5 @@ ID,Condition,Trials,Relation,Code,Comparisons
 106,8,1,C-D,A14,1
 107,8,1,C-D,A15,1
 108,8,1,C-D,A16,1
+109,0,3,C-B,R1,3
+110,0,3,C-B,R2,3

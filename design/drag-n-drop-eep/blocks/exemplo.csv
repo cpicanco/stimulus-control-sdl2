@@ -1,2 +1,4 @@
 ID,Name,EndSessionOnCriterion,EndSessionOnNotCriterionAfterBlockRepetitions,RepeatStyle,EndCriterionStyle,EndCriterionEvaluationTime,MaxBlockRepetitionConsecutives,MaxBlockRepetitionInSession,NextBlockOnCriterion,NextBlockOnNotCriterion,EndCriterionValue,Reinforcement
-1,Probes-BC-CB-constant-words,False,False,None,HitPorcentage,OnBlockEnd,,,2,2,100,0
+1,Block 1,False,False,None,HitPorcentage,OnBlockEnd,,,2,,100,100
+2,Block 2,False,False,None,HitPorcentage,OnBlockEnd,,,3,,100,100
+3,Block 3,True,False,None,HitPorcentage,OnBlockEnd,,,,,100,100
