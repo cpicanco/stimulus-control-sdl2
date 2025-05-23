@@ -10,7 +10,7 @@
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="untyped_arguments"/>
+      <Title Value="sdltimertest"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -24,9 +24,23 @@
     <RunParams>
       <FormatVersion Value="2"/>
     </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="laz_synapse"/>
+      </Item>
+      <Item>
+        <PackageName Value="BGRABitmapPack"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCLBase"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPackages>
     <Units>
       <Unit>
-        <Filename Value="untyped_arguments.lpr"/>
+        <Filename Value="sdltimertest.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -35,10 +49,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="untyped_arguments"/>
+      <Filename Value="sdltimertest"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src\schedules;..\..\src;..\..\dependencies\pupil-fpc;..\..\dependencies\fpc-opengaze\src;..\..\dependencies\fpc-opengaze\utils;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\utils;..\..\dependencies\msgpack-delphi;..\..\dependencies\fpc-zmq"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
@@ -46,11 +61,6 @@
         <DebugInfoType Value="dsDwarf3"/>
       </Debugging>
     </Linking>
-    <Other>
-      <ConfigFile>
-        <WriteConfigFilePath Value=""/>
-      </ConfigFile>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>

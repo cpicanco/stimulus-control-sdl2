@@ -10,7 +10,7 @@
         <MainUnitHasScaledStatement Value="False"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="serialize"/>
+      <Title Value="untyped_arguments"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -24,17 +24,9 @@
     <RunParams>
       <FormatVersion Value="2"/>
     </RunParams>
-    <RequiredPackages>
-      <Item>
-        <PackageName Value="LCL"/>
-      </Item>
-      <Item>
-        <PackageName Value="LCLBase"/>
-      </Item>
-    </RequiredPackages>
     <Units>
       <Unit>
-        <Filename Value="serialize.lpr"/>
+        <Filename Value="untyped_arguments.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -43,12 +35,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="serialize"/>
+      <Filename Value="untyped_arguments"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="..\.."/>
-      <OtherUnitFiles Value="..\..\src;..\..\dependencies\SDL2-for-Pascal\units;..\..\src\schedules;..\..\dependencies\pupil-fpc;..\..\dependencies\fpc-zmq;..\..\dependencies\msgpack-delphi;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\utils"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

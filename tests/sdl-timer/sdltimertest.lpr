@@ -5,7 +5,7 @@ uses
   , SysUtils
   , SDL2
   , ctypes
-  , timestamps
+  , timestamps.methods
   , sdl.app
   , sdl.app.events.custom
   , sdl.app.output
@@ -38,9 +38,7 @@ begin
     Timer.Interval:= 2000;
     Timer.OnTimer:=@MyClass.NotifyEvent;
 
-    SDLApp := TSDLApplication.Create('Stimulus Control', 1);
-    SDLApp.SetupEvents;
-    StartEpikTimer;
+    SDLApp := TSDLApplication.Create;
     Timer.Start;
     SDLApp.Run;
   finally

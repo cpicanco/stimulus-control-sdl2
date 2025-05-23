@@ -4,7 +4,7 @@ uses Classes, Generics.Map;
 
 type
 
-  TMyMap = specialize TObjectToIntegerMap<TStringList>;
+  TMyMap = specialize TGenericToIntegerMap<TStringList>;
 
 var
   StringList1 : TStringList;
