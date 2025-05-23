@@ -80,6 +80,7 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
   - Se **FoodDisabled**, não há liberação.
   - Se **FoodOnFirstTryOnly**, há liberação apenas para acertos de primeira.
   - Se **FoodOnRetryAllowedOnCompletionOnly**, há liberação apenas para acertos na última relação.
+  - Se **FoodOnFirstTryOnlyOnCompletionOnly**, há liberação apenas para acertos na última relação e apenas para acertos de primeira.
   - Se **FoodOnRetryAllowed**, há liberação para acertos.
 
 ### **2.4. Arquivo "exemplo.csv"**
