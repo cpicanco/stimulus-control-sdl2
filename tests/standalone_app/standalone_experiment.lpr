@@ -1,24 +1,26 @@
 program standalone_experiment;
 uses
-  Interfaces,
-  Classes, SysUtils, sdl.app
-  , timestamps.methods
+  Interfaces, Classes, SysUtils
+  , sdl.app
   //, eyelink.classes
-  {$IFDEF NO_LCL}
   , sdl.app.renderer.nolcl
-  , sdl.app.video.writer.windows
-  {$ENDIF}
+  , sdl.app.system.keyboard.nolcl
+  , sdl.app.task
+  , timestamps.methods, sdl.app.renderer.variables
+  //, sdl.app.video.writer.windows
   ;
+
+
 var
-  SDLApp : TSDLApplication;
+  Task : TKeyboardTask;
+
   //EyeLink : TEyeLink;
 begin
-  WriteLn('Renderer fps reference: ', 1000 div 50);
+  WriteLn('Press space bar);
   //EyeLink := TEyeLink.Create(nil);
   //EyeLink.InitializeLibraryAndConnectToDevice;
   //EyeLink.DataReceiveFile;
-  StartEpikTimer;
-  StartTimestamp := ET.Elapsed;
+
 
   //EyeLink := TEyeLink.Create(nil);
   //EyeLink.InitializeLibraryAndConnectToDevice;
@@ -26,21 +28,26 @@ begin
   //EyeLink.DoTrackerSetup;
   //EyeLink.OpenDataFile;
 
+
+  Task := TKeyboardTask.Create;
   SDLApp := TSDLApplication.Create;
   try
-    SDLApp.SetupVideo(0);
-    SDLApp.SetupEvents;
-    Sleep(50);
-    VideoWriter := TVideoWriter.Create(SDLApp.Monitor);
-    VideoWriter.StartRecording;
+    SDLApp.SetupVideo;
+    SDLApp.Events.Keyboard.RegisterOnKeyDown(Task.OnKeyDown);
+    Task.SetupMonitor(SDLApp.Monitor);
+    //SDLApp.SetupEvents;
+    //Sleep(50);
+    //VideoWriter := TVideoWriter.Create(SDLApp.Monitor);
+    //VideoWriter.StartRecording;
     SDLApp.Run;
   finally
     //EyeLink.ReceiveDataFile;
     //EyeLink.Free;
-    VideoWriter.MainThreadSynchronize;
-    VideoWriter.Stop;
+    //VideoWriter.MainThreadSynchronize;
+    //VideoWriter.Stop;
     //CheckSynchronize;
     SDLApp.Free;
+    Task.Free;
   end;
   ReadLn;
 end.

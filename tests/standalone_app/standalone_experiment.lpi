@@ -57,16 +57,23 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="..\..\src\graphics.bmptopng.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Graphics.BMPtoPNG"/>
-      </Unit>
-      <Unit>
         <Filename Value="src\pixels.format.conversion.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="ffmpeg-fpc-master\binding\libavutil_error_init.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="sdl.app.system.keyboard.nolcl.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="sdl.app.task.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="sdl.app.renderer.variables.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
@@ -80,7 +87,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="..\.."/>
-      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src;..\..\dependencies\epiktimer;..\..\src\schedules;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\utils;ffmpeg-fpc-master\binding;src"/>
+      <OtherUnitFiles Value="..\..\dependencies\SDL2-for-Pascal\units;..\..\src;..\..\src\schedules;..\..\dependencies\EyeLink-for-Pascal\classes;..\..\dependencies\EyeLink-for-Pascal\bindings;..\..\dependencies\EyeLink-for-Pascal\utils;ffmpeg-fpc-master\binding;src"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
@@ -104,7 +111,7 @@
     </Linking>
     <Other>
       <Verbosity>
-        <ShoLineNum Value="True"/>
+        <ShowLineNum Value="True"/>
         <ShowDebugInfo Value="True"/>
       </Verbosity>
       <WriteFPCLogo Value="False"/>
