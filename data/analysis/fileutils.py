@@ -8,12 +8,25 @@ import pandas as pd
 from anonimizator import anonimize
 from headers import info_header
 
+data_folder = 'data'
 data_folder_name = 'data'
 design_folder_name = 'design'
 project_folder_name = 'pseudowords'
 
+def change_data_folder_name(new_name):
+    global data_folder_name
+    data_folder_name = new_name
+
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    script_path = os.path.dirname(script_path)
+    script_path = os.path.dirname(script_path)
+    cd(os.path.join(script_path, data_folder, data_folder_name))
+
 def cache_folder():
-    return os.path.join(data_dirname(), 'analysis', 'cache')
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    script_path = os.path.dirname(script_path)
+    script_path = os.path.dirname(script_path)
+    return os.path.join(script_path,data_folder, 'analysis', 'cache')
 
 def design_pseudowords_dirname():
     # get script path
@@ -90,7 +103,8 @@ def list_data_folders(include_list=[], exclude_list=[], directory_name='.'):
             'output',
             '0-Rafael',
             '3-Teste',
-            '7-Teste2']
+            '7-Teste2',
+            'analysis.zip']
 
         entries = [entry for entry in all_entries \
                 if os.path.isdir(os.path.join(directory_name, entry)) \
@@ -105,7 +119,6 @@ def list_data_folders(include_list=[], exclude_list=[], directory_name='.'):
         return entries
 
 def get_data_folders(anonimized=False):
-    data_dir()
     participant_folders = list_data_folders()
     if anonimized:
         participant_folders = [anonimize(folder) for folder in participant_folders]
@@ -165,8 +178,7 @@ def get_cycle(entry):
                     pass
                 else:
                     cycle += 1
-            else:
-                pass
+
             return str(cycle)
 
 def safety_copy(entry, cycle):
@@ -232,6 +244,22 @@ def walk_and_execute(entry, function, *args):
             cd(cycle_folder)
             function(*args)
             cd('..')
+        cd('..')
+    cd('..')
+    cd('..')
+
+def walk_and_execute_1(entry, function, *args):
+    cd(entry)
+    try:
+        cd('analysis')
+    except FileNotFoundError:
+        cd('..')
+        return
+
+    safety_copy_folders_by_date = list_data_folders()
+    for date_folder in safety_copy_folders_by_date:
+        cd(date_folder)
+        function(*args)
         cd('..')
     cd('..')
     cd('..')

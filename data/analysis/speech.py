@@ -1,6 +1,16 @@
-from fileutils import as_data, file_exists
-from fileutils import cd, list_files, list_data_folders, load_file
-from fileutils import walk_and_execute, get_data_folders
+import os
+
+from fileutils import (
+    as_data,
+    file_exists,
+    cd,
+    list_files,
+    list_data_folders,
+    data_dir,
+    load_file,
+    walk_and_execute,
+    get_data_folders)
+
 from correlation import plot_correlation, plot_correlation_2
 from classes import Information
 
@@ -141,10 +151,14 @@ def save_probes_by_participant(should_fix_cycles):
 
     cd('..')
 
-def load_all_probes():
+def load_all_probes(study_foldername):
+    data_dir()
+    cd(study_foldername)
     participant_folders = get_data_folders(anonimized=True)
-    cd('analysis')
-    cd('output')
+
+    data_dir()
+    cd(os.path.join('analysis', 'output', study_foldername))
+
     container = []
     for participant in participant_folders:
         participant = participant.replace('\\', '').replace('-', '_')
@@ -158,10 +172,10 @@ def load_all_probes():
         container.append(data)
     return pd.concat(container)
 
-def concatenate_probes(filename='probes_CD.data'):
-    data = load_all_probes()
+def concatenate_probes(foldername, filename='probes_CD.data'):
+    data = load_all_probes(foldername)
     save_probes_file(filename, data)
-    print(f'All probes concatenated to file: {filename}')
+    print(f'All probes concatenated to file: {os.path.join('analysis', 'output', foldername, filename)}')
 
 def validated_speech(word):
     if not isinstance(word, str):
@@ -243,60 +257,91 @@ def correlate_latency_levenshtein(do_global_analysis=False):
                                'Trials', 'Latency',
                                name=name, title1=words1, title2=words2, save=True)
 
-def override_CD_probes_in_data_file(must_not_override=True):
-    cd('output')
+def override_CD_probes_in_data_file(study_foldername, must_not_override=False):
+    def process_files():
+        filtered_data = None
+        for entry in list_files('.info.processed'):
+            data_file = as_data(entry, processed=True)
+            if not file_exists(data_file):
+                continue
+
+            info = Information(entry)
+            if info.has_valid_result():
+                if not '-CD-' in info.session_name:
+                    continue
+
+                if file_exists(data_file.replace('.data', '.probes')):
+                    if must_not_override:
+                        continue
+
+                # print a message identifying participant, folder, and file
+                print(f'Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}')
+                data_to_override = load_file(data_file)
+
+                filtered_data = data[data['File'] == data_file]
+
+                participant = filtered_data['Participant'].str.replace(r'\\', '', regex=True)
+                filtered_data = filtered_data[participant == anonimize(participant_folder, as_path=False)]
+
+                if filtered_data.shape[0] == 0:
+                    line = f'No data transcribed for Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}'
+                    inconsistencies_file.write(line + '\n')
+                    continue
+
+                # save inconsistencies to file
+                if filtered_data.shape[0] != data_to_override.shape[0]:
+                    # if participant_folder == '13-POS23' and data_file == '031.data.processed':
+                    line = f'Lacking transcriptions for Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}'
+                    inconsistencies_file.write(line + '\n')
+
+                uid_to_response = dict(zip(filtered_data['Session.Trial.UID'], filtered_data['Speech-3']))
+                data_to_override['Response'] = data_to_override['Session.Trial.UID'].map(uid_to_response).fillna('INVALID')
+
+                uid_to_result = dict(zip(filtered_data['Session.Trial.UID'], filtered_data['Result']))
+                data_to_override['Result'] = data_to_override['Session.Trial.UID'].map(uid_to_result).fillna('INVALID')
+
+                data_to_override.to_csv(data_file, sep='\t', index=False)
+
+                if 'Levenshtein' not in filtered_data.columns:
+                    filtered_data['Levenshtein'] = filtered_data.apply(lambda row: similarity(row), axis=1)
+                filtered_data['Levenshtein'].to_csv(data_file.replace('.data', '.probes'), sep='\t', index=False)
+
+    data_dir()
+    cd(os.path.join('analysis', 'output', study_foldername))
+
     filename = 'probes_CD.data.processed'
     data = load_probes_file(filename)
     print('----------------------------- override data files and creating probes files')
-    cd('..')
-    cd('..')
-    participant_folders = list_data_folders()
-    for participant_folder in participant_folders:
-        cd(participant_folder)
-        cd('analysis')
-        safety_copy_data_folders = list_data_folders()
-        for data_folder_by_day in safety_copy_data_folders:
-            cd(data_folder_by_day)
 
-            for cycle in list_data_folders():
-                cd(cycle)
-                filtered_data = None
-                for entry in list_files('.info.processed'):
-                    data_file = as_data(entry, processed=True)
-                    if not file_exists(data_file):
-                        continue
+    data_dir()
+    cd(study_foldername)
 
-                    info = Information(entry)
-                    if info.has_valid_result():
-                        if not '-CD-' in info.session_name:
-                            continue
-
-                        if file_exists(data_file.replace('.data', '.probes')):
-                            if must_not_override:
-                                continue
-                        # print a message idenifying participant, folder, and file
-                        print(f'Participant: {participant_folder}, Folder: {data_folder_by_day}, File: {data_file}')
-                        data_to_override = load_file(data_file)
-
-                        filtered_data = data[data['File'] == data_file]
-
-                        participant = filtered_data['Participant'].str.replace(r'\\', '')
-                        filtered_data = filtered_data[participant == anonimize(participant_folder, as_path=False)]
-
-                        # check if count is the same
-                        if filtered_data.shape[0] != data_to_override.shape[0]:
-                            print(f'Count is different for {data_file}')
-                            raise Exception('Count is different')
-                        else:
-                            data_to_override['Result'] = filtered_data['Result'].values
-                            data_to_override['Response'] = filtered_data['Speech-3'].values
-                            data_to_override.to_csv(data_file, sep='\t', index=False)
-                            filtered_data['Levenshtein'].to_csv(data_file.replace('.data', '.probes'), sep='\t', index=False)
+    with open('inconsistencies.txt', 'w', encoding='utf-8') as inconsistencies_file:
+        participant_folders = list_data_folders()
+        for participant_folder in participant_folders:
+            cd(participant_folder)
+            cd('analysis')
+            safety_copy_data_folders = list_data_folders()
+            for data_folder_by_day in safety_copy_data_folders:
+                cd(data_folder_by_day)
+                if foldername == foldername_1:
+                    process_files()
+                else:
+                    for cycle in list_data_folders():
+                        cd(cycle)
+                        process_files()
+                        cd('..')
                 cd('..')
             cd('..')
-        cd('..')
-        cd('..')
+            cd('..')
 
 
 if __name__ == "__main__":
-    override_CD_probes_in_data_file(must_not_override=False)
+    from study1_constants import foldername as foldername_1
+    from study2_constants import foldername as foldername_2
+    from study3_constants import foldername as foldername_3
+
+    folders = [foldername_1, foldername_2, foldername_3]
+    for foldername in folders:
+        concatenate_probes(foldername=foldername)
+        override_CD_probes_in_data_file(foldername,must_not_override=False)

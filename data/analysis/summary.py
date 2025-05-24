@@ -1,12 +1,19 @@
 import numpy as np
 import scipy.stats as stats
 
+from explorer import(
+    change_data_folder_name,
+    foldername_1,
+    foldername_2,
+    foldername_3)
+
 from fileutils import (cd, data_dir, list_data_folders, list_files, load_file,
     walk_and_execute)
 
 from metadata import Metadata
 
-def collect_metadata():
+def collect_metadata(foldername):
+    change_data_folder_name(foldername)
     data_dir()
 
     container=[]
@@ -32,7 +39,7 @@ if __name__ == '__main__':
     ages = []
     genders = []
     fields = []
-    for metadata in collect_metadata():
+    for metadata in collect_metadata(foldername_2):
         data = metadata.items
         # if data['code'] == 'VRA':
         #     continue

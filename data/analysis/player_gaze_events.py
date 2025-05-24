@@ -62,6 +62,9 @@ class GazeEvents(BaseEvents):
     )}
     def __init__(self, info):
         super().__init__(info)
+        if self.events is None:
+            self.events = np.array([], dtype=self.__dtype__)
+            return
         self.__convert_timestamps_to_seconds()
 
     def missing_events(self):
@@ -102,19 +105,19 @@ class GazeEvents(BaseEvents):
         return (x, y)
 
 if __name__ == '__main__':
+    import os
     from player_information import GazeInfo
     from fileutils import cd, data_dir
 
     data_dir()
-    cd('26-MSS')
-    cd('analysis')
-    cd('2024-08-29')
-    cd('4')
-    info = GazeInfo('030')
+    filepath = os.path.join('estudo2', '12-HUM', 'analysis', '2024-07-24', '1')
+    filename = '001'
+
+    cd(filepath)
+    info = GazeInfo(filename)
 
     gaze = GazeEvents(info)
-    print(gaze.events[gaze.__BestGazeValid__])
-    print(f'{gaze.missing_events()} missing events')
-    print('duration:', gaze.duration())
-
-    data_dir()
+    print(gaze.events[gaze.__FixationValid__][0])
+    print(gaze.events[gaze.__FixationValid__][7])
+    # print(f'{gaze.missing_events()} missing events')
+    # print('duration:', gaze.duration())

@@ -55,6 +55,11 @@ words_per_cycle = {
     6 : {'teaching': [bole, nifa], 'generalization': [febi, lano]},
 }
 
+# isr = intrasyllabic recombination
+isr_right = [nibe, bofi, leba, bona, lefi, nilo]
+isr_left = [nale, lani, febo, nole, bifa]
+isr_both = [nofa, lofi, fabe, febi, lano, falo, bena]
+
 category_per_word = {
     nibo : 'Teaching',
     fale : 'Teaching',
@@ -123,6 +128,30 @@ cycle_per_word = {
     bena : 7,
 }
 
+pre_test_12_8 = [
+    nibo,
+    fale,
+    bofa,
+    leni,
+    lebo,
+    fani,
+    boni,
+    lefa,
+    fabo,
+    nile,
+    bole,
+    nifa,
+
+    lani,
+    febo,
+    nole,
+    bifa,
+    bona,
+    lefi,
+    fabe,
+    nilo
+]
+
 pre_test_hardcoded_order = [
     bena,
     falo,
@@ -165,7 +194,7 @@ all = [
 
 words_per_file = {
     'Ciclo0-0-Pre-treino': ['X1', 'X2', 'bala', 'bolo'],
-    'Ciclo1-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo1-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo1-1-Treino-AB': words_per_cycle[1]['teaching'] + constant,
     'Ciclo1-2a-Treino-AC-CD': words_per_cycle[1]['teaching'],
     'Ciclo1-2b-Treino-AC-Ref-Intermitente': words_per_cycle[1]['teaching'],
@@ -174,7 +203,7 @@ words_per_file = {
     'Ciclo1-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[1]['generalization'] + constant,
     'Ciclo1-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[1]['generalization'] + constant,
 
-    'Ciclo2-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo2-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo2-1-Treino-AB': words_per_cycle[2]['teaching'] + constant,
     'Ciclo2-2a-Treino-AC-CD': words_per_cycle[2]['teaching'],
     'Ciclo2-2b-Treino-AC-Ref-Intermitente': words_per_cycle[2]['teaching'],
@@ -183,7 +212,7 @@ words_per_file = {
     'Ciclo2-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[2]['generalization'] + constant,
     'Ciclo2-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[2]['generalization'] + constant,
 
-    'Ciclo3-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo3-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo3-1-Treino-AB': words_per_cycle[3]['teaching'] + constant,
     'Ciclo3-2a-Treino-AC-CD': words_per_cycle[3]['teaching'],
     'Ciclo3-2b-Treino-AC-Ref-Intermitente': words_per_cycle[3]['teaching'],
@@ -192,7 +221,7 @@ words_per_file = {
     'Ciclo3-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[3]['generalization'] + constant,
     'Ciclo3-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[3]['generalization'] + constant,
 
-    'Ciclo4-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo4-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo4-1-Treino-AB': words_per_cycle[4]['teaching'] + constant,
     'Ciclo4-2a-Treino-AC-CD': words_per_cycle[4]['teaching'],
     'Ciclo4-2b-Treino-AC-Ref-Intermitente': words_per_cycle[4]['teaching'],
@@ -201,7 +230,7 @@ words_per_file = {
     'Ciclo4-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[4]['generalization'] + constant,
     'Ciclo4-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[4]['generalization'] + constant,
 
-    'Ciclo5-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo5-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo5-1-Treino-AB': words_per_cycle[5]['teaching'] + constant,
     'Ciclo5-2a-Treino-AC-CD': words_per_cycle[5]['teaching'],
     'Ciclo5-2b-Treino-AC-Ref-Intermitente': words_per_cycle[5]['teaching'],
@@ -210,7 +239,7 @@ words_per_file = {
     'Ciclo5-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[5]['generalization'] + constant,
     'Ciclo5-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[5]['generalization'] + constant,
 
-    'Ciclo6-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:],
+    'Ciclo6-0-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
     'Ciclo6-1-Treino-AB': words_per_cycle[6]['teaching'] + constant,
     'Ciclo6-2a-Treino-AC-CD': words_per_cycle[6]['teaching'],
     'Ciclo6-2b-Treino-AC-Ref-Intermitente': words_per_cycle[6]['teaching'],
@@ -219,7 +248,8 @@ words_per_file = {
     'Ciclo6-5-Sondas-CD-Palavras-generalizacao-reservadas': words_per_cycle[6]['generalization'] + constant,
     'Ciclo6-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[6]['generalization'] + constant,
 
-    'Ciclo6-7-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_hardcoded_order[2:]
+    'Ciclo6-7-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
+    'Ciclo6-7-Sondas-CD-Palavras-30-Todas' : pre_test_hardcoded_order
 }
 
 def recombine_letters(consonants='bfln', vowels='aeio'):
@@ -235,5 +265,17 @@ def recombine_letters(consonants='bfln', vowels='aeio'):
 for word in recombine_letters():
     all.append(word)
 
+
+teaching = rf'({nibo}|{fale}|{boni}|{lefa}|{nile}|{bole}|{fani}{lebo}|{bofa}{leni}|{nifa}|{lebo})'
+assessment = rf'({nale}|{lani}|{febo}|{nole}|{bifa}|{nofa}|{lofi}|{fabe}|{febi}|{lano}|{nibe}|{bofi}|{leba}|{bona}|{lefi}|{nilo})'
+
+isr_left = rf'({nofa}|{nale}|{lani}|{febo}|{nole}|{bifa})'
+isr_both = rf'({lofi}|{febi}|{lano}|{bena})'
+isr_right = rf'({nibe}|{bofi}|{leba}|{bona}|{lefi}|{nilo}|{falo}|{fabe})'
+
+list_right = [nibe, bofi, leba, bona, lefi, nilo, falo, fabe]
+list_left = [nofa, nale, lani, febo, nole, bifa]
+list_both = [lofi, febi, lano, bena]
+
 if __name__ == '__main__':
-    print(len([word for word in recombine_letters()]))
+    pass

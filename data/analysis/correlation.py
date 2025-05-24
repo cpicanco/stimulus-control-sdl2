@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.stats import pearsonr, linregress
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
 # Assuming you have two lists of data:
@@ -7,28 +9,35 @@ def plot_correlation(x, y, xlabel, ylabel, title, save=False):
         print(f"Skipping plot for {title} due to empty data.")
         return
 
-    # prepare data
-    correlation_matrix = np.corrcoef(x, y)
-    correlation_xy = correlation_matrix[0,1]
-    r_squared = correlation_xy**2
+    r, p = pearsonr(x, y)
+    print(f"r({len(x)-2}) = {r:.3f}, p = {p:.3f}")
+
+    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    print(f"Regression Slope: {slope:.3f}")
+    print(f"Regression Intercept: {intercept:.3f}")
+    print(f"R^2: {r_value**2:.3f}")
+    print(f"p-value: {p_value:.3f}")
+    print(f"Standard Error: {std_err:.3f}")
 
     # plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4, 3.8))
+    # set size
+    # ax.set_aspect(1)
     ax.scatter(x, y)
     #draw line of best fit
     ax.plot(np.unique(x), np.poly1d(np.polyfit(x, y, 1))(np.unique(x)), color='red')
-    ax.text(0.3, 0.9, f'R^2 = {r_squared}', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.2, 0.9, f'r = {r:.3f}', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 
     if ylabel == 'Latency':
         plt.ylim(0, 40)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title(title)
+    # plt.title(title)
 
     fig.tight_layout()
     if save:
-        plt.savefig(f'{title}.png')
+        plt.savefig(f'correlation_{title}.png')
     else:
         plt.show()
     plt.close(fig)

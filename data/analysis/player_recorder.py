@@ -47,7 +47,7 @@ def record_videos():
         BehaviorDrawingFactory,
         GazeDrawingFactory
     )
-    from explorer import load_participant_sources
+    from explorer_study2 import load_participant_sources
 
     start_from_reached = False
     start_from = ''

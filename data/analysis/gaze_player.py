@@ -2,7 +2,7 @@ import ast
 import re
 
 import pandas as pd
-from video_2 import Device as OpenCVDevice
+from player_video_flickering import Device as OpenCVDevice
 
 def quote_keys(dict_string):
     # Use regular expressions to add quotes around the keys

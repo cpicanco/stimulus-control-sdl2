@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+from numpy.lib.recfunctions import append_fields
 
 from player_events import BaseEvents
 
@@ -33,11 +33,11 @@ class TrialEvents(BaseEvents):
     __BlockTrialID__ = 'Session.Block.Trial.ID'
     __BlockName__ = 'Session.Block.Name'
     __TrialID__ = 'Trial.ID'
-    __Cycle_ID = 'Cycle.ID'
+    __CycleID__ = 'Cycle.ID'
     __Name__ = 'Name'
-    __Relation = 'Relation'
+    __Relation__ = 'Relation'
     __Comparisons__ = 'Comparisons'
-    __Result = 'Result'
+    __Result__ = 'Result'
     __CounterHit__ = 'CounterHit'
     __CounterHitMaxConsecutives__ = 'CounterHit.MaxConsecutives'
     __CounterMiss__ = 'CounterMiss'
@@ -58,75 +58,76 @@ class TrialEvents(BaseEvents):
     __File__ = 'File'
     __dtype__ = {
         'names' : (
-            __Timestamp__,                      # np.float64
-            __Trial__,                          # np.uint64
-            __Block__,                          # np.uint64
-            __BlockTrial__,                     # np.uint64
-            __BlockID__,                        # np.uint64
-            __BlockTrialID__,                   # np.uint64
-            __BlockName__,                      # U40
-            __TrialID__,                        # np.uint64
-            __Cycle_ID,                         # np.uint8
-            __Name__,                           # U40
-            __Relation,                         # U40
-            __Comparisons__,                    # np.uint8
-            __Result,                           # np.bool_
-            __CounterHit__,                     # np.uint64
-            __CounterHitMaxConsecutives__,      # np.uint64
-            __CounterMiss__,                    # np.uint64
-            __CounterMissMaxConsecutives__,     # np.uint64
-            __CounterNone__,                    # np.uint64
-            __CounterNoneMaxConsecutives__,     # np.uint64
-            __SamplePosition1__,                # U20
-            __ComparisonPosition1__,            # U20
-            __ComparisonPosition2__,            # U20
-            __ComparisonPosition3__,            # U20
-            __Response__,                       # U20
-            __HasDifferentialReinforcement__,   # np.bool_
-            __Latency__,                        # np.float64
-            __Participant__,                    # U10
-            __Condition__,                      # np.uint8
-            __Date__,                           # U10
-            __Time__,                           # U10
-            __File__                            # U20
+            __Timestamp__,                      # 0
+            __Trial__,                          # 1
+            __Block__,                          # 2
+            __BlockTrial__,                     # 3
+            __BlockID__,                        # 4
+            __BlockTrialID__,                   # 5
+            __BlockName__,                      # 6
+            __TrialID__,                        # 7
+            __CycleID__,                        # 8
+            __Name__,                           # 9
+            __Relation__,                       # 10
+            __Comparisons__,                    # 11
+            __Result__,                         # 12
+            __CounterHit__,                     # 13
+            __CounterHitMaxConsecutives__,      # 14
+            __CounterMiss__,                    # 15
+            __CounterMissMaxConsecutives__,     # 16
+            __CounterNone__,                    # 17
+            __CounterNoneMaxConsecutives__,     # 18
+            __SamplePosition1__,                # 19
+            __ComparisonPosition1__,            # 20
+            __ComparisonPosition2__,            # 21
+            __ComparisonPosition3__,            # 22
+            __Response__,                       # 23
+            __HasDifferentialReinforcement__,   # 24
+            __Latency__,                        # 25
+            __Participant__,                    # 26
+            __Condition__,                      # 27
+            __Date__,                           # 28
+            __Time__,                           # 29
+            __File__                            # 30
         ),
         'formats' : (
-            np.float64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            'U40',
-            np.uint64,
-            np.uint8,
-            'U40',
-            'U40',
-            np.uint8,
-            np.uint8,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            np.uint64,
-            'U20',
-            'U20',
-            'U20',
-            'U20',
-            'U20',
-            np.bool_,
-            np.float64,
-            'U10',
-            'U4',
-            'U10',
-            'U10',
-            'U20'
+            np.float64, # 0
+            np.uint64,  # 1
+            np.uint64,  # 2
+            np.uint64,  # 3
+            np.uint64,  # 4
+            np.uint64,  # 5
+            'U40',      # 6
+            np.uint64,  # 7
+            np.uint8,   # 8
+            'U40',      # 9
+            'U40',      # 10
+            np.uint8,   # 11
+            np.uint8,   # 12
+            np.uint64,  # 13
+            np.uint64,  # 14
+            np.uint64,  # 15
+            np.uint64,  # 16
+            np.uint64,  # 17
+            np.uint64,  # 18
+            'U20',      # 19
+            'U20',      # 20
+            'U20',      # 21
+            'U20',      # 22
+            'U20',      # 23
+            np.uint8,   # 24
+            np.float64, # 25
+            'U10',      # 26
+            'U4',       # 27
+            'U10',      # 28
+            'U10',      # 29
+            'U20'       # 30
             ) }
     __converters__ = {
         0 : lambda x: x.replace(',', '.'),
         10 : lambda x: x.replace('-', ''),
-        12 : lambda x: x.replace('Hit', '1').replace('Miss', '0'),
+        12 : lambda x: x.replace('Hit', '1').replace('Miss', '0').replace('INVALID', '255'),
+        23 : lambda x: x.strip().replace('INVALID', 'nan'),
         24 : lambda x: x.replace('True', '1').replace('False', '0'),
         25 : lambda x: x.replace(',', '.')}
 
@@ -139,26 +140,39 @@ class TrialEvents(BaseEvents):
         self.events[self.__Timestamp__] = self.events[self.__Timestamp__] - first_timestamp
         self.events[self.__Timestamp__] = self.events[self.__Timestamp__]
 
+    def new_column(self, column: str, dtype = np.float64) -> None:
+        if column not in self.events.dtype.names:
+            default_values = np.full(len(self.events), None, dtype=dtype)
+            self.events = append_fields(self.events, column, default_values, usemask=False)
+
     def from_uid(self, uid: int) -> dict:
-        row = self.events[self.events[self.__Trial__] == uid][0]
-        return dict(zip(row.dtype.names, row))
+        data = self.events[self.events[self.__Trial__] == uid]
+        if data.size == 0:
+            return None
+        else:
+            row = data[0]
+            return dict(zip(row.dtype.names, row))
+
+    def to_uid(self, uid: int, column: str, value) -> dict:
+        mask = self.events[self.__Trial__] == uid
+        self.events[column][mask] = value
 
 if __name__ == '__main__':
     from player_information import GazeInfo
     from fileutils import cd, data_dir
 
     data_dir()
-    cd('5-NUN')
+    cd('estudo2')
+    cd('12-HUM')
     cd('analysis')
-    cd('2024-08-19')
+    cd('2024-07-24')
     cd('1')
-    info = GazeInfo('003')
+    info = GazeInfo('001')
 
-    events = BehavioralEvents(info)
-    print('duration:', events.duration())
-    for event in events.events[events.__Annotation__]:
-        print(event)
+    # events = BehavioralEvents(info)
+    # print('duration:', events.duration())
+    # for event in events.events[events.__Annotation__]:
+    #     print(event)
 
     events = TrialEvents(info)
-    print(events.from_uid(1))
-    data_dir()
+    print(events.from_uid(1)['HasDifferentialReinforcement'])

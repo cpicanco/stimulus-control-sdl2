@@ -256,7 +256,7 @@ if __name__ == '__main__':
     import os
 
     from fileutils import cd, data_dir
-    from explorer import load_participants
+    from explorer_study2 import load_participants
     from player_information import GazeInfo
     from player_synchronizer import Synchronizer
     from numpy.lib import recfunctions as rfn

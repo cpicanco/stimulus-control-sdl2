@@ -35,6 +35,8 @@ class BaseEvents:
         self.events = load_from_file(filename, dtype, converters)
 
     def duration(self):
+        if self.events.size == 0:
+            return 0
         return self.events[self.__class__.__Timestamp__][-1]
 
     @property
@@ -43,6 +45,8 @@ class BaseEvents:
 
     @property
     def indices(self):
+        if self.events is None:
+            return np.array([])
         return np.arange(len(self.events[self.__class__.__Timestamp__]))
 
     @property
@@ -55,8 +59,12 @@ class BaseEvents:
 
     @property
     def labels(self):
+        if self.events is None:
+            return np.array([])
         return np.full(len(self.events[self.__class__.__Timestamp__]), self._label, dtype=np.uint8)
 
     @property
     def DataFrame(self):
+        if self.events is None:
+            return pd.DataFrame()
         return pd.DataFrame(self.events)

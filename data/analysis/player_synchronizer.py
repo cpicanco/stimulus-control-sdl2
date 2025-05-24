@@ -1,12 +1,8 @@
-from enum import Enum
-
 import pandas as pd
 import numpy as np
-# from scipy.stats import entropy
-# from itertools import groupby
 
 from player_information import GazeInfo
-from player_behavior_events import (BehavioralEvents, TrialEvents)
+from player_behavior_events import BehavioralEvents, TrialEvents
 from player_gaze_events import GazeEvents
 from player_constants import DEFAULT_FPS
 
@@ -19,23 +15,12 @@ from player_utils import (
     as_dict
 )
 
-# create a data filter for shapes
-#    mask = shape.contains_points(gaze_data)
-#    data = all_gaze_data[mask]
-
-def calculate_mesh(rectangle, n_vertical_split=1, number_of_letters=4):
-    horizontal_bins = np.linspace(0, rectangle.width, num=number_of_letters+1)
-
-    vertical_bins = np.linspace(0, rectangle.height, num=n_vertical_split+1)
-
-    return np.meshgrid(horizontal_bins, vertical_bins)
-
 
 def mixed_strings_to_bool(input_array):
     """
-        Convert a list of strings to a boolean array
-        where True indicates a change in the string.
-        A change is counted when the change is to a non-empty and different string.
+    Converts a list of strings to a boolean array
+    where True indicates a change in the string.
+    A change is counted when the change is to a non-empty and different string.
     """
     output_array = np.zeros(len(input_array), dtype=bool)
     # Find indices of non-empty strings
@@ -70,28 +55,24 @@ def count_trues_in_groups(input_list, group_size=150):
     return true_counts.tolist()
 
 def mix_vertically_str(array):
-    result = np.empty(array.shape[1], dtype=object)  # Initialize result array
-    result[:] = ''  # Fill with empty strings initially
-
+    # Initialize result array
+    result = np.empty(array.shape[1], dtype=object)
+    # Fill with empty strings initially
+    result[:] = ''
+    # loop over columns
     for i in range(array.shape[1]):
+        # Get column
         column = array[:, i]
-        non_empty = column[column != '']  # Select non-empty strings
+        # Select non-empty strings
+        non_empty = column[column != '']
         if len(np.unique(non_empty)) > 1:
             # Raise an error if there's more than one unique non-empty string
             raise ValueError(f"Conflict detected at position {i}: {non_empty}")
         if len(non_empty) > 0:
-            result[i] = non_empty[0]  # Assign the unique non-empty string
+            # Assign the unique non-empty string
+            result[i] = non_empty[0]
 
     return result
-
-class WordFilterType(Enum):
-    ByPositive = 1
-    ByNegative = 2
-    ByPositiveAndNegative = 3
-
-class TrialFilterType(Enum):
-    TrialsReferenceWord = 1
-    TrialsAll = 2
 
 class TimeFilter:
     def __init__(self, data, unit):
@@ -121,15 +102,14 @@ class TimeFilter:
         self._current = value
         self._update_mask(value, value + self._unit)
 
-class WordFilter:
+class TrialFilter:
     def __init__(self,
                  info: GazeInfo,
                  screen: Screen,
                  time_sorted_data: np.ndarray,
                  gaze: GazeEvents,
                  behavior: BehavioralEvents,
-                 trials: TrialEvents,
-                 word_string: str = '',
+                 trials: TrialEvents
                  ):
         self._info = info
         self._screen = screen
@@ -139,7 +119,6 @@ class WordFilter:
         self._behavior = behavior
         self._trials = trials
 
-        self.word_string = word_string
         self.stimuli_begin = None
         self.stimuli_end = None
         self.annotation_column = self._behavior.__Annotation__
@@ -164,7 +143,6 @@ class WordFilter:
 
         :param target_stimuli_types:
             Samp, Comp
-        :return:
         """
         events = self._info.target_trial_events()
         name = self._info.SessionName
@@ -208,62 +186,11 @@ class WordFilter:
         dataframe = dataframe[~dataframe[self.event_column].str.match('LastStimuli.Show', na=False)]
         return dataframe.groupby('Session.Trial.UID')
 
-    @property
-    def switchings_per_second(self) -> np.ndarray:
-        return np.concatenate([trial['switchings_per_second'] for trial in self.data_by_trial])
-
-    @property
-    def switching_rate(self) -> list:
-        return [trial['switching_rate'] for trial in self.data_by_trial]
-
-    def trials(self, calculate_fixations: bool = False) -> list:
-        def calculate_heatmap(data: dict):
-            relation_letter = data['relation_letter']
-            rectangle = data['rectangle']
-            x_data = data['relative_fixations']['FPOGX'].values
-            y_data = data['relative_fixations']['FPOGY'].values
-            weights = data['relative_fixations']['FPOGD'].values
-
-            width = rectangle.width
-            height = rectangle.height
-
-            n_vertical_split = 1
-            if relation_letter == 'A':
-                n_horizontal_slit = 1
-            elif relation_letter == 'B':
-                n_horizontal_slit = 1
-            elif relation_letter == 'C':
-                n_horizontal_slit = 4
-            else:
-                raise Exception(f"Relation letter not supported: {relation_letter}")
-
-            horizontal_bins = np.linspace(0, width, num=n_horizontal_slit+1)
-
-            vertical_bins = np.linspace(0, height, num=n_vertical_split+1)
-
-            # invert y
-            # y_data = height - y_data
-
-            heatmap_data, _, _ = np.histogram2d(
-                x_data, y_data,
-                bins=[horizontal_bins, vertical_bins],
-                range=[[0, width], [0, height]],
-                weights=weights)
-
-            X, Y = np.meshgrid(horizontal_bins, vertical_bins)
-
-            data['heatmap'] = heatmap_data
-            data['heatmap_xmesh'] = X
-            data['heatmap_ymesh'] = Y
-            data['heatmap_relation_letter'] = relation_letter
-
-        # def clamp(gaze: pd.DataFrame) -> pd.DataFrame:
-        #     gaze = gaze[gaze['FPOGX'] >= 0.0]
-        #     gaze = gaze[gaze['FPOGY'] >= 0.0]
-        #     gaze = gaze[gaze['FPOGX'] <= 1.0]
-        #     gaze = gaze[gaze['FPOGY'] <= 1.0]
-        #     return gaze
-
+    def processed_fixations(self) -> list:
+        """
+        Returns a list of dictionaries containing processed fixations for sections of each trial,
+        full trial, sample and comparison, along with corresponding trial data.
+        """
         def process_fixations(gaze: pd.DataFrame) -> pd.DataFrame:
             denormalized_fixations = denormalize(gaze['FPOGX'], gaze['FPOGY'])
             denormalized_fixations = pd.DataFrame({
@@ -378,7 +305,7 @@ class WordFilter:
                 fixations_timestamps=fixations_timestamps,
             )
 
-            return formated_letter, switchings
+            return fixations_over_letters, switchings
 
         def process_fixations_over_words(
                 fixations : tuple,
@@ -390,7 +317,7 @@ class WordFilter:
             processed_fixations, fixations_timestamps = fixations
 
             if processed_fixations.empty:
-                return []
+                return [], {}
             fixations_over_words = []
             not_contained_mask = None
             fixations_contained_mask = None
@@ -447,23 +374,34 @@ class WordFilter:
                     'fixations_count': fixations_count,
                     'contained_mask': fixations_contained_mask
                 }
-                calculate_heatmap(formated_word)
 
+                # handle 'C' words simultaneous to 'B' figures
                 if relation_letter == 'C':
-                   formated_word['letter_fixations'] = process_fixations_over_letters(
-                        letters=list(word),
-                        processed_fixations=processed_fixations,
-                        fixations_timestamps=fixations_timestamps,
-                        word_rectangle=word_rectangle
-                    )
+                    if '_' in word:
+                       pass # in BC relations, '_' means 'B', so we cannot process letters
+                    else:
+                        formated_word['letter_fixations'] = process_fixations_over_letters(
+                            letters=list(word),
+                            processed_fixations=processed_fixations,
+                            fixations_timestamps=fixations_timestamps,
+                            word_rectangle=word_rectangle
+                        )
+
+                elif relation_letter == 'B':
+                    if '_' in word: # in CB relations, '_' means 'C', so we can process letters
+                        formated_word['letter_fixations'] = process_fixations_over_letters(
+                            letters=list(word.replace('_', '')),
+                            processed_fixations=processed_fixations,
+                            fixations_timestamps=fixations_timestamps,
+                            word_rectangle=word_rectangle
+                        )
+
                 fixations_over_words.append(formated_word)
 
             word_switchings = process_switchings(
                 fixations_over_words,
                 processed_fixations,
                 fixations_timestamps)
-
-            # print('Derived trial measures: ', derived_trial_measures)
 
             return fixations_over_words, word_switchings
 
@@ -489,9 +427,6 @@ class WordFilter:
 
             result = {}
             result['duration'] = section_duration
-
-            if not calculate_fixations:
-                return result
 
             processed_fixations, fixations_timestamps = fixations
 
@@ -547,15 +482,15 @@ class WordFilter:
         if self.events_pattern is None:
             self.setup_target_trial_events()
 
-        if calculate_fixations:
-            denormalize = np.vectorize(self._screen.denormalize)
-            processed_fixations = process_fixations(self.gaze_df)
-        else:
-            processed_fixations = None
+        denormalize = np.vectorize(self._screen.denormalize)
+        processed_fixations = process_fixations(self.gaze_df)
 
         trials = []
         for trial_uid, trial_events in self.events_grouped_by_trial:
+            self._trials.to_uid(trial_uid, 'Cycle.ID', self._info.Cycle)
             trial = self._trials.from_uid(trial_uid)
+            if trial is None:
+                continue
             relation = trial['Relation']
             reference_word = trial['Name']
 
@@ -602,115 +537,219 @@ class WordFilter:
                 'sample_fixations': data_by_section['sample']['fixations'],
                 'comparisons_duration': data_by_section['comparisons']['duration'],
                 'comparisons_fixations': data_by_section['comparisons']['fixations'],
-                'trial_uid_in_session': trial_uid,
-                'cycle': self._info.Cycle,
-                'relation': relation,
-                'reference_word': reference_word,
-                'condition': trial['Condition'],
-                'result': trial['Result'],
-                'file': trial['File'],
-                'has_differential_reinforcement': trial['HasDifferentialReinforcement'],
-                'participant': trial['Participant'],
-                'latency': trial['Latency']
+                'data': trial
             }
 
             trials.append(trial_dict)
 
         return trials
 
-
-    #         trials.append({
-    #             'uid': trial_data['Session.Trial.UID'].iloc[0],
-    #             'words': words,
-    #             'gaze': gaze,
-    #             'reference_word': reference_word,
-    #             'fixations_outside_words_mask': not_contained_mask,
-    #             'switchings_per_second': switchings_per_second,
-    #             'switchings': switchings,
-    #             'switchings_mask': switchings_mask,
-    #             'switchings_labels': switchings_labels,
-    #             'switching_rate': switchings/trial_duration,
-    #             'fixations_count': fixations_count,
-    #             'fixation_rate': fixations_count/trial_duration,
-    #             'duration': trial_duration
-    #         })
-
-    #     max_rate = np.max([trial['switching_rate'] for trial in trials])
-    #     max_fixations = np.max([trial['fixation_rate'] for trial in trials])
-
-    #     for trial in trials:
-    #         trial['switching_rate_normalized'] = (trial['switching_rate']/max_rate)
-    #         trial['switching_max_rate'] = max_rate
-    #         trial['fixation_rate_normalized'] = (trial['fixation_rate']/max_fixations)
-    #         trial['fixation_max_rate'] = max_fixations
-
-    #     if filter_type == TrialFilterType.TrialsAll:
-    #         return trials
-    #     elif filter_type == TrialFilterType.TrialsReferenceWord:
-    #         return [trial for trial in trials if trial['reference_word'] == self.word_string]
-
-
     @property
-    def duration_per_trial(self) -> list:
-        return [trial['duration'] for trial in self.data_by_trial]
+    def DataFrame(self) -> pd.DataFrame:
+        """
+        Returns a dataframe with trial data per row.
+        """
+        def get_sample_figure(trial_events: pd.DataFrame, relation: str) -> str:
+            mk = trial_events[self.event_column].str.match(self.events[relation]['samp']['begin'])
+            word_shapes_dict = as_dict(trial_events[mk][self.annotation_column].iloc[0])
+            return next(iter(word_shapes_dict))
 
-    @property
-    def switching_rate_normalized_per_trial(self) -> list:
-        return [trial['switching_rate_normalized'] for trial in self.data_by_trial]
+        if self.events_pattern is None:
+            self.setup_target_trial_events()
 
-    def process_all_trials(self):
-        self.data_by_trial = self._filter_by_trial(TrialFilterType.TrialsAll)
+        self._trials.new_column(f'Sample.Figure', 'U12')
+        # self._trials.new_column(f'Sample.Figure.Top', np.float64)
+        # self._trials.new_column(f'Sample.Figure.Left', np.float64)
+        # self._trials.new_column(f'Sample.Figure.Width', np.float64)
+        # self._trials.new_column(f'Sample.Figure.Height', np.float64)
 
-    def process_trials_with_reference_word(self):
-        self.data_by_trial = self._filter_by_trial(TrialFilterType.TrialsReferenceWord)
+        # for i in range(1, 3):
+        #     self._trials.new_column(f'Comparison{i}.Figure.Top', np.float64)
 
-    def get_heatmap_of_positive_words(self):
-        return self.get_heatmap(WordFilterType.ByPositive)
 
-    def get_heatmap_of_negative_words(self):
-        return self.get_heatmap(WordFilterType.ByNegative)
+        sections = ['Trial', 'Sample', 'Comparisons']
+        for section in sections:
+            self._trials.new_column(f'{section}.Duration')
 
-    def get_heatmap_by_trial(self):
-        return self.get_heatmap(WordFilterType.ByPositiveAndNegative)
+        for trial_uid, trial_events in self.events_grouped_by_trial:
+            self._trials.to_uid(trial_uid, 'Cycle.ID', self._info.Cycle)
+            trial = self._trials.from_uid(trial_uid)
 
-    def get_heatmap(self, filter_type: WordFilterType):
-        def larger(rectangles):
-            return max(rectangles, key=lambda rectangle: rectangle.width*rectangle.height)
+            if trial is None:
+                continue
+            relation = trial['Relation']
 
-        result = {}
-        result['heatmap_by_trial'] = []
-        result['heatmaps_by_trial'] = []
-        result['rectangles_by_trial'] = []
-        for trial in self.data_by_trial:
-            data_to_include = {'words': []}
-            for word in trial['words']:
-                if filter_type == WordFilterType.ByPositive:
-                    if word['function'] == 'positive':
-                        data_to_include['words'].append(word)
-                elif filter_type == WordFilterType.ByNegative:
-                    if word['function'] == 'negative':
-                        data_to_include['words'].append(word)
-                elif filter_type == WordFilterType.ByPositiveAndNegative:
-                    if word['function'] == 'positive' or word['function'] == 'negative':
-                        data_to_include['words'].append(word)
+            # assign events pattern of sample
+            sample_event_pattern = self.get_event_pattern(
+                [self.events[relation]['samp']['begin'],
+                 self.events[relation]['samp']['end']]
+            )
 
-            if data_to_include['words'] == []:
-                # print(f'No words for trial {trial["uid"]} with filter {filter_type}. Creating an empty heatmap.')
-                data_to_include['trial_heatmaps'] = [np.zeros((4, n_vertical_split))]
-                data_to_include['trials_rectangles'] = [Rectangle(width=514, height=230)]
+            self._trials.to_uid(trial_uid, 'Sample.Figure', get_sample_figure(trial_events, relation))
+
+            # assign events pattern of comparisons
+            if relation == 'CD':
+                comparison_event_pattern = None
             else:
-                data_to_include['trial_heatmaps'] = [word['heatmap'] for word in data_to_include['words']]
-                data_to_include['trials_rectangles'] = [word['rectangle'] for word in data_to_include['words']]
-            result['heatmap_by_trial'].append(sum(data_to_include['trial_heatmaps']))
-            result['heatmaps_by_trial'].append(data_to_include['trial_heatmaps'])
-            result['rectangles_by_trial'].append(larger(data_to_include['trials_rectangles']))
+                comparison_event_pattern = self.get_event_pattern(
+                    [self.events[relation]['comp']['begin'],
+                    self.events[relation]['comp']['end']]
+                )
 
-        result['rectangle'] = larger(result['rectangles_by_trial'])
-        X, Y = calculate_mesh(result['rectangle'])
-        result['heatmap_xmesh'] = X
-        result['heatmap_ymesh'] = Y
-        result['heatmap'] = sum(result['heatmap_by_trial'])
-        return result
+            sections = ['Trial', 'Sample', 'Comparisons']
+            events = [
+                self.events_pattern,
+                sample_event_pattern,
+                comparison_event_pattern]
+
+            for section, event_pattern in zip(sections, events):
+                column = f'{section}.Duration'
+                section_duration = None
+                if event_pattern is not None:
+                    mask = trial_events[self.event_column].str.match(event_pattern)
+                    events = trial_events[mask]
+
+                    if len(events) > 0:
+                        timestamps = events[self._behavior.__Timestamp__]
+                        section_duration = timestamps.max() - timestamps.min()
+                        if section_duration == 0:
+                            section_duration = None
+
+                self._trials.to_uid(trial_uid, column, section_duration)
+
+        return self._trials.DataFrame
+
+
+    def raw_fixations(self) -> list:
+        """
+        Returns a list of dictionaries with raw fixations for both sections of the trial
+        sample and comparisons, along with corresponding trial data.
+        """
+        def process_section(
+            fixations : pd.DataFrame,
+            trial_events : pd.DataFrame,
+            event_pattern : str,
+            section : str,
+            relation : str
+        ) -> dict:
+
+            mask = trial_events[self.event_column].str.match(event_pattern)
+            events = trial_events[mask]
+
+            if len(events) == 0:
+                return {}
+
+            timestamps = events[self._behavior.__Timestamp__]
+            section_duration = timestamps.max() - timestamps.min()
+            if section_duration == 0:
+                return {}
+
+            result = {}
+            result['duration'] = section_duration
+
+            mask = fixations[self._gaze.__Timestamp__].between(timestamps.min(), timestamps.max())
+            section_fixations = fixations[mask]
+
+            if section == 'sample':
+                mk = trial_events[self.event_column].str.match(self.events[relation]['samp']['begin'])
+                word_shapes_dict = as_dict(trial_events[mk][self.annotation_column].iloc[0])
+
+                result['fixations'] = section_fixations
+                result['words'] = word_shapes_dict
+                result['relation_letter'] = relation[0]
+
+            elif section == 'comparisons':
+                mk = trial_events[self.event_column].str.match(self.events[relation]['comp']['begin'])
+                word_shapes_dict = as_dict(trial_events[mk][self.annotation_column].iloc[0])
+
+                if (relation == 'BC') or (relation == 'CB'):
+                    # BC, CB uses simultaneous/0-delayed mts
+                    # show sample -> response to sample -> show comparisons (sample stays)
+                    # hence, we need to include sample in shapes dict
+                    mk = trial_events[self.event_column].str.match(self.events[relation]['samp']['begin'])
+                    candidate_dict = as_dict(trial_events[mk][self.annotation_column].iloc[0])
+                    sample_shapes_dict = {}
+                    for key in candidate_dict.keys():
+                        sample_shapes_dict[key+'_'] = candidate_dict[key]
+                    word_shapes_dict.update(sample_shapes_dict)
+
+                else:
+                    # AB, AC uses successive/0-delayed mts
+                    # show sample -> response to sample -> remove sample -> show comparisons
+                    # hence, we don't need to include sample in shapes dict
+                    pass
+
+                result['fixations'] = section_fixations
+                result['word_shapes'] = word_shapes_dict
+                result['relation_letter'] = relation[1]
+
+            return result
+
+        # assign events pattern of trial
+        if self.events_pattern is None:
+            self.setup_target_trial_events()
+
+        denormalize = np.vectorize(self._screen.denormalize)
+        processed_fixations = denormalize(self.gaze_df['FPOGX'], self.gaze_df['FPOGY'])
+        processed_fixations = pd.DataFrame({
+            'FPOGX': processed_fixations[0],
+            'FPOGY': processed_fixations[1],
+            'TIME_TICK': self.gaze_df['TIME_TICK'],
+            'FPOGD': self.gaze_df['FPOGD'],
+            'FPOGID': self.gaze_df['FPOGID'],
+            'FPOGV': self.gaze_df['FPOGV']
+        })
+
+        sections = ['sample', 'comparisons']
+        trials = []
+        for trial_uid, trial_events in self.events_grouped_by_trial:
+            trial = self._trials.from_uid(trial_uid)
+            if trial is None:
+                continue
+            relation = trial['Relation']
+
+            # assign events pattern of samples
+            sample_event_pattern = self.get_event_pattern(
+                [self.events[relation]['samp']['begin'],
+                 self.events[relation]['samp']['end']]
+            )
+
+            # assign events pattern of comparisons
+            if relation == 'CD':
+                comparison_event_pattern = None
+            else:
+                comparison_event_pattern = self.get_event_pattern(
+                    [self.events[relation]['comp']['begin'],
+                    self.events[relation]['comp']['end']]
+                )
+
+            events = [
+                sample_event_pattern,
+                comparison_event_pattern]
+
+            data_by_section = {}
+            for section, event_pattern in zip(sections, events):
+                if event_pattern is None:
+                    data_by_section[section] = None
+                    continue
+
+                data_by_section[section] = process_section(
+                    fixations=processed_fixations,
+                    trial_events=trial_events,
+                    event_pattern=event_pattern,
+                    section=section,
+                    relation=relation,
+                )
+
+            trial_dict = {
+                'sections': data_by_section,
+                'data': trial
+            }
+
+            trials.append(trial_dict)
+
+        return trials
+
 
 class Synchronizer:
     def __init__(self, code: str):
@@ -726,8 +765,8 @@ class Synchronizer:
         self.gaze_indices = self.gaze.indices
 
         self.trials = TrialEvents(self.info)
-        # self.trials.label = 2
-        # self.trials_indices = self.trials.indices
+        self.trials.label = 2
+        self.trials_indices = self.trials.indices
 
         self.desired_fps: int = DEFAULT_FPS
 
@@ -744,8 +783,13 @@ class Synchronizer:
             self.behavior.timestamps,
             self.behavior.labels,
             self.behavior.indices)), dtype=dtype)
+        data3 = np.array(list(zip(
+            self.trials.timestamps,
+            self.trials.labels,
+            self.trials.indices)), dtype=dtype)
 
-        self._data = np.concatenate((data1, data2))
+        self._data = np.concatenate((data1, data2, data3))
+        # self._data = np.concatenate((data1, data2))
         self._data.sort(order='timestamp')
         self.per_second = TimeFilter(self._data, 1.0)
         self.per_frame = TimeFilter(self._data, 1/self.desired_fps)
@@ -754,15 +798,14 @@ class Synchronizer:
     def _get_duration(self):
         return np.max((self.gaze.duration(), self.behavior.duration()))
 
-    def word_filter(self, word: str = '') -> WordFilter:
-        return WordFilter(
+    def trial_filter(self) -> TrialFilter:
+        return TrialFilter(
             info=self.info,
             screen=self.screen,
             time_sorted_data=self._data,
             gaze=self.gaze,
             behavior=self.behavior,
-            trials=self.trials,
-            word_string=word)
+            trials=self.trials)
 
     def duration_difference(self) -> float:
         return self.gaze.duration() - self.behavior.duration()
@@ -786,39 +829,3 @@ class Synchronizer:
         for value in self.per_second.range:
             self.per_second.current = value
             yield value, self.per_second.data
-
-if __name__ == '__main__':
-    import os
-
-    from explorer import (
-        load_participant_sources,
-        load_pickle,
-        save_pickle
-    )
-
-    sources = load_participant_sources()
-    for participant in sources:
-        target_sources = []
-        for design_file in sources[participant]:
-            for source in sources[participant][design_file]:
-                # if 'Pre-treino' not in source['name']:
-                if 'Sondas-CD' in source['name']:
-                    filename = '_'.join([participant.replace('-', '_'), source['code']])
-                    print(filename)
-                    # check if file exists
-                    if os.path.exists(filename):
-                        source['trials'] = load_pickle(filename)
-                    else:
-                        # force the creating of directories
-                        session : Synchronizer
-                        session = source['session']
-                        session_filtered = session.word_filter('')
-                        source['trials'] = session_filtered.trials(calculate_fixations=True)
-
-                        save_pickle(filename, source['trials'])
-
-                    for trial in source['trials']:
-                        if trial['relation'] == 'CD':
-                            fixations_by_word, measures = trial['sample_fixations']
-                            for word in fixations_by_word:
-                                print(word['fixations_count'], word['letter_fixations'][1]['switchings'])

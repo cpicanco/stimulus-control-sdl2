@@ -38,3 +38,5 @@ if __name__ == '__main__':
     print(f'Screen Height (Degrees): {visual_angle(SCREEN_H_CM)}')
     print(f'Letter Height (Degrees): {visual_angle(LETTER_HEIGHT)}')
     print('*****************************')
+
+    print(f'Calibration Error (Degrees): {visual_angle(1.1521)}')

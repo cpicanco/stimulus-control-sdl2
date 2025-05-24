@@ -9,8 +9,6 @@ from player_media import draw_word, load_fonts
 from player_information import GazeInfo
 from player_synchronizer import Synchronizer
 
-K = 12.031777217921098/4
-
 load_fonts()
 
 def empty_word(width, height):
@@ -499,7 +497,6 @@ def get_section_cols(of_type : str, section: str):
     return cols_count, cols_duration
 
 if __name__ == '__main__':
-    from dataclasses import dataclass
     from enum import Enum
 
     from player_utils import calculate
@@ -508,10 +505,19 @@ if __name__ == '__main__':
     import numpy as np
     import pandas as pd
 
-    from explorer_study2 import (
+    from explorer import (
         load_data,
         export
     )
+
+    relation = 'AC'
+    is_for_sample = False
+
+    mapping = {
+        'duration': 'Duration\n(seconds)',
+        'count': 'Count',
+        'duration_by_count': 'Duration\nby Count',
+        'duration_times_count': 'Duration\ntimes Count'}
 
     cols_duration_by_count = [
         'letter1_duration_by_count',
@@ -535,7 +541,7 @@ if __name__ == '__main__':
     class ComparisonsType(Enum):
         Positive = 'positive'
         Negative = 'negative'
-        SimultaneousSample = 'simulteneous_sample'
+        SimulteneousSample = 'simulteneous_sample'
 
     class Relation(Enum):
         AB = 'AB'
@@ -544,22 +550,6 @@ if __name__ == '__main__':
         BC = 'BC'
         BB = 'BB'
         CB = 'CB'
-
-    class CalculationType(Enum):
-        NONE = "none"
-        ROLLING_SUM = "rolling_sum_no_overlap"
-        RATIO = "ratio"
-        PRODUCT = "product"
-
-    @dataclass
-    class Metric:
-        name : str
-        header : str
-        relation : Relation
-        source_columns: list[str]  # Columns needed for calculation
-        target_columns: list[str]  # Result columns
-        calculation: CalculationType
-        percentage: bool = False   # Parameter for calculations that need it
 
     def get_section_cols(of_type : str, section: Section):
         cols_count = []
@@ -571,7 +561,7 @@ if __name__ == '__main__':
             iterator = range(1, 2)
         elif of_type == ComparisonsType.Negative:
             iterator = range(2, 4)
-        elif of_type == ComparisonsType.SimultaneousSample:
+        elif of_type == ComparisonsType.SimulteneousSample:
             iterator = range(4, 5)
         else:
             raise ValueError(f'of_type must be {", ".join([s.value for s in ComparisonsType])}')
@@ -588,125 +578,30 @@ if __name__ == '__main__':
                 )
         return cols_count, cols_duration
 
-    def process_metrics(data: pd.DataFrame, metrics: list[Metric]) -> pd.DataFrame:
-        """Process all metrics in a single loop with structured operations"""
-        processed_data = []
-        for metric in metrics:
-            # Apply filtering here
-            df = data[data['relation'] == metric.relation.value].copy()
-            # Handle rolling sum calculations
-            processed_metric = []
-            for src_col, tgt_col in zip(metric.source_columns, metric.target_columns):
-                if metric.calculation == CalculationType.NONE:
-                    processed_metric.append(df[src_col].fillna(0))
-                if metric.calculation == CalculationType.ROLLING_SUM:
-                    processed_metric.append(calculate(
-                        df,
-                        calculation=metric.calculation.value,
-                        target_column=src_col,
-                        percentage=metric.percentage
-                    )['target_calculation'])
+    if (relation == 'CD'):
+        is_for_sample = True
+        cols_count, cols_duration = get_section_cols(
+            of_type=ComparisonsType.Positive,
+            section=Section.Samples)
 
-                elif metric.calculation == CalculationType.RATIO:
-                    df[tgt_col] = (
-                        df[src_col[0]] / df[src_col[1]]
-                    )
-                    processed_metric.append(df[tgt_col].fillna(0))
+    elif (relation == 'AC') or (relation == 'BC'):
+        is_for_sample = False
+        cols_count, cols_duration = get_section_cols(
+            of_type=ComparisonsType.Positive,
+            section=Section.Comparisons)
 
-                elif metric.calculation == CalculationType.PRODUCT:
-                    # Handle product calculations: source[0] * source[1]
-                    df[tgt_col] = (
-                        df[src_col[0]] * df[src_col[1]]
-                    )
-                    processed_metric.append(df[tgt_col].fillna(0))
-                # Add new calculation types here...
-
-            df = pd.concat(processed_metric, axis=1)
-            processed_data.append(df)
-        return processed_data
-
-    METRICS = []
-    # CD
-    cols_count, cols_duration = get_section_cols(
-        of_type=ComparisonsType.Positive,
-        section=Section.Samples)
-    pairwise_src_columns = [cols for cols in zip(cols_duration, cols_count)]
-    METRICS.append(
-        Metric(
-            name='duration_by_count',
-            header='Duration\nby Count',
-            relation=Relation.CD,
-            source_columns=pairwise_src_columns,
-            target_columns=cols_duration_by_count,
-            calculation=CalculationType.RATIO
-        )
-    )
-
-    # # AC
-    # cols_count, cols_duration = get_section_cols(
-    #     of_type=ComparisonsType.Positive,
-    #     section=Section.Comparisons)
-    # pairwise_src_columns = [cols for cols in zip(cols_duration, cols_count)]
-    # METRICS.append(
-    #     Metric(
-    #         name='duration_by_count',
-    #         header='Duration\nby Count',
-    #         relation=Relation.AC,
-    #         source_columns=pairwise_src_columns,
-    #         target_columns=cols_duration_by_count,
-    #         calculation=CalculationType.RATIO
-    #     )
-    # )
-
-    # # BC
-    # cols_count, cols_duration = get_section_cols(
-    #     of_type=ComparisonsType.Positive,
-    #     section=Section.Comparisons)
-    # pairwise_src_columns = [cols for cols in zip(cols_duration, cols_count)]
-    # METRICS.append(
-    #     Metric(
-    #         name='duration_by_count',
-    #         header='Duration\nby Count',
-    #         relation=Relation.BC,
-    #         source_columns=pairwise_src_columns,
-    #         target_columns=cols_duration_by_count,
-    #         calculation=CalculationType.RATIO
-    #     )
-    # )
-
-    # # CB
-
-    # cols_count, cols_duration = get_section_cols(
-    #     of_type=ComparisonsType.Positive,
-    #     section=Section.Samples)
-    # pairwise_src_columns = [cols for cols in zip(cols_duration, cols_count)]
-    # METRICS.append(
-    #     Metric(
-    #         name='sample_duration_by_count',
-    #         header='Duration\nby Count (Sample, CB)',
-    #         relation=Relation.CB,
-    #         source_columns=pairwise_src_columns,
-    #         target_columns=cols_duration_by_count,
-    #         calculation=CalculationType.RATIO
-    #     )
-    # )
-
-    # cols_count, cols_duration = get_section_cols(
-    #     of_type=ComparisonsType.SimultaneousSample,
-    #     section=Section.Comparisons)
-    # pairwise_src_columns = [cols for cols in zip(cols_duration, cols_count)]
-    # METRICS.append(
-    #     Metric(
-    #         name='comparisons_duration_by_count',
-    #         header='Duration\nby Count (Comparisons, CB)',
-    #         relation=Relation.CB,
-    #         source_columns=pairwise_src_columns,
-    #         target_columns=cols_duration_by_count,
-    #         calculation=CalculationType.RATIO
-    #     ),
-    # )
+    elif (relation == 'CB'):
+        if is_for_sample:
+            cols_count, cols_duration = get_section_cols(
+                of_type=ComparisonsType.Positive,
+                section=Section.Samples)
+        else:
+            cols_count, cols_duration = get_section_cols(
+                of_type=ComparisonsType.Positive,
+                section=Section.Comparisons)
 
     df = load_data()
+
     df['participant'] = df.apply(lambda row: row['participant'].replace('\\', '').replace('-', '_'), axis=1)
     # normalize session column
     i = 0
@@ -716,25 +611,79 @@ if __name__ == '__main__':
         session_mapping = {num: new_num for new_num, num in enumerate(unique_sorted)}
         participant_data['session'] = participant_data['file_num'].map(session_mapping) + 1
 
-        processed_data = process_metrics(participant_data, METRICS)
+        # yticks = []
+        # cycles_onset = []
 
+        df = participant_data[participant_data['relation'] == relation]
+        # df = df[df['condition'] == '7']
+
+        # unique_sessions = participant_data['session'].unique()
+        # for (cycle, condition, session), g in df.groupby(['cycle', 'condition', 'file']):
+        #     if condition == '7':
+        #         yticks.append(g['uid'].values[0])
+        #         yticks.append(g['uid'].values[-1])
+
+        #         if session == unique_sessions[-1]:
+        #             continue
+        #         else:
+        #             cycles_onset.append(g['uid'].values[-1])
+
+        # cycles_onset.insert(0, yticks[0])
+        # cycles_onset.append(participant_data['uid'].max())
+
+        # # remove first and last vertical line
+        # yticks.sort()
+
+        # df = df[cols_duration+cols_count + ['uid']]
+        df = df[cols_duration+cols_count]
+        cols = zip(cols_duration, cols_count, cols_duration_by_count, cols_duration_times_count)
+        for (col_duration, col_count, col_duration_count, col_duration_times_count) in cols:
+            df[col_duration] = calculate(df,
+                    calculation='rolling_sum_no_overlap',
+                    target_column=col_duration,
+                    percentage=False)['target_calculation']
+
+            df[col_count] = calculate(df,
+                    calculation='rolling_sum_no_overlap',
+                    target_column=col_count,
+                    percentage=False)['target_calculation']
+
+            df[col_duration_count] = df[col_duration] / df[col_count]
+
+            df[col_duration_times_count] = df[col_duration] * df[col_count]
+
+        # uid_to_index = {uid: idx for idx, uid in enumerate(df['uid'])}
+        # df.drop('uid', axis=1, inplace=True)
+        # df.dropna(inplace=True)
+
+        # ylabels = np.array([uid_to_index[uid] for uid in yticks if uid in uid_to_index])
+        # yticks = ylabels // 4
+        # cycles_onset = np.array([uid_to_index[uid] for uid in cycles_onset if uid in uid_to_index]) // 4
+
+        duration = df[cols_duration]
+        count = df[cols_count]
+        duration_by_count = df[cols_duration_by_count]
+        duration_times_count = df[cols_duration_times_count]
+
+        processed_data = [duration, count, duration_by_count, duration_times_count]
+
+
+        # Create a two heatmaps, join y
         fig, axs = plt.subplots(nrows=1, ncols=len(processed_data), figsize=(6, 10), sharey=True)
-
+        # global title
         fig.text(0.5, 0.95, participant)
-
-        # test if axs is a list
-        if isinstance(axs, plt.Axes):
+        # turn axs to a flat list
+        axs = axs.flatten()
+        if len(axs) == 1:
             axs = [axs]
-        else:
-            axs = axs.flatten()
 
-        for ax, data, metric in zip(axs, processed_data, METRICS):
+        for ax, data, title in zip(axs, processed_data, mapping.keys()):
             heatmap_data = data.to_numpy()
             heatmaps_max = heatmap_data.max()
             im = ax.imshow(
                 heatmap_data,
                 aspect='auto',  # Ensure rows and columns scale proportionally
-                extent=[0, 4*K, len(heatmap_data), 0],
+                extent=[0, 4, len(df), 0],
                 vmin=0,
                 vmax=heatmaps_max,
                 cmap='viridis'
@@ -742,40 +691,18 @@ if __name__ == '__main__':
 
             # Add labels
             ax.set_xlabel('Letters')
-            if metric.name == 'duration':
+            if title == 'duration':
                 ax.set_ylabel('Trials')
-            ax.set_xticks([i*K for i in range(5)])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-            # ax.set_xticklabels(['L1', 'L2', 'L3', 'L4'])
+            ax.set_xticks(np.arange(0.5, 4.5, 1))  # Center ticks
+            ax.set_xticklabels(['L1', 'L2', 'L3', 'L4'])
 
             # Add colorbar horizontally on top
             cbar = plt.colorbar(im, ax=ax, location='top', orientation='horizontal', shrink=0.8, aspect=50)
             cbar.ax.xaxis.set_ticks_position('top')  # Move ticks to the top
             cbar.ax.xaxis.set_label_position('top')  # Move label to the top
-            cbar.set_label(metric.name)
+            cbar.set_label(mapping[title])
             # Format the colorbar to show 3 decimal places
-            if 'duration' in metric.name:
-                cbar.formatter = FormatStrFormatter('%.3f')  # Set format to 3 decimal places
-
+            cbar.formatter = FormatStrFormatter('%.3f')  # Set format to 3 decimal places
             cbar.update_ticks()  # Update ticks to apply formatting
 
         plt.tight_layout()

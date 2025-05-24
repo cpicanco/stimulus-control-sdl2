@@ -40,11 +40,12 @@ class Information:
     __end_time__ = 'Hora_Termino:'
     __duration__ = 'Duration:'
 
-    def __init__(self, entry):
+    def __init__(self, entry, verbose=True):
         if not entry.endswith('.info.processed'):
             raise ValueError('The file must be a .info.processed file.')
         else:
-            print(f'Loading {entry}...')
+            if verbose:
+                print(f'Loading {entry}...')
 
         self.__entry__ = entry
         self.__info_file__ = self.__load_info_file__(entry)
@@ -137,40 +138,35 @@ class Information:
         self.monitor = JSONObject(eval(json_string))
 
     def __str__(self):
-        return f'{self.__header_version__}{self.version}\n' \
-               f'{self.__participant_name__}{self.participant_name}\n' \
-               f'{self.__session_name__}{self.session_name}\n' \
-               f'{self.__start_date__}{self.start_date}\n' \
-               f'{self.__start_time__}{self.start_time}\n' \
-               f'{self.__end_date__}{self.end_date}\n' \
-               f'{self.__end_time__}{self.end_time}\n' \
-               f'{self.__duration__}{self.duration}\n' \
-               f'{self.__session_result__}{self.result}\n' \
-               f'{self.__grid__}{self.grid}\n' \
-               f'{self.__monitor__}{self.monitor}\n' \
-               f'{self.__session_result__}{self.result}'
+        return f'{self.__header_version__}\t{self.version}\n' \
+               f'{self.__participant_name__}\t{self.participant_name}\n' \
+               f'{self.__session_name__}\t{self.session_name}\n' \
+               f'{self.__grid__}\t{self.grid}\n' \
+               f'{self.__monitor__}\t{self.monitor}\n' \
+               f'{self.__start_date__}\t{self.start_date}\n' \
+               f'{self.__start_time__}\t{self.start_time}\n' \
+               f'{self.__end_date__}\t{self.end_date}\n' \
+               f'{self.__end_time__}\t{self.end_time}\n' \
+               f'{self.__duration__}\t{self.duration}\n' \
+               f'{self.__session_result__}\t{self.result}'
 
-    def has_valid_result(self):
-        result = False
-        valid_results = [
-            'Interrompida',
-            'Concluida',
-            'Critério atingido',
-            'Critério não atingido']
-        for valid_result in valid_results:
-            if self.result == valid_result:
-                result = True
-                break
+    def save_to_file(self):
+        with open(self.__entry__, 'w', encoding='utf-8') as file:
+            file.write(str(self))
 
-        return result
+    def has_valid_result(self) -> bool:
+        valid_results = {
+            'Interrompida', 'Concluida',
+            'Critério atingido', 'Critério não atingido'}
 
-# if __name__ == "__main__":
-#     from fileutils import cd, list_files
-#     cd('..')
-#     cd('0-Rafael')
-#     cd('analysis')
-#     cd('2024-03-02')
+        return self.result in valid_results
 
-#     for entry in list_files('.info.processed'):
-#         info = Information(entry)
-#         print(info)
+if __name__ == "__main__":
+    import os
+
+    from fileutils import cd, list_files
+
+    cd(os.path.join('..', 'estudo1', '12-MED', 'analysis', '2024-03-25'))
+    for entry in list_files('.info.processed'):
+        info = Information(entry)
+        print(info.has_valid_result())

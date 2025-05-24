@@ -130,3 +130,9 @@ info_header = [
     'Hora_Termino:',
     'Duration:',
     'Resultado:']
+
+info_header_v3 = [i for i in info_header]
+info_header_v3.insert(3, 'Nome_do_planejamento:')
+
+if __name__ == '__main__':
+    print(info_header_v3)

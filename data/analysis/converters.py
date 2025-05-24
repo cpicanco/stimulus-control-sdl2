@@ -1,7 +1,7 @@
 import csv
 import pandas as pd
 
-from headers import info_header, data_header, timestamps_header, session_name_dict
+from headers import info_header, info_header_v3, data_header, timestamps_header, session_name_dict
 from fileutils import as_timestamps, as_data, as_info, load_file, file_exists, cd
 
 from anonimizator import anonimize
@@ -104,11 +104,6 @@ def convert_data_file(entry, override=False):
                 break
         return next_row
 
-    if not override:
-        if file_exists(as_data(entry, processed=True)):
-            print(f'Processed data file {entry} already exists. Skipping...')
-            return
-
     with open(entry, 'r', encoding='utf-8') as file:
         reader = csv.reader(file, delimiter='\t')
         processed_lines = []
@@ -175,7 +170,11 @@ def convert_data_file(entry, override=False):
             processed_lines.append(row)
             row = next_row
 
-    save_processed_file(entry, processed_lines)
+    if not override:
+        if file_exists(as_data(entry, processed=True)):
+            return processed_lines
+    else:
+        save_processed_file(entry, processed_lines)
 
 def override_timestamps_file(entry, override=False):
     if override:
@@ -253,8 +252,14 @@ def convert_info_file(entry, override=False):
             return
     default_conclusion = 'Concluida'
     version = 0
+    target_info_header = [i for i in info_header]
     with open(entry, 'r', encoding='utf-8') as file:
         first_line = file.readline().strip()
+
+        if first_line == 'Version:3':
+            version = 3
+            default_conclusion = 'Cancelada'
+            target_info_header = [i for i in info_header_v3]
 
         if first_line == 'Version:2':
             version = 2
@@ -263,11 +268,11 @@ def convert_info_file(entry, override=False):
         if first_line == 'Version:1':
             version = 1
 
-        if (version == 1) or (version == 2):
+        if (version == 1) or (version == 2) or (version == 3):
             # replace header in each line for header+tab
             lines = [first_line] + file.readlines()
             processed_lines = [line.strip().replace(header, header + '\t').split('\t') \
-                               for header, line in zip(info_header, lines)]
+                               for header, line in zip(target_info_header, lines)]
 
     if version == 0:
         # check if .interrupted.bin file exists
@@ -393,24 +398,6 @@ def add_info_to_data_files(entry, override=False):
     """
     Read .info.processed and add it to .data.processed files.
     """
-    def add_columns_to_data_file(entry, column_data):
-        name, condition, date, time = column_data
-
-        data = get_data_file(entry)
-        if data is None:
-            return
-
-        # include new columns into the dataframe
-        data['Participant'] = anonimize(name)
-        data['Condition'] = condition
-        data['Date'] = date
-        data['Time'] = time
-        data['File'] = entry
-
-        # save the new dataframe into a new file
-        data.to_csv(entry, sep='\t' ,index=False)
-        print(f'Participant, Condition, Date, Time, File, columns added to file {entry}.')
-
     if not override:
         if file_exists(as_data(entry, processed=True)):
             print(f'Processed data file {entry} already exists. Skipping...')
@@ -420,44 +407,70 @@ def add_info_to_data_files(entry, override=False):
     data_info = entry.replace('.data.processed', '.info.processed')
     if file_exists(data_info):
         info = load_file(data_info)
-        name = info.loc['Nome_do_sujeito:'][1]
-        date = info.loc['Data_Inicio:'][1]
-        time = info.loc['Hora_Inicio:'][1]
+        session_name = info.loc['Nome_da_sessao:'][1]
 
-        if '0-Pre-treino' in info.loc['Nome_da_sessao:'][1]:
+        if '0-Pre-treino' in session_name:
             condition = '0'
 
-        elif '0-Sondas-CD-Palavras-12-ensino-8-generalizacao' in info.loc['Nome_da_sessao:'][1]:
+        elif '0-Sondas-CD-Palavras-12-ensino-8-generalizacao' in session_name:
             condition = '7'
 
-        elif '1-Treino-AB' in info.loc['Nome_da_sessao:'][1]:
+        elif '7-Sondas-CD-Palavras-30-Todas' in session_name:
+            condition = '7'
+
+        elif '1-Treino-AB' in session_name:
             condition = '1'
 
-        elif '2a-Treino-AC-CD' in info.loc['Nome_da_sessao:'][1]:
+        elif '2a-Treino-AC-CD' in session_name:
             condition = '2a'
 
-        elif '2b-Treino-AC-Ref-Intermitente' in info.loc['Nome_da_sessao:'][1]:
+        elif '2b-Treino-AC-Ref-Intermitente' in session_name:
             condition = '2b'
 
-        elif '3-Sondas-BC-CB-Palavras-de-ensino' in info.loc['Nome_da_sessao:'][1]:
+        elif '3-Sondas-BC-CB-Palavras-de-ensino' in session_name:
             condition = '3'
 
-        elif '4-Sondas-BC-CB-Palavras-reservadas' in info.loc['Nome_da_sessao:'][1]:
+        elif '4-Sondas-BC-CB-Palavras-reservadas' in session_name:
             condition = '4'
 
-        elif '5-Sondas-CD-Palavras-generalizacao-reservadas' in info.loc['Nome_da_sessao:'][1]:
+        elif '5-Sondas-CD-Palavras-generalizacao-reservadas' in session_name:
             condition = '5'
 
-        elif '6-Sondas-AC-Palavras-generalizacao-reservadas' in info.loc['Nome_da_sessao:'][1]:
+        elif '6-Sondas-AC-Palavras-generalizacao-reservadas' in session_name:
             condition = '6'
 
-        elif '7-Sondas-CD-Palavras-12-ensino-8-generalizacao' in info.loc['Nome_da_sessao:'][1]:
+        elif '7-Sondas-CD-Palavras-12-ensino-8-generalizacao' in session_name:
             condition = '7'
 
         else:
             condition = 'NA'
 
-        add_columns_to_data_file(entry, [name, condition, date, time])
+        version = '0'
+
+        try:
+            version = info.loc['Version:'][1]
+        except KeyError:
+            pass
+
+        data = get_data_file(entry)
+        if data is None:
+            return
+
+        # include new columns into the dataframe
+        data['Participant'] = anonimize(info.loc['Nome_do_sujeito:'][1])
+        data['Condition'] = condition
+        data['Date'] = info.loc['Data_Inicio:'][1]
+        data['Time'] = info.loc['Hora_Inicio:'][1]
+        data['File'] = entry
+
+        if version == '3':
+            design = info.loc['Nome_do_planejamento:'][1]
+            data['Design'] = design
+
+        # save the new dataframe into a new file
+        data.to_csv(entry, sep='\t' ,index=False)
+        print(f'Participant, Condition, Date, Time, File, columns added to file {entry}.')
+
 
 if __name__ == "__main__":
     cd('..')

@@ -71,7 +71,10 @@ class GazeInfo:
         gaze_info_filename = self.base_filename + self.__gaze_info_extension__
 
         lines = load_from_file(info_filename)
-        lines += load_from_file(gaze_info_filename)
+        lines_gaze = load_from_file(gaze_info_filename)
+
+        if lines_gaze is not None:
+            lines += load_from_file(gaze_info_filename)
 
         for line in lines:
             def value(delimiter=':'):
@@ -179,7 +182,9 @@ class GazeInfo:
             'Sondas-CD-Palavras-generalizacao-reservadas':
                 {'CD': CD},
             'Sondas-AC-Palavras-generalizacao-reservadas':
-                {'AC': AC}
+                {'AC': AC},
+            'Sondas-CD-Palavras-30-Todas':
+                {'CD': CD},
         }
 
 if __name__ == '__main__':
