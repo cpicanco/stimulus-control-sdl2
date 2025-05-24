@@ -27,6 +27,7 @@ type
     private // registered parameters
       FDragDropOrientation: string;
       FFoodReleasingRule : string;
+      FEndTrialOnWrongDragDrop : Boolean;
       FAutoAnimateOnstart: Boolean;
       FUseHelpProgression: Boolean;
       FDistance: Integer;
@@ -111,6 +112,7 @@ begin
   FKind := TDragDrop.ClassName;
   FDragDropOrientation := '';
   FFoodReleasingRule := 'FoodDisabled';
+  FEndTrialOnWrongDragDrop := True;
   FAutoAnimateOnstart := False;
   FUseHelpProgression := False;
   FDistance := 0;
@@ -123,6 +125,8 @@ begin
   FRefName     := '';
 
   with TrialKeys, DragDropKeys do begin
+    RegisterParameter(EndTrialOnWrongDragDropKey,
+      @FEndTrialOnWrongDragDrop, FEndTrialOnWrongDragDrop);
     RegisterParameter(FoodDispensingRuleKey,
       @FFoodReleasingRule, FFoodReleasingRule);
     RegisterParameter(AutoAnimateOnStartKey,

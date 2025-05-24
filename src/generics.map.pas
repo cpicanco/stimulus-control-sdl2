@@ -11,7 +11,7 @@ type
 
   { TObjectToIntegerMap }
 
-  generic TObjectToIntegerMap<T: class> = class
+  generic TGenericToIntegerMap<T: class> = class
   private
     type
       TDictionaryType = specialize TDictionary<T, Integer>;
@@ -35,39 +35,39 @@ type
 
 implementation
 
-constructor TObjectToIntegerMap.Create;
+constructor TGenericToIntegerMap.Create;
 begin
   inherited Create;
   FDictionary := TDictionaryType.Create;
 end;
 
-destructor TObjectToIntegerMap.Destroy;
+destructor TGenericToIntegerMap.Destroy;
 begin
   FDictionary.Free;
   inherited Destroy;
 end;
 
-procedure TObjectToIntegerMap.Add(const Key: T; Value: Integer);
+procedure TGenericToIntegerMap.Add(const Key: T; Value: Integer);
 begin
   FDictionary.Add(Key, Value);
 end;
 
-procedure TObjectToIntegerMap.Remove(const Key: T);
+procedure TGenericToIntegerMap.Remove(const Key: T);
 begin
   FDictionary.Remove(Key);
 end;
 
-function TObjectToIntegerMap.ContainsKey(const Key: T): Boolean;
+function TGenericToIntegerMap.ContainsKey(const Key: T): Boolean;
 begin
   Result := FDictionary.ContainsKey(Key);
 end;
 
-function TObjectToIntegerMap.TryGetValue(const Key: T; out Value: Integer): Boolean;
+function TGenericToIntegerMap.TryGetValue(const Key: T; out Value: Integer): Boolean;
 begin
   Result := FDictionary.TryGetValue(Key, Value);
 end;
 
-function TObjectToIntegerMap.Sum: Integer;
+function TGenericToIntegerMap.Sum: Integer;
 var
   Pair: TDictionaryType.TDictionaryPair;
 begin
@@ -76,17 +76,17 @@ begin
     Result := Result + Pair.Value;
 end;
 
-procedure TObjectToIntegerMap.Clear;
+procedure TGenericToIntegerMap.Clear;
 begin
   FDictionary.Clear;
 end;
 
-function TObjectToIntegerMap.GetItem(const Key: T): Integer;
+function TGenericToIntegerMap.GetItem(const Key: T): Integer;
 begin
   Result := FDictionary[Key];
 end;
 
-procedure TObjectToIntegerMap.SetItem(const Key: T; const Value: Integer);
+procedure TGenericToIntegerMap.SetItem(const Key: T; const Value: Integer);
 begin
   FDictionary[Key] := Value;
 end;

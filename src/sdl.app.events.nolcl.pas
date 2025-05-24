@@ -14,7 +14,10 @@ unit sdl.app.events.nolcl;
 interface
 
 uses
-  Classes, SysUtils, ctypes, sdl2, sdl.app.events.abstract;
+  Classes, SysUtils, ctypes
+  , sdl2
+  , sdl.app.events.abstract
+  , sdl.app.system.keyboard.nolcl;
 
 type
 
@@ -25,14 +28,13 @@ type
 
   TCustomEventHandler = class sealed(TEventHandler)
     private
-      FOnAudioChannelFinished: TOnAudioChannelFinished;
-      procedure SetOnAudioChannelFinished(AValue: TOnAudioChannelFinished);
+      FKeyboard: TSDLSystemKeyboard;
       procedure UserEvent(const event: TSDL_UserEvent);
     public
       constructor Create; reintroduce;
       destructor Destroy; override;
       procedure AssignEvents;
-      property OnAudioChannelFinished : TOnAudioChannelFinished read FOnAudioChannelFinished write SetOnAudioChannelFinished;
+      property Keyboard : TSDLSystemKeyboard read FKeyboard write FKeyboard;
     public
       property OnMouseMotion;
       property OnMouseButtonDown;
@@ -42,6 +44,11 @@ type
       property OnUserEvent;
       property OnTextEditing;
       property OnTextInput;
+      property OnControllerAxisMotion;
+      property OnControllerButtonDown;
+      property OnControllerButtonUp;
+      property OnControllerTouchPadMotion;
+      property OnControllerSensorUpdate;
   end;
 
 var
@@ -49,16 +56,10 @@ var
 
 implementation
 
-uses sdl.timer;
+uses
+  sdl.timer;
 
 { TCustomEventHandler }
-
-procedure TCustomEventHandler.SetOnAudioChannelFinished(
-  AValue: TOnAudioChannelFinished);
-begin
-  if FOnAudioChannelFinished=AValue then Exit;
-  FOnAudioChannelFinished:=AValue;
-end;
 
 procedure TCustomEventHandler.UserEvent(const event: TSDL_UserEvent);
 
@@ -76,20 +77,21 @@ procedure TCustomEventHandler.UserEvent(const event: TSDL_UserEvent);
 
 begin
   case event.type_ of
-
     SESSION_ONTIMER:
       DoOnTimer;
-
   end;
 end;
 
 constructor TCustomEventHandler.Create;
 var
   Event : TSDL_EventType;
-  SDLUserEvents : array [0..0] of TSDL_EventType =
-    (SESSION_ONTIMER);
+  SDLUserEvents : array [0..0] of TSDL_EventType = (
+    SESSION_ONTIMER);
 begin
   inherited Create;
+  FKeyboard := TSDLSystemKeyboard.Create;
+  OnKeyDown := FKeyboard.OnKeyDown;
+  OnTextInput := FKeyboard.OnTextInput;
   for Event in SDLUserEvents do
     if not UserEventRegistered(Event) then
       raise Exception.Create('Event not registered:'+IntToStr(Event));
@@ -98,7 +100,7 @@ end;
 
 destructor TCustomEventHandler.Destroy;
 begin
-  FOnAudioChannelFinished:=nil;
+  FKeyboard.Free;
   inherited Destroy;
 end;
 

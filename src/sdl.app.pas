@@ -18,10 +18,10 @@ uses
   , SDL2
   , ctypes
   , sdl.app.video.types
-  , sdl.app.system.keyboard
   {$IFDEF NO_LCL}
   , sdl.app.events.nolcl
   {$ELSE}
+  , sdl.app.system.keyboard
   , sdl.app.events.custom
   , sdl.app.events.abstract
   {$ENDIF}
@@ -215,42 +215,28 @@ begin
 end;
 
 procedure TSDLApplication.Run;
-//type
-//  TRenderMode = (rendNormal, rendTestMode);
-//var
-//  LRenderMode : TRenderMode = rendTestMode;
 begin
-  //case LRenderMode of
-  //  rendNormal: { do nothing };
-  //  rendTestMode: SDL.App.Renderer.TestMode.Initialize;
-  //end;
-
   FRunning:=True;
+  {$IFNDEF NO_LCL}
   if FShowMarkers then begin
     Markers := TMarkers.Create;
     Markers.LoadFromFile;
   end;
+  {$ENDIF}
 
   try
     while FRunning do begin
       SDLEvents.HandlePending;
-      //Render;
       RenderOptimized;
     end;
   finally
 
+    {$IFNDEF NO_LCL}
     if FShowMarkers then begin
       Markers.Free;
       Markers := nil;
     end;
 
-    //case LRenderMode of
-    //  rendNormal: { do nothing };
-    //  rendTestMode: SDL.App.Renderer.TestMode.Finalize;
-    //end;
-
-
-    {$IFNDEF NO_LCL}
     if Assigned(SDLText) then begin
       SDLText.Free;
       SDLText := nil;
@@ -264,7 +250,7 @@ begin
 
     if Assigned(SDLEvents) then begin
       SDLEvents.Free;
-      //SdlEvents := nil;
+      SDLEvents := nil;
     end;
 
     if Assigned(Mouse) then begin
@@ -279,8 +265,9 @@ begin
   end;
 
   //Print('Good Bye');
-  if Assigned(OnClose) then
+  if Assigned(OnClose) then begin
     OnClose(Self);
+  end;
 end;
 
 procedure TSDLApplication.PrintRendererSetup;
@@ -381,12 +368,6 @@ begin
 
   // expose global variables
   AssignVariables(FSDLWindow, FSDLRenderer, FSDLSurface);
-
-  {$IFDEF NO_LCL}
-  sdl.app.renderer.nolcl.Monitor := Self.Monitor;
-  {$ELSE}
-
-  {$ENDIF}
 end;
 
 procedure TSDLApplication.Terminate;

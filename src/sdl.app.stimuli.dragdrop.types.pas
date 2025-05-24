@@ -28,6 +28,7 @@ type
   TFoodDispensingRule = (
     FoodDisabled,
     FoodOnFirstTryOnly,
+    FoodOnFirstTryOnlyOnCompletionOnly,
     FoodOnRetryAllowedOnCompletionOnly,
     FoodOnRetryAllowed
     );

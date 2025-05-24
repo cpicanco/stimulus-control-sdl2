@@ -14,7 +14,7 @@ unit sdl.app.stimuli.dragdrop;
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections, Generics.Map
+  Classes, SysUtils, Generics.Collections
   , sdl.app.stimuli.contract
   , sdl.app.stimuli
   , sdl.app.stimuli.dragdrop.types
@@ -32,7 +32,7 @@ type
 
   TDragDropablePictures = specialize TList<TDragDropablePicture>;
   TAnimations = specialize TList<TAnimation>;
-  TWrongDragDrops = specialize TObjectToIntegerMap<TDragDropablePicture>;
+  TWrongDragDrops = specialize TDictionary<String, Integer>;
 
   { TDragDropStimuli }
 
@@ -54,6 +54,7 @@ type
     FAnimation : TAnimation;
     FDoneAnimations : TAnimations;
     FGridOrientation : TGridOrientation;
+    FEndTrialOnWrongDragDrop : Boolean;
     function GetRandomSample : TDragDropablePicture;
     function ToJSON(ADrag, ADrop : TDragDropablePicture) : string; overload;
     function ToJSON(ASamples, AComparisons: TDragDropablePictures) : string; overload;
@@ -254,7 +255,10 @@ begin
 
       FGridOrientation := DragDropToGridOrientation(
         Parameters[DragDropOrientationKey].ToDragDropOrientation);
-      FAutoAnimateOnStart := Parameters[AutoAnimateOnStartKey].ToBoolean;
+      FAutoAnimateOnStart :=
+      	Parameters[AutoAnimateOnStartKey].ToBoolean;
+      FEndTrialOnWrongDragDrop :=
+      	Parameters[EndTrialOnWrongDragDropKey].ToBoolean;
       FFoodDispensingRule :=
         Parameters[FoodDispensingRuleKey].ToFoodDispensingRule;
 
@@ -317,6 +321,7 @@ begin
             LItem.UpdateDistance;
             LItem.Parent := TSDLControl(AParent);
             LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);
+            FWrongDragDrops.Add(LItem.CustomName, 0);
           end;
         end;
 
@@ -348,7 +353,7 @@ begin
             LItem.UpdateDistance;
             LItem.Parent := TSDLControl(AParent);
             LItem.MoveToPoint(Parameters[DistanceKey].ToInteger);
-            FWrongDragDrops.Add(LItem, 0);
+            FWrongDragDrops.Add(LItem.CustomName, 0);
           end;
         end;
       end;
@@ -362,7 +367,6 @@ procedure TDragDropStimuli.Start;
 var
   LItem : TDragDropablePicture;
 begin
-  // todo: refactor to avoid using a global var
   TDragDropablePicture.Reset;
 
   for LItem in FComparisons do LItem.Show;
@@ -472,7 +476,7 @@ begin
   LAnimation.Show;
   FDoneAnimations.Add(LAnimation);
 
-  Sample.Draggable:=False;
+  Sample.Draggable := False;
 
   for Sample in FSamples do
     if Sample.Draggable then begin
@@ -489,8 +493,9 @@ begin
       FDragDropDone := True;
     end;
 
-  if Assigned(OnRightDragDrop) then
+  if Assigned(OnRightDragDrop) then begin
     OnRightDragDrop(Sender, Source, X, Y);
+  end;
 
 
   if Assigned(RS232) then begin
@@ -500,10 +505,17 @@ begin
       end;
 
       FoodOnFirstTryOnly: begin
-        if FWrongDragDrops[Sample] = 0 then begin
+        if FWrongDragDrops[Sample.CustomName] = 0 then begin
           RS232.Dispenser;
         end;
       end;
+
+      FoodOnFirstTryOnlyOnCompletionOnly: begin
+        if FDragDropDone and (FWrongDragDrops[Sample.CustomName] = 0) then begin
+          RS232.Dispenser;
+        end;
+      end;
+
 
       FoodOnRetryAllowedOnCompletionOnly: begin
         if FDragDropDone then begin
@@ -644,11 +656,23 @@ begin
   Sample := Source as TDragDropablePicture;
   Timestamp('WrongDragDrop', ToJSON(Sample, Comparison));
 
-  Sample.ToOriginalBounds;
   //FAnimation.Animate(Sample);
-  FWrongDragDrops[Sample] := FWrongDragDrops[Sample] + 1;
+  FWrongDragDrops[Sample.CustomName] :=
+    FWrongDragDrops[Sample.CustomName] + 1;
   if Assigned(OnWrongDragDrop) then begin
     OnWrongDragDrop(Sender, Source, X, Y);
+  end;
+
+  if FEndTrialOnWrongDragDrop then begin
+    //FResult := Hit; todo: dragdrop trial have different hit types
+    Pool.Counters.Miss;
+    FResult := Miss;
+    FAnimation.Stop;
+    FAnimation.Hide;
+    Timestamp(ClassName+'.DragDropDone');
+    Finalize;
+  end else begin
+    Sample.ToOriginalBounds;
   end;
 end;
 
@@ -696,8 +720,15 @@ begin
 end;
 
 function TDragDropStimuli.ToData: string;
+var
+  LPair: TWrongDragDrops.TDictionaryPair;
+  LSum : integer;
 begin
-  Result := FWrongDragDrops.Sum.ToString;
+  LSum := 0;
+  for LPair in FWrongDragDrops do begin
+    LSum := LSum + LPair.Value;
+  end;
+  Result := LSum.ToString;
 end;
 
 constructor TDragDropStimuli.Create;
@@ -711,6 +742,7 @@ begin
   FDoneAnimations := TAnimations.Create;
   FWrongDragDrops := TWrongDragDrops.Create;
   FRenderer := TRendererThread.Create;
+  FEndTrialOnWrongDragDrop := False;
 end;
 
 destructor TDragDropStimuli.Destroy;

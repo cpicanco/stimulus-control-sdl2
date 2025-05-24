@@ -19,6 +19,7 @@ type
   TDragDropKeys = record
     FoodDispensingRuleKey : string;
     AutoAnimateOnStartKey : string;
+    EndTrialOnWrongDragDropKey : string;
     DragDropOrientationKey : string;
     UseHelpProgressionKey : string;
     DistanceKey : string;
@@ -35,6 +36,7 @@ const
   DragDropKeys : TDragDropKeys = (
     FoodDispensingRuleKey : 'FoodDispensingRule';
     AutoAnimateOnStartKey : 'AutoAnimateOnStart';
+    EndTrialOnWrongDragDropKey : 'EndTrialOnWrongDragDrop';
     DragDropOrientationKey : 'Orientation';
     UseHelpProgressionKey : 'UseHelpProgression';
     DistanceKey : 'Distance';
