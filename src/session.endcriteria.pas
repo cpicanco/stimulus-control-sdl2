@@ -262,7 +262,8 @@ var
 
   function NextBlockOnCriterionNotAchieved : SmallInt;
   begin
-    if FCurrentBlock.NextBlockOnNotCriterion > -1 then begin
+    if (FCurrentBlock.NextBlockOnNotCriterion > -1) or
+       FCurrentBlock.EndSessionOnNotCriterionAfterBlockRepetitions then begin
       Result := NextBlockAfterRepetitionDone(
         FCurrentBlock.NextBlockOnNotCriterion);
     end else begin
