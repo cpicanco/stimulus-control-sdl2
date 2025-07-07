@@ -2,11 +2,10 @@ import os
 
 import pandas as pd
 import numpy as np
-from odf.opendocument import OpenDocumentSpreadsheet, Element
+from odf.opendocument import OpenDocumentSpreadsheet
 from odf.table import Table, TableRow, TableCell
 from odf.text import P
 from odf.style import Style, TableCellProperties, TextProperties, Map
-from odf.namespaces import OFFICENS, STYLENS, FONS
 
 from odf_custom import CalcElement, conditional_formats_key
 
@@ -21,6 +20,13 @@ os.chdir(script_path)
 folder1 = os.path.join(script_path, folder1_name)
 folder2 = os.path.join(script_path, folder2_name)
 folder3 = os.path.join(script_path, folder3_name)
+
+col1_base = f'Speech'
+col2_base = f'Speech-2'
+col1_folder1 = f'Speech_{folder1_name}'
+col1_folder2 = f'Speech_{folder2_name}'
+col2_folder1 = f'Speech-2_{folder1_name}'
+col2_folder2 = f'Speech-2_{folder2_name}'
 
 # Helper functions for cell creation
 def create_text_cell(text):
@@ -51,23 +57,15 @@ def process_concordance():
     Add columns from folder1/file to folder2/file
     Save to folder3/file
     '''
+
     for file in os.listdir(folder1):
         if file.endswith('.data'):
-            # Precompute concordance values
-            col1_base = f'Speech'
-            col2_base = f'Speech-2'
-            col1_folder1 = f'Speech_{folder1_name}'
-            col1_folder2 = f'Speech_{folder2_name}'
-            col2_folder1 = f'Speech-2_{folder1_name}'
-            col2_folder2 = f'Speech-2_{folder2_name}'
-
             dataframe1 = pd.read_csv(os.path.join(folder1, file), sep='\t', encoding='utf-8')
             dataframe2 = pd.read_csv(os.path.join(folder2, file), sep='\t', encoding='utf-8')
             dataframe2.rename(columns={col1_base: col1_folder2, col2_base: col2_folder2}, inplace=True)
             dataframe2[col1_folder1] = dataframe1[col2_base]
             dataframe2[col2_folder1] = dataframe1[col2_base]
             dataframe2.drop(columns=['Speech-3'], inplace=True)
-
 
             concordance1 = (
                 dataframe2[col1_folder1].astype(str).str.strip().str.lower()
@@ -206,37 +204,26 @@ def process_concordance():
 def copy_processed_data_to_parent_folder():
     # get parent foldername
     script_path_parent = os.path.dirname(script_path)
-    for file in os.listdir(script_path):
-        if file.endswith('.ods'):
-            # convert to tsv
-            df = pd.read_excel(file, engine='odf', sheet_name='Sheet1', skipfooter=1, header=0)
+    # use folder1 as reference folder
+    col2_base = f'Speech-2'
+    for file in os.listdir(folder1):
+        if file.endswith('.data'):
+            # Precompute concordance values
+            df = pd.read_csv(os.path.join(folder1, file), sep='\t', encoding='utf-8')
+            df.drop(columns=['Speech-3'], inplace=True)
+            df.rename(columns={col2_base: 'Speech-3'}, inplace=True)
 
-            df['Speech-2'] = ''
-
-            print(df.columns)
-
-            df.drop(columns=[
-                'Speech_rafael',
-                'Speech-2_rafael'
-
-            ], inplace=True)
-
-            df.rename(columns={
-                'Speech_geovana':'Speech',
-                'Speech-2_geovana':'Speech-3'
-            })
-
-            filename = os.path.join(script_path_parent, file.replace('.ods', ''))
+            filename = os.path.join(script_path_parent, file)
             df.to_csv(filename, sep='\t', index=False, encoding='utf-8')
 
 if __name__ == '__main__':
     # First, calculate concordance from files with trascriptions (from independent observers)
-    process_concordance() # *comment or uncomment this line, if needed*
+    process_concordance() # *comment or uncomment this line, as needed*
 
     ##############################################################
-    # Now, you can inspect and edit the processed data.ods files #
-    # Then, run this script again uncommenting the copy function #
-    # to copy the edited files to the parent folder.                                         #
+    # Now, you can inspect the processed {file}.ods files        #
+    # and edit src files in {folder1} and {folder2} as needed.   #
+    # Comment the line below if you don't want                   #
+    # autocopy {folder3} files to parent folder.                 #
     ##############################################################
-
-    # copy_processed_data_to_parent_folder() # *comment or uncomment this line, if needed*
+    copy_processed_data_to_parent_folder() # *comment or uncomment this line, as needed*
