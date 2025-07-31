@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -22,6 +22,7 @@ type
 
   TChunk = class(TInterfacedObject, ISound)
   private
+    FParent : TObject;
     FShouldBeDeallocated : Boolean;
     FFilename : string;
     FChannel: cint;
@@ -35,7 +36,9 @@ type
     procedure SetOnStop(AValue: TNotifyEvent);
     procedure SetShouldBeDeallocated(AValue: Boolean);
     procedure SetCustomData(AData : string);
+    procedure SetParent(AParent : TObject);
     function GetCustomData : string;
+    function GetParent : TObject;
   public
     constructor Create;
     destructor Destroy; override;
@@ -94,9 +97,19 @@ begin
   FCustomData := AData;
 end;
 
+procedure TChunk.SetParent(AParent: TObject);
+begin
+  FParent := AParent;
+end;
+
 function TChunk.GetCustomData: string;
 begin
   Result := FCustomData;
+end;
+
+function TChunk.GetParent: TObject;
+begin
+  Result := FParent;
 end;
 
 constructor TChunk.Create;

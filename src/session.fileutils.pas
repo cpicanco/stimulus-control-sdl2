@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -42,8 +42,8 @@ function FilenameNoOverride(AFilename: string; out AFileIndex: integer): string;
 function NewConfigurationFile : string;
 function LoadConfigurationFile(AFilename : string) : string;
 
-function LoadProtocolIndex(AParticipantName : string) : integer;
-procedure SaveProtocolIndex(AParticipantName : string; AItemIndex : integer);
+function LoadProtocol(AParticipantName : string) : string;
+procedure SaveProtocol(AParticipantName : string; ADesignBasePath: string);
 
 
 implementation
@@ -56,6 +56,7 @@ uses
   , session.constants
   , session.information
   , session.configurationfile
+  , session.loggers.types
   ;
 
 const
@@ -86,38 +87,41 @@ begin
   Result := FileExists(LFilename);
 end;
 
-function LoadProtocolIndex(AParticipantName : string) : integer;
+function LoadProtocol(AParticipantName : string) : string;
 var
   LFolder : string;
   LFilename : string;
   LStringList : TStringList;
 begin
+  Result := '';
+
   LFolder := ConcatPaths([
     Pool.ConfigurationsRootBasePath,
     AParticipantName]);
   ForceDirectories(LFolder);
-  LFilename := ConcatPaths([LFolder, GLastProtocol]);
 
+  LFilename := ConcatPaths([LFolder, GLastProtocol]);
   if FileExists(LFilename) then begin
     LStringList := TStringList.Create;
     try
       LStringList.LoadFromFile(LFilename);
-      Result := LStringList[0].ToInteger;
+      Result := LStringList[0];
     finally
       LStringList.Free;
     end;
-  end else begin
-    Result := -1;
   end;
 end;
 
 
-procedure SaveProtocolIndex(AParticipantName : string; AItemIndex : integer);
+procedure SaveProtocol(AParticipantName : string; ADesignBasePath: string);
 var
   LFolder : string;
   LFilename : string;
   LStringList : TStringList;
 begin
+  if AParticipantName.IsEmpty then Exit;
+  if ADesignBasePath.IsEmpty then Exit;
+
   LFolder := ConcatPaths([
     Pool.ConfigurationsRootBasePath,
     AParticipantName]);
@@ -126,7 +130,7 @@ begin
   LStringList := TStringList.Create;
   try
     LStringList.Clear;
-    LStringList.Append(AItemIndex.ToString);
+    LStringList.Append(ADesignBasePath);
     LStringList.SaveToFile(LFilename);
   finally
     LStringList.Free;

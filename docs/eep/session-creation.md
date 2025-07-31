@@ -44,6 +44,7 @@ O arquivo "exemplo.csv" contém os seguintes parâmetros para configurar os bloc
 - **EndCriterionValue**: valor do critério de desempenho. Ver EndCriterionStyle.
 - **Reinforcement**: Porcentagem de tentativas do bloco com reforçamento diferencial.
 
+
 ### **2.2. Diretório "instructions"**
 O arquivo "exemplo.csv" neste diretório inclui parâmetros para as instruções da sessão, como:
 
@@ -63,6 +64,7 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
 - **Samples**: Quantidade de estímulos modelos (móveis).
 - **Comparisons**: Quantidades de estímulos alvos (fixos).
 - **DragableAnimation**:
+- **StimuliFolder**: Nome da pasta  de imagens usada para carregar os arquivos png: media/png/NOME_DA_PASTA (escrever apenas NOME_DA_PASTA e não o endereço completo).
 - **GridSize**: Tamanho da grade de estímulos em formato NxN.
   - Por exemplo, se = 4, teremos uma matriz 4x4. Logo, é possível posicionar 16 estímulos na grade.
 - **Orientation**: Tipo de orientação do arraste.
@@ -73,8 +75,14 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
     - Se **RightToLeft**, orientação é do tipo "direita para esquerda".
     - Se **Custom**, orientação é do tipo customizada.
 - **AutoAnimatedOnStart**: Controla a ativação da animação da borda do estímulo modelo.
-  - Se **T** (True,) a animação é ativada assim que a tentativa é iniciada, automaticamente  em um dos estímulos modelos.
+  - Se **T** (True), a animação é ativada assim que a tentativa é iniciada, automaticamente  em um dos estímulos modelos.
   - Se **F** (False), a animação é ativada somente depois que um estímulo modelo for selecionado.
+- **FoodDispensingRule**: define a regra para a liberação de comida (ativação do dispensador).
+  - Se **FoodDisabled**, não há liberação.
+  - Se **FoodOnFirstTryOnly**, há liberação apenas para acertos de primeira.
+  - Se **FoodOnRetryAllowedOnCompletionOnly**, há liberação apenas para acertos na última relação.
+  - Se **FoodOnFirstTryOnlyOnCompletionOnly**, há liberação apenas para acertos na última relação e apenas para acertos de primeira.
+  - Se **FoodOnRetryAllowed**, há liberação para acertos.
 
 ### **2.4. Arquivo "exemplo.csv"**
 

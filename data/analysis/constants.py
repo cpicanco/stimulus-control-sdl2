@@ -1,42 +1,20 @@
-participants_natural = [
-    '12-MED', # Engenharia Mecatrônica
-    '13-AND', # Química
-    '18-FEL', # Física
-    '24-ADO', # Física
-    '34-GST', # Física
-    '47-JMP', # Física
-    '14-MSC', # Ciências da computação/Sistemas da informação
-    '19-SAN', # Ciências da computação/Sistemas da informação
-    '20-CAM', # Ciências da computação/Sistemas da informação
-    '21-GIO', # Ciências da computação/Sistemas da informação
-    '23-KTL', # Ciências da computação/Sistemas da informação
-    '36-JLA', # Ciências da computação/Sistemas da informação
-    '37-LRS', # Ciências da computação/Sistemas da informação
-    '40-ACM', # Ciências da computação/Sistemas da informação
-    '44-LUC', # Ciências da computação/Sistemas da informação
-    '15-VER', # Matemática/Estatística
-    '27-DAL', # Matemática/Estatística
-    '28-TIG', # Matemática/Estatística
-    '32-KIK', # Matemática/Estatística
-    '38-ORT', # Matemática/Estatística
-    '43-ARJ', # Matemática/Estatística
-    '46-CMR', # Matemática/Estatística
-    '38-ORT', # Matemática/Estatística
-]
+from study1_constants import participants_to_ignore as participants_to_ignore1
+from study2_constants import participants_to_ignore as participants_to_ignore2
+from study3_constants import participants_to_ignore as participants_to_ignore3
+from study4_constants import participants_to_ignore as participants_to_ignore4
+participants_to_ignore = participants_to_ignore1 + participants_to_ignore2 + participants_to_ignore3 + participants_to_ignore4
 
-participants_social = [
-    '29-SIN', # Administração pública
-    '39-LPI', # Letras/Linguística
-    '49-JGA', # Letras/Linguística
-    '54-LNO', # Psicologia
-    '50-EDU', # Arquitetura/Urbanismo
-    '51-TLT', # Arquitetura/Urbanismo
-    '52-LZO', # Arquitetura/Urbanismo
-    '53-WEN', # Arquitetura/Urbanismo
-    '55-JFF', # Arquitetura/Urbanismo
-    '56-VIT', # Arquitetura/Urbanismo
-    '57-REN', # Arquitetura/Urbanismo
-    '58-AIS'  # Arquitetura/Urbanismo
-]
+from study1_constants import participants_natural as participants_natural1
+from study1_constants import participants_social as participants_social1
+from study2_constants import participants_natural as participants_natural2
+from study2_constants import participants_humanities as participants_social2
+from study3_constants import participants as participants_natural3
 
-participant_folders = participants_natural + participants_social
+
+participants_natural = participants_natural1 + participants_natural2 + participants_natural3
+participants_social = participants_social1 + participants_social2
+
+if __name__ == "__main__":
+    print(len(participants_natural + participants_social))
+    print(len(participants_natural))
+    print(len(participants_social))

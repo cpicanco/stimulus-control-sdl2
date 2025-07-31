@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -33,7 +33,9 @@ type
     procedure SetOnStop(ANotifyEvent: TNotifyEvent);
     procedure SetOnStart(ANotifyEvent: TNotifyEvent);
     procedure SetCustomData(AData : string);
+    procedure SetParent(AParent : TObject);
     function GetCustomData : string;
+    function GetParent : TObject;
     procedure LoadFromFile(AFilename : string);
     procedure Play;
     procedure Stop;

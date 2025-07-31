@@ -1,6 +1,28 @@
+{
+
+Test suit for timing experiments using threads.
+
+Aimed at monotonic timing.
+
+Initializes timing references, sets the main thread's CPU affinity, and then
+runs two parallel sets of loops(one in the main thread, one in TMyThread1).
+Both loops repeatedly measure and output elapsed timesbased on clock_monotonic
+relative to an initial start time,and also include 1-second sleep intervals.
+The worker thread uses the main thread's initial clock_monotonic timeas its
+reference. Both threads also log their total operational durationusing both
+TDateTime and clock_monotonic.
+
+}
+
 program windows_timing;
 
 uses Classes, SysUtils, debug.output, timestamps.windows, Windows;
+
+type
+  TimeBufferRange = 0..99;
+
+var
+  Range : TimeBufferRange;
 
 function DateTimeToStrUs(dt: TDatetime): string;
 var
@@ -49,7 +71,7 @@ type
     LStartRealTime: TDateTime;
     LStopTime: Double;
     LStopRealTime: TDateTime;
-    LTimeBuffer : array[0..99] of Double;
+    //LTimeBuffer : array[0..99] of Double;
   begin
     WriteLn('Thread 1 is running');
     Print1('Thread 1 is running');
@@ -61,7 +83,7 @@ type
     Print1(DateTimeToStrUs(LStartRealTime));
 
     for j := 0 to 10 do begin
-      for i := Low(LTimeBuffer) to High(LTimeBuffer) do begin
+      for i := Low(Range) to High(Range) do begin
         WriteLn(Elapsed(clock_monotonic, LStartTime)+'T');
         //LTimeBuffer[i] := clock_monotonic;
       end;
@@ -91,7 +113,7 @@ var
   StopRealTime: TDateTime;
 
   i, j : Integer;
-  TimeBuffer : array[0..99] of Double;
+  //TimeBuffer : array[TimeBufferRange] of Double;
 begin
   StartRealTime := Now;
   StartTime := clock_monotonic;
@@ -110,9 +132,9 @@ begin
   Print2(DateTimeToStrUs(StartRealTime));
 
   for j := 0 to 10 do begin
-    for i := Low(TimeBuffer) to High(TimeBuffer) do begin
+    for i := Low(Range) to High(Range) do begin
       WriteLn(Elapsed(clock_monotonic, StartTime));
-      TimeBuffer[i] := clock_monotonic;
+      //TimeBuffer[i] := clock_monotonic;
     end;
 
     //for i := Low(TimeBuffer) to High(TimeBuffer) do begin

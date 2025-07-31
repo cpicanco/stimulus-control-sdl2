@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -58,6 +58,7 @@ type
     procedure MouseExit(Sender: TObject); override;
     procedure Paint; override;
   public
+    class procedure Reset;
     constructor Create; override;
     destructor Destroy; override;
     procedure Load(AParameters : TStringList;
@@ -225,6 +226,11 @@ begin
   inherited Paint;
 end;
 
+class procedure TDragDropablePicture.Reset;
+begin
+  SomeInstanceIsDragging := False;
+end;
+
 constructor TDragDropablePicture.Create;
 begin
   inherited Create;
@@ -263,18 +269,22 @@ procedure TDragDropablePicture.UpdateDistance;
 var
   LTarget : TDragDropablePicture;
 begin
-  LTarget := TargetChoice as TDragDropablePicture;
-  FBresenhamLine.Update(BoundsRect, LTarget.BoundsRect);
+  if Assigned(TargetChoice) then begin
+    LTarget := TargetChoice as TDragDropablePicture;
+    FBresenhamLine.Update(BoundsRect, LTarget.BoundsRect);
+  end;
 end;
 
 procedure TDragDropablePicture.MoveToPoint(APorcentage: Float);
 var
   Point : TPoint;
 begin
-  Point := FBresenhamLine.GetPoint(APorcentage);
-  Left := Point.X;
-  Top := Point.Y;
-  SetOriginalBounds;
+  if Assigned(TargetChoice) then begin
+    Point := FBresenhamLine.GetPoint(APorcentage);
+    Left := Point.X;
+    Top := Point.Y;
+    SetOriginalBounds;
+  end;
 end;
 
 function TDragDropablePicture.GetID: TStimulusID;

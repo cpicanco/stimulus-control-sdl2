@@ -27,10 +27,11 @@ class Grid:
         return '{'+'grid:{'+','.join(str(i)+':'+str(p) for i, p in enumerate(self.positions))+'}'+'}'
 
 class Information:
-    __supported_versions__ = ['1', '2']
+    __supported_versions__ = ['1', '2', '3']
     __header_version__ = 'Version:'
     __participant_name__ = 'Nome_do_sujeito:'
     __session_name__ = 'Nome_da_sessao:'
+    __session_design__ = 'Nome_do_planejamento:'
     __session_result__ = 'Resultado:'
     __grid__ = 'Grade_de_estimulos:'
     __monitor__ = 'Monitor:'
@@ -40,17 +41,19 @@ class Information:
     __end_time__ = 'Hora_Termino:'
     __duration__ = 'Duration:'
 
-    def __init__(self, entry):
+    def __init__(self, entry, verbose=True):
         if not entry.endswith('.info.processed'):
             raise ValueError('The file must be a .info.processed file.')
         else:
-            print(f'Loading {entry}...')
+            if verbose:
+                print(f'Loading {entry}...')
 
         self.__entry__ = entry
         self.__info_file__ = self.__load_info_file__(entry)
         self.version = self.__get_version__()
         self.session_name = self.__get_session_name__()
         self.participant_name = self.__get_participant_name__()
+        self.session_design = self.__get_session_design__()
         self.start_date = self.__get_start_date__()
         self.end_date = self.__get_end_date__()
         self.start_time = self.__get_start_time__()
@@ -73,6 +76,12 @@ class Information:
 
     def __get_participant_name__(self):
         return self.__info_file__.loc[self.__participant_name__][1]
+
+    def __get_session_design__(self):
+        try:
+            return self.__info_file__.loc[self.__session_design__][1]
+        except KeyError:
+            return None
 
     def __get_result__(self):
         try:
@@ -137,40 +146,36 @@ class Information:
         self.monitor = JSONObject(eval(json_string))
 
     def __str__(self):
-        return f'{self.__header_version__}{self.version}\n' \
-               f'{self.__participant_name__}{self.participant_name}\n' \
-               f'{self.__session_name__}{self.session_name}\n' \
-               f'{self.__start_date__}{self.start_date}\n' \
-               f'{self.__start_time__}{self.start_time}\n' \
-               f'{self.__end_date__}{self.end_date}\n' \
-               f'{self.__end_time__}{self.end_time}\n' \
-               f'{self.__duration__}{self.duration}\n' \
-               f'{self.__session_result__}{self.result}\n' \
-               f'{self.__grid__}{self.grid}\n' \
-               f'{self.__monitor__}{self.monitor}\n' \
-               f'{self.__session_result__}{self.result}'
+        return f'{self.__header_version__}\t{self.version}\n' \
+               f'{self.__participant_name__}\t{self.participant_name}\n' \
+               f'{self.__session_name__}\t{self.session_name}\n' \
+               f'{self.__session_design__}\t{self.session_design}\n' \
+               f'{self.__grid__}\t{self.grid}\n' \
+               f'{self.__monitor__}\t{self.monitor}\n' \
+               f'{self.__start_date__}\t{self.start_date}\n' \
+               f'{self.__start_time__}\t{self.start_time}\n' \
+               f'{self.__end_date__}\t{self.end_date}\n' \
+               f'{self.__end_time__}\t{self.end_time}\n' \
+               f'{self.__duration__}\t{self.duration}\n' \
+               f'{self.__session_result__}\t{self.result}'
 
-    def has_valid_result(self):
-        result = False
-        valid_results = [
-            'Interrompida',
-            'Concluida',
-            'Critério atingido',
-            'Critério não atingido']
-        for valid_result in valid_results:
-            if self.result == valid_result:
-                result = True
-                break
+    def save_to_file(self):
+        with open(self.__entry__, 'w', encoding='utf-8') as file:
+            file.write(str(self))
 
-        return result
+    def has_valid_result(self) -> bool:
+        valid_results = {
+            'Interrompida', 'Concluida',
+            'Critério atingido', 'Critério não atingido'}
 
-# if __name__ == "__main__":
-#     from fileutils import cd, list_files
-#     cd('..')
-#     cd('0-Rafael')
-#     cd('analysis')
-#     cd('2024-03-02')
+        return self.result in valid_results
 
-#     for entry in list_files('.info.processed'):
-#         info = Information(entry)
-#         print(info)
+if __name__ == "__main__":
+    import os
+
+    from fileutils import cd, list_files
+
+    cd(os.path.join('..', 'estudo1', '12-MED', 'analysis', '2024-03-25'))
+    for entry in list_files('.info.processed'):
+        info = Information(entry)
+        print(info.has_valid_result())

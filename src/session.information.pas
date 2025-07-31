@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2024-2025 Carlos Rafael Fernandes Picanço.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit session.information;
 
 {$mode ObjFPC}{$H+}
@@ -5,22 +14,7 @@ unit session.information;
 interface
 
 uses
-  Classes, SysUtils, SDL2, sdl.app.grids.types;
-
-type
-
-  TInformation = record
-    Version : UInt8;
-    Basename : string;
-    ParticipantName : string;
-    SessionName : string;
-    SessionResult : string;
-    Grid : TMatrix;
-    Monitor : TSDL_Rect;
-    SessionStart : TDateTime;
-    SessionEnd : TDateTime;
-    SessionDuration : TDateTime;
-  end;
+  Classes, SysUtils, session.loggers.types;
 
   function LoadInformationFromFile(const AFileName: string): TInformation;
   procedure SetSessionResult(AResult : string);
@@ -58,6 +52,7 @@ begin
         ParticipantName := Trim(Values[HSUBJECT_NAME]);
         SessionName     := Trim(Values[HSESSION_NAME]);
         SessionResult   := Trim(Values[HSESSION_RESULT]);
+        SessionDesignFolder := Trim(Values[HSESSION_DESIGN]);
         //Grid :=            Trim(MatrixFromJSON(LInfoFile.Values[HGRID]));
         //Monitor :=         Trim(MonitorFromJSON(Values[HMONITOR]));
         //SessionStart :=    Trim(StrToDateTime(Values[HBEGIN_TIME]));

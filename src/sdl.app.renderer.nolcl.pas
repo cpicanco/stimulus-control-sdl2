@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -14,42 +14,36 @@ unit sdl.app.renderer.nolcl;
 
 interface
 
-uses sdl2;
+uses SDL2;
 
-procedure Render;
-
-var
-  Monitor : TSDL_Rect;
-  StartTimestamp : Extended;
-  LFile : file of PSDL_Surface;
+procedure RenderOptimized;
 
 implementation
 
 uses
   Classes,
   SysUtils
-  , sdl.app.video.writer.windows
+  //, sdl.app.video.writer.windows
+  , sdl.app.renderer.validation
+  , sdl.app.renderer.types
+  , sdl.app.renderer.variables
   , sdl.app.video.methods
-  , sdl.colors
+  , sdl.app.task
   ;
 
-var
-  LRect : TSDL_Rect = (x: 0; y: 0; w: 200; h: 200);
 
-procedure Render;
+
+procedure RenderOptimized;
 begin
-  with clBlack do SDL_SetRenderDrawColor(PSDLRenderer, r, g, b, a);
-  SDL_RenderClear(PSDLRenderer);
+  if GPaintingInvalidated then begin
+    GPaintingInvalidated := False;
 
-  LRect.x := Random(Monitor.w-LRect.w);
-  LRect.y := Random(Monitor.h-LRect.h);
+    TKeyboardTask.Render;
 
-  with clGray do SDL_SetRenderDrawColor(PSDLRenderer, r, g, b, a);
-  SDL_RenderFillRect(PSDLRenderer, @LRect);
-
-  SDL_RenderPresent(PSDLRenderer);
+    SDL_RenderPresent(PSDLRenderer);
+  end;
   CheckSynchronize;
-  SDL_Delay(1000 div 30);
+  SDL_Delay(DELTA_TIME);
 end;
 
 end.

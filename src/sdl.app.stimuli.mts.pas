@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -48,8 +48,7 @@ type
       FNavigator : ITableNavigator;
       FResult : TTrialResult;
       FHasConsequence : Boolean;
-      FSoundCorrect : ISound;
-      FSoundWrong   : ISound;
+      FAuditiveConsequence : ISound;
       FMTSModality : TMTSModality;
       FButton : TButton;
       FComparisons : TCustomStimulusList;
@@ -227,10 +226,13 @@ begin
 
     if FHasConsequence then begin
       if LIsHit then begin
-        FSoundCorrect.Play;
+        FAuditiveConsequence := SDLAudio.SoundFromName('acerto');
       end else begin
-        FSoundWrong.Play;
+        FAuditiveConsequence := SDLAudio.SoundFromName('erro');
       end;
+      FAuditiveConsequence.SetOnStart(@ConsequenceStart);
+      FAuditiveConsequence.SetOnStop(@ConsequenceDone);
+      FAuditiveConsequence.Play;
     end else begin
       Finalize;
     end;
@@ -238,28 +240,51 @@ begin
 end;
 
 procedure TMTSStimuli.ConsequenceDone(Sender: TObject);
+var
+  LSound : ISound;
+  LStimuli : TMTSStimuli;
 begin
-  if (Sender as ISound) = FSoundCorrect then begin
-    Timestamp('Hit.Stop');
+  LSound := Sender as ISound;
+  LSound.SetOnStop(nil);
+  LStimuli := LSound.GetParent as TMTSStimuli;
+
+  case LStimuli.MyResult of
+    Hit : begin
+      Timestamp('Hit.Stop');
+    end;
+
+    Miss :begin
+      Timestamp('Miss.Stop');
+    end;
+
+    otherwise begin
+      Timestamp(LSound.ShortName+'.Stop');
+    end;
   end;
 
-  if (Sender as ISound) = FSoundWrong then begin
-    Timestamp('Miss.Stop');
-  end;
-
-  FSoundCorrect.SetOnStop(nil);
-  FSoundWrong.SetOnStop(nil);
-  Finalize;
+  LStimuli.Finalize;
 end;
 
 procedure TMTSStimuli.ConsequenceStart(Sender: TObject);
+var
+  LSound : ISound;
+  LStimuli : TMTSStimuli;
 begin
-  if (Sender as ISound) = FSoundCorrect then begin
-    Timestamp('Hit.Start');
-  end;
+  LSound := Sender as ISound;
+  LStimuli := LSound.GetParent as TMTSStimuli;
 
-  if (Sender as ISound) = FSoundWrong then begin
-    Timestamp('Miss.Start');
+  case LStimuli.MyResult of
+    Hit : begin
+      Timestamp('Hit.Start');
+    end;
+
+    Miss : begin
+      Timestamp('Miss.Start');
+    end;
+
+    otherwise begin
+      Timestamp(LSound.ShortName+'.Start');
+    end;
   end;
 end;
 
@@ -572,12 +597,9 @@ begin
   if not Assigned(AParent) then
     raise Exception.Create('You must assign a parent.');
 
-  FSoundCorrect := SDLAudio.SoundFromName('acerto');
-  FSoundWrong   := SDLAudio.SoundFromName('erro');
-  FSoundCorrect.SetOnStart(@ConsequenceStart);
-  FSoundWrong.SetOnStart(@ConsequenceStart);
-  FSoundCorrect.SetOnStop(@ConsequenceDone);
-  FSoundWrong.SetOnStop(@ConsequenceDone);
+  // sounds run on different threads
+  // Parent is used by sound events to make them thread safe
+  SDLAudio.Parent := Self;
 
   with TrialKeys, MTSKeys do begin
     FHasConsequence := AParameters.Values[HasConsequenceKey].ToBoolean;

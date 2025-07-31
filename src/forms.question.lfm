@@ -1,20 +1,20 @@
 object FormQuestion: TFormQuestion
   Left = 583
-  Height = 80
-  Top = 285
+  Height = 269
+  Top = 234
   Width = 320
   BorderStyle = bsNone
   Caption = 'FormQuestion'
-  ClientHeight = 80
+  ClientHeight = 269
   ClientWidth = 320
   DefaultMonitor = dmPrimary
   Position = poDesktopCenter
   ShowInTaskBar = stNever
-  LCLVersion = '3.99.0.0'
+  LCLVersion = '4.99.0.0'
   object ButtonCancel: TButton
     Left = 0
-    Height = 80
-    Top = 0
+    Height = 108
+    Top = 161
     Width = 120
     Align = alLeft
     Cancel = True
@@ -25,8 +25,8 @@ object FormQuestion: TFormQuestion
   end
   object ButtonInterrupt: TButton
     Left = 200
-    Height = 80
-    Top = 0
+    Height = 108
+    Top = 161
     Width = 120
     Align = alRight
     Caption = 'Continuar Depois'
@@ -34,5 +34,21 @@ object FormQuestion: TFormQuestion
     ModalResult = 12
     TabOrder = 0
     OnKeyDown = ButtonInterruptKeyDown
+  end
+  object LabelInfo: TLabel
+    Left = 10
+    Height = 141
+    Top = 10
+    Width = 300
+    Align = alTop
+    BorderSpacing.Around = 10
+    Caption = 'Deseja continuar essa sessão depois?'
+    Constraints.MaxWidth = 300
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -35
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentFont = False
+    WordWrap = True
   end
 end

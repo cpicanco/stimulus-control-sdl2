@@ -79,3 +79,13 @@ release/*
 *.ods
 *.ods#
 *.~lock.*
+data/analysis/cache/*
+data/analysis/output/*
+*.xlsx
+*.gaze
+*.gaze.calibration
+debug
+default_log.txt
+data/dados-brasil-*
+data/dados-portugal/*
+media/*

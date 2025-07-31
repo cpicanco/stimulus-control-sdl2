@@ -1,155 +1,156 @@
 object FormMain: TFormMain
-  Left = 768
-  Height = 697
-  Top = 33
-  Width = 377
+  Left = 1364
+  Height = 870
+  Top = 41
+  Width = 471
   Caption = 'Stimulus Control'
-  ClientHeight = 697
-  ClientWidth = 377
+  ClientHeight = 870
+  ClientWidth = 471
   DefaultMonitor = dmPrimary
+  DesignTimePPI = 120
   PopupMenu = PopupMenuMisc
-  SessionProperties = 'ComboBoxCondition.ItemIndex;ComboBoxParticipant.ItemIndex;ComboBoxParticipant.Items;ComboBoxParticipant.Text;Height;IniPropStorage1.IniFileName;IniPropStorageProtocol.IniFileName;LabelLastSessionName.Caption;LabelLastSessionName.Color;LabelSessionEndCriteria.Caption;LabelSessionEndCriteria.Color;Left;OpenDialog1.InitialDir;Top;Width;ComboBoxDesignFolder.ItemIndex'
-  LCLVersion = '3.99.0.0'
+  SessionProperties = 'ComboBoxCondition.ItemIndex;ComboBoxDesignFolder.ItemIndex;ComboBoxParticipant.ItemIndex;ComboBoxParticipant.Items;ComboBoxParticipant.Text;IniPropStorage1.IniFileName;IniPropStorageProtocol.IniFileName;LabelLastSessionName.Caption;LabelLastSessionName.Color;LabelSessionEndCriteria.Caption;LabelSessionEndCriteria.Color;OpenDialog1.InitialDir;Top;Width;Left;Height'
+  LCLVersion = '4.99.0.0'
   OnCreate = FormCreate
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
-    Left = 7
-    Height = 675
-    Top = 11
-    Width = 363
-    ClientHeight = 675
-    ClientWidth = 363
+    Left = 8
+    Height = 844
+    Top = 13
+    Width = 454
+    ClientHeight = 844
+    ClientWidth = 454
     ParentShowHint = False
     ShowHint = True
     TabOrder = 0
     object ComboBoxParticipant: TComboBox
-      Left = 16
-      Height = 23
+      Left = 20
+      Height = 28
       Hint = 'O nome do participante corresponde'#13#10'ao nome da pasta de dados desse participante.'#13#10#13#10'A pasta de dados de cada participante'#13#10'está dentro da pasta "data".'
-      Top = 16
-      Width = 152
-      ItemHeight = 15
+      Top = 20
+      Width = 190
+      ItemHeight = 20
       ReadOnly = True
       TabOrder = 1
       Text = 'Participante'
-      OnEditingDone = ComboBoxParticipantEditingDone
+      OnChange = ComboBoxParticipantChange
     end
     object ButtonRunInterruptedSession: TButton
-      Left = 16
-      Height = 26
+      Left = 20
+      Height = 32
       Hint = 'Aqui você pode retomar uma sessão'#13#10'do início do bloco no qual ela foi'#13#10'interrompida.'#13#10#13#10'Caso seja necessário, você pode'#13#10'interromper uma sessão pressionando'#13#10'a tecla ESC.'
-      Top = 456
-      Width = 328
+      Top = 570
+      Width = 410
       Caption = 'Reiniciar sessão interrompida'
       TabOrder = 2
       OnClick = ButtonRunInterruptedSessionClick
     end
     object ButtonRunNewSession: TButton
-      Left = 16
-      Height = 26
+      Left = 20
+      Height = 32
       Hint = 'Para criar uma nova sessão, selecione'#13#10'o parâmetro e clique aqui.'
-      Top = 488
-      Width = 328
+      Top = 610
+      Width = 410
       Caption = 'Iniciar nova sessão'
       TabOrder = 3
       OnClick = ButtonRunNewSessionClick
     end
     object ButtonNewParticipant: TButton
-      Left = 186
-      Height = 26
+      Left = 232
+      Height = 32
       Hint = 'Você pode criar novos participantes aqui.'#13#10#13#10'Para remover um participante da lista,'#13#10'selecione o participante na caixa,'#13#10'clique com o botão direito do mouse'#13#10'sobre o botão e selecione a opção'#13#10'para remover.'
-      Top = 16
-      Width = 158
+      Top = 20
+      Width = 198
       Caption = 'Criar novo participante'
       PopupMenu = PopupMenuParticipants
       TabOrder = 4
       OnClick = ButtonNewParticipantClick
     end
     object ButtonMisc: TButton
-      Left = 16
-      Height = 26
+      Left = 20
+      Height = 32
       Hint = 'Este programa de computador salvará'#13#10'todas as configurações automaticamente'#13#10'ao ser fechado.'#13#10#13#10'Quando voltar, você encontrará tudo'#13#10'exatamente da forma como deixou'#13#10'ao sair.'
-      Top = 424
-      Width = 328
+      Top = 530
+      Width = 410
       Caption = 'Configurações da sessão'
       TabOrder = 5
       OnClick = ButtonMiscClick
     end
     object ProgressBar: TProgressBar
-      Left = 16
-      Height = 20
-      Top = 568
-      Width = 328
+      Left = 20
+      Height = 25
+      Top = 710
+      Width = 410
       Step = 1
       TabOrder = 6
       Visible = False
     end
     object ComboBoxDesignFolder: TComboBox
-      Left = 16
-      Height = 23
-      Top = 48
-      Width = 152
-      ItemHeight = 15
+      Left = 20
+      Height = 28
+      Top = 60
+      Width = 190
+      ItemHeight = 20
       ReadOnly = True
       TabOrder = 7
       Text = 'Nome da Pasta'
-      OnEditingDone = ComboBoxDesignFolderEditingDone
+      OnChange = ComboBoxDesignFolderChange
     end
     object ListBoxCondition: TListBox
-      Left = 16
-      Height = 338
-      Top = 80
-      Width = 328
+      Left = 20
+      Height = 422
+      Top = 100
+      Width = 410
       ItemHeight = 0
       TabOrder = 8
     end
     object LabelSessionEndCriteria: TLabel
       Left = 1
-      Height = 20
-      Top = 654
-      Width = 361
+      Height = 25
+      Top = 818
+      Width = 452
       Align = alBottom
       Caption = 'Resultado da última sessão'
-      Constraints.MinHeight = 20
+      Constraints.MinHeight = 25
       ParentColor = False
     end
     object ButtonTestCondition: TButton
-      Left = 186
-      Height = 26
-      Top = 48
-      Width = 78
+      Left = 232
+      Height = 32
+      Top = 60
+      Width = 98
       Caption = 'Testar fluxo'
       TabOrder = 9
       OnClick = ButtonTestConditionClick
     end
     object ButtonOpenSpeechValidation: TButton
-      Left = 269
-      Height = 26
-      Top = 48
-      Width = 75
+      Left = 336
+      Height = 32
+      Top = 60
+      Width = 94
       Caption = 'Eventos'
       TabOrder = 10
       OnClick = ButtonOpenSpeechValidationClick
     end
     object LabelLastSessionName: TLabel
       Left = 1
-      Height = 20
-      Top = 628
-      Width = 361
+      Height = 25
+      Top = 785
+      Width = 452
       Align = alBottom
       Caption = 'Resultado da última sessão'
-      Constraints.MinHeight = 20
+      Constraints.MinHeight = 25
       ParentColor = False
     end
     object Splitter1: TSplitter
       Cursor = crVSplit
       Left = 1
-      Height = 6
-      Top = 622
-      Width = 361
+      Height = 8
+      Top = 777
+      Width = 452
       Align = alBottom
       Beveled = True
       ResizeAnchor = akBottom
@@ -157,18 +158,18 @@ object FormMain: TFormMain
     object Splitter2: TSplitter
       Cursor = crVSplit
       Left = 1
-      Height = 6
-      Top = 648
-      Width = 361
+      Height = 8
+      Top = 810
+      Width = 452
       Align = alBottom
       Beveled = True
       ResizeAnchor = akBottom
     end
     object ButtonRunNextSession: TButton
-      Left = 16
-      Height = 26
-      Top = 520
-      Width = 328
+      Left = 20
+      Height = 32
+      Top = 650
+      Width = 410
       Caption = 'Iniciar sessão seguinte'
       TabOrder = 0
       OnClick = ButtonRunNextSessionClick
@@ -177,8 +178,8 @@ object FormMain: TFormMain
   object OpenDialog1: TOpenDialog
     DefaultExt = '.ini'
     Filter = 'Sessão|*.ini|*.INI'
-    Left = 104
-    Top = 392
+    Left = 130
+    Top = 490
   end
   object IniPropStorage1: TIniPropStorage
     StoredValues = <    
@@ -196,20 +197,20 @@ object FormMain: TFormMain
       end>
     IniFileName = 'configurations.ini'
     OnRestoreProperties = IniPropStorage1RestoreProperties
-    Left = 192
-    Top = 184
+    Left = 240
+    Top = 230
   end
   object PopupMenuParticipants: TPopupMenu
-    Left = 192
-    Top = 312
+    Left = 240
+    Top = 390
     object MenuItemRemoveParticipant: TMenuItem
       Caption = 'Retirar participante da lista'
       OnClick = MenuItemRemoveParticipantClick
     end
   end
   object PopupMenuMisc: TPopupMenu
-    Left = 192
-    Top = 248
+    Left = 240
+    Top = 310
     object MenuItemCopyPNGFiles: TMenuItem
       Caption = 'Copiar arquivos PNG para a pasta do participante'
       OnClick = MenuItemCopyPNGFilesClick
@@ -234,7 +235,7 @@ object FormMain: TFormMain
   object OpenDialog2: TOpenDialog
     DefaultExt = '.csv'
     Filter = 'Sessão|*.csv|*.CSV|*.CSV'
-    Left = 192
-    Top = 384
+    Left = 240
+    Top = 480
   end
 end

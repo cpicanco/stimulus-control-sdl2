@@ -22,14 +22,15 @@ Os passos a seguir devem demorar aproximadamente 45min e assumem que você possu
 9. Clique no botão `Setup+` e marque a opção `Include help` na lista `Miscellaneous settings`
 10. Clique sobre o botão `Install/update FPC+Lazarus` e aguarde a conclusão.
 
-## Passo 2 (4 min) - Tema Monokai no Lazarus (opcional)
+## Passo 2 (4 min) - Tema Escuro Monokai no Lazarus (opcional)
 1. Baixe o arquivo `Monokai.xml` com o tema [Monokai](https://wiki.freepascal.org/UserSuppliedSchemeSettings)
 2. Copie o arquivo `Monokai.xml` para a pasta `C:\lazarus-trunk\config_lazarus\userschemes`
 3. Abra o Lazarus
 4. Navegue para Tools>Options>Editor>Display>Colors e escolha `Monokai` no drop down `Color Schemes`
 5. Navegue para Lazarus>Tools>Options>Editor>Display fonte para `Consolas`, tamanho 9
+6. Instale o pacote [metadarkstyle](https://github.com/zamtmn/metadarkstyle) (dica: você pode usar o Online Package Manager para isso)
 
-## Passo 4 (1 min) - Baixar dependências
+## Passo 3 (1 min) - Baixar dependências
 O projeto depende de três bibliotecas
 
 - zmq 4.x (https://zeromq.org/)
@@ -39,7 +40,7 @@ O projeto depende de três bibliotecas
 1. Você pode baixar as dlls [aqui](https://drive.google.com/drive/folders/1DVSJrth2xP6rerUs1RnUYDRQWJoM7YhA?usp=sharing)
 
 
-## Passo 3 (20 min) - Git Bash, Stimulus Control
+## Passo 4 (20 min) - Git Bash, Stimulus Control
 1. Baixe e instale o Git para windows https://git-scm.com/download/win
 2. Abra o `Git Bash` (prompt de comando)
 3. Clone o repositório recursivamente executando o comando (dica: use apenas `SHIFT+Insert` para colar texto no prompt):

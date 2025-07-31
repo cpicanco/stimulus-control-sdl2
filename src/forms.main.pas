@@ -1,12 +1,13 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
+{%RunFlags BUILD-}
 unit forms.main;
 
 {$mode objfpc}{$H+}
@@ -57,8 +58,10 @@ type
     procedure ButtonRunNewSessionClick(Sender: TObject);
     procedure ButtonNewParticipantClick(Sender: TObject);
     procedure BeginSession(Sender: TObject);
-    procedure ComboBoxDesignFolderEditingDone(Sender: TObject);
-    procedure ComboBoxParticipantEditingDone(Sender: TObject);
+    procedure ComboBoxDesignFolderChange(Sender: TObject);
+    //procedure ComboBoxDesignFolderEditingDone(Sender: TObject);
+    procedure ComboBoxParticipantChange(Sender: TObject);
+    //procedure ComboBoxParticipantEditingDone(Sender: TObject);
     procedure EndSession(Sender : TObject);
     procedure CloseSDLApp(Sender : TObject);
     procedure FormCreate(Sender: TObject);
@@ -113,6 +116,7 @@ uses
   , session.fileutils
   , session.csv.experiments
   , session.design.conversion
+  , session.loggers.types
   , sdl.app
   , sdl.app.controller.manager
   , sdl.app.grids.types
@@ -155,7 +159,7 @@ begin
     if LNewParticipant.IsEmpty or (Length(LNewParticipant) < 3) then Exit;
     Items.Append(LNewParticipant);
     ItemIndex := Items.Count-1;
-    MenuItemCopyPNGFilesClick(ButtonNewParticipant);
+    // MenuItemCopyPNGFilesClick(ButtonNewParticipant);
   end;
 end;
 
@@ -207,7 +211,7 @@ begin
       end;
 
       LCondition := ListBoxCondition.Items.IndexOf(LInformation.SessionName);
-      if LCondition > -1 then begin
+      if LCondition >= 0 then begin
         ItemIndex := LCondition;
         if ItemIndex < Items.Count -1 then begin
           ItemIndex := ItemIndex + 1;
@@ -237,30 +241,38 @@ begin
   end;
 end;
 
-procedure TFormMain.ComboBoxDesignFolderEditingDone(Sender: TObject);
+procedure TFormMain.ComboBoxDesignFolderChange(Sender: TObject);
 begin
   with ComboBoxDesignFolder do begin
-    if ItemIndex > 0 then begin
+    if ItemIndex >= 0 then begin
       if ComboBoxDesignFolder.Items.Count > 0 then begin
         ListBoxCondition.Clear;
         Pool.DesignBasePath := Items[ItemIndex];
-        SaveProtocolIndex(ParticipantFolderName, ItemIndex);
+        SaveProtocol(ParticipantFolderName, Pool.DesignBasePath);
         GetDesignFilesFor(ListBoxCondition.Items);
       end;
     end;
   end;
 end;
 
-procedure TFormMain.ComboBoxParticipantEditingDone(Sender: TObject);
+procedure TFormMain.ComboBoxParticipantChange(Sender: TObject);
 var
   LInformation : TInformation;
   LCondition : integer;
+  LDesignFolderIndex : integer;
 begin
   if ComboBoxParticipant.Items.Count > 0 then begin
     SetupFolders;
-    ComboBoxDesignFolder.ItemIndex := LoadProtocolIndex(ParticipantFolderName);
-    ComboBoxDesignFolderEditingDone(ComboBoxParticipant);
-    //IniPropStorageProtocol.Save;
+
+    LDesignFolderIndex :=
+      ComboBoxDesignFolder.Items.IndexOf(LoadProtocol(ParticipantFolderName));
+    if LDesignFolderIndex >= 0 then begin
+      ComboBoxDesignFolder.ItemIndex := LDesignFolderIndex;
+      ComboBoxDesignFolderChange(ComboBoxParticipant);
+    end else begin
+      Exit;
+    end;
+
     //LConfiguration := ConcatPaths([
     //  Pool.ConfigurationsRootBasePath,
     //  ParticipantFolderName, 'protocol.ini']);
@@ -292,10 +304,11 @@ begin
       LabelLastSessionName.Caption := LInformation.SessionName;
       LabelSessionEndCriteria.Caption := LInformation.SessionResult;
       LCondition := ListBoxCondition.Items.IndexOf(LInformation.SessionName);
-      if LCondition > -1 then begin
+      if LCondition >= 0 then begin
         ListBoxCondition.ItemIndex := LCondition;
       end;
     end;
+    IniPropStorage1.Save;
   end;
 end;
 
@@ -341,22 +354,28 @@ end;
 procedure TFormMain.IniPropStorage1StoredValues0Restore(
   Sender: TStoredValue; var Value: TStoredType);
 var
-  LValue : integer;
+  LValue : string;
 begin
   GetDesignFoldersFor(ComboBoxDesignFolder.Items);
   with Pool, ComboBoxDesignFolder do begin
-    LValue := Value.ToInteger;
-    if (LValue < Items.Count) and (LValue <> -1) then begin
-      DesignBasePath := Items[LValue];
-    end;
+    LValue := Value;
+    DesignBasePath := Items[Items.IndexOf(LValue)];
   end;
 end;
 
+
 procedure TFormMain.IniPropStorage1StoredValues0Save(
   Sender: TStoredValue; var Value: TStoredType);
+var
+  LValue : string;
 begin
-  SaveProtocolIndex(ParticipantFolderName, ComboBoxDesignFolder.ItemIndex);
-  Value := ComboBoxDesignFolder.ItemIndex.ToString;
+  with ComboBoxDesignFolder do begin
+    LValue := Items[ItemIndex];
+  end;
+  SaveProtocol(
+    ParticipantFolderName,
+    LValue);
+  Value := LValue;
 end;
 
 procedure TFormMain.IniPropStorage1StoredValues1Restore(
@@ -460,7 +479,7 @@ begin
     ShouldRestartAtBlockStart := ItemIndex = 0;
 
   with GlobalTrialParameters, FormMisc.ComboBoxAudioPromptForText do begin
-    if ItemIndex > -1 then begin
+    if ItemIndex >= 0 then begin
       AudioPromptForText := Items[ItemIndex];
     end else begin
       ShowMessage('Escolha um prompt de texto nas configurações.');
@@ -469,7 +488,7 @@ begin
   end;
 
   with GlobalTrialParameters, FormMisc.ComboBoxFontName do begin
-    if ItemIndex > -1 then begin
+    if ItemIndex >= 0 then begin
       FontName := Items[ItemIndex];
     end else begin
       ShowMessage('Escolha uma fonte para o texto nas configurações.');
@@ -517,7 +536,7 @@ begin
     TimeOutInterval := Value;
 
   with GlobalTrialParameters, FormMisc.ComboBoxAudioFolder do begin
-    if ItemIndex > -1 then begin
+    if ItemIndex >= 0 then begin
       Pool.AudioBasePath := Items[ItemIndex];
     end else begin
       ShowMessage('Escolha uma pasta de audio nas configurações.');
@@ -564,10 +583,12 @@ end;
 function TFormMain.ParticipantFolderName: string;
 begin
   if ComboBoxParticipant.Items.Count > 0 then begin
-    Pool.Counters.Subject := ComboBoxParticipant.ItemIndex;
-    Result := Pool.Counters.Subject.ToString +'-'+
-        ComboBoxParticipant.Items[Pool.Counters.Subject] +
-        DirectorySeparator;
+    if ComboBoxParticipant.ItemIndex >= 0 then begin
+      Pool.Counters.Subject := ComboBoxParticipant.ItemIndex;
+      Result := Pool.Counters.Subject.ToString +'-'+
+          ComboBoxParticipant.Items[Pool.Counters.Subject] +
+          DirectorySeparator;
+    end;
   end;
 end;
 
@@ -595,6 +616,8 @@ begin
     ForceDirectories(Pool.BaseDataPath) and
     ForceDirectories(Pool.DataResponsesBasePath);
 end;
+
+
 
 function TFormMain.Validated: Boolean;
   function SetupParticipantID : Boolean;
@@ -645,7 +668,9 @@ begin
         ItemIndex := Items.Count-1;
       end;
     end else begin
-      if ItemIndex = -1 then begin
+      if ItemIndex >= 0 then begin
+        // do nothing
+      end else begin
         if Items.Count > 0 then begin
           ItemIndex := Items.Count-1;
           ShowMessage('O último monitor foi selecionado: ' + Items[ItemIndex]);
@@ -659,7 +684,7 @@ begin
 
   if Pool.ConfigurationFilename.IsEmpty then begin
     with ListBoxCondition do begin
-      if ItemIndex > -1 then begin
+      if ItemIndex >= 0 then begin
         ShowMessage(
           'Uma nova sessão será criada:' + LineEnding + Items[ItemIndex]);
       end else begin
@@ -693,6 +718,7 @@ end;
 
 procedure TFormMain.RunSession;
 begin
+  SetSessionResult('');
   SDLApp := TSDLApplication.Create(@Pool.AppName[1]);
   SDLApp.SetupVideo(FormMisc.ComboBoxMonitor.ItemIndex);
   //SDLApp.PrintRendererSetup;
@@ -723,23 +749,41 @@ end;
 
 procedure TFormMain.CreateNewConfigurationFile;
 var
-  LFilename: String;
+  LFilename: string;
+  LDesignFolder : string;
 begin
-  if ListBoxCondition.Items.Count = 0 then begin
-    ShowMessage('A pasta de parâmetros (design) está vazia.');
-    Exit;
+
+  with ListBoxCondition do begin
+    if ItemIndex < 0 then begin
+      ShowMessage('Escolha um arquivo com os parâmetro da sessão.');
+      Exit;
+    end;
+
+    if Items.Count = 0 then begin
+      ShowMessage('A pasta de projetos está vazia.');
+      Exit;
+    end;
+
+    LFilename := Items[ItemIndex];
   end;
 
-  if ListBoxCondition.ItemIndex = -1 then begin
-    ShowMessage('Escolha um arquivo com os parâmetro da sessão.');
-    Exit;
-  end else begin
-    with ListBoxCondition do begin
-      LFilename := Items[ItemIndex];
+  with ComboBoxDesignFolder do begin
+    if ItemIndex < 0 then begin
+      Showmessage('Escolha uma pasta de projetos.');
+      Exit;
     end;
+
+    if Items.Count = 0 then begin
+      Showmessage('A pasta design está vazia.');
+      Exit;
+    end;
+
+    LDesignFolder := Items[ItemIndex];
   end;
 
   ToogleControlPanelEnabled(ProgressBar);
+
+  Pool.DesignBasePath := LDesignFolder;
   Pool.ConfigurationFilename := MakeConfigurationFile(LFilename);
   ProgressBar.Visible := True;
   ToogleControlPanelEnabled(ProgressBar);

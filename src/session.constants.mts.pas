@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -28,8 +28,8 @@ type
 
 const
   HeaderSample = 'S';
-  HeaderCompasisons = 'Comparisons';
-  HeaderCompasison = 'C';
+  HeaderComparisons = 'Comparisons';
+  HeaderComparison = 'C';
   HeaderRelation = 'Relation';
   HeaderHasPrompt = 'HasPrompt';
 
@@ -37,8 +37,8 @@ const
     RelationKey    : HeaderRelation;
     SamplesKey     : 'Samples';
     SampleKey      : HeaderSample;
-    ComparisonsKey : HeaderCompasisons;
-    ComparisonKey  : HeaderCompasison;
+    ComparisonsKey : HeaderComparisons;
+    ComparisonKey  : HeaderComparison;
     HasPromptKey   : HeaderHasPrompt;
     HasTextPromptKey  : 'HasTextPrompt';
     PromptKey      : 'Prompt';

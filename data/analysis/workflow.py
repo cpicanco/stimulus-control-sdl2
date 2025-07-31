@@ -69,9 +69,9 @@ def prepare_for_transcription_v2(override=False):
     save_probes_by_participant(False)
 
 if __name__ == "__main__":
-    prepare_for_transcription_v2(override=True)
+    # prepare_for_transcription_v2(override=True)
     # do manual transcription
-    # concatenate_probes()
+    concatenate_probes()
     # calculate_similarity()
     # override_CD_probes_in_data_file(False)
     # create_metadata()

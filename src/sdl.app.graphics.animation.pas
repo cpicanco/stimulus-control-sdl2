@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2025-2025 Carlos Rafael Fernandes Picanço.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit sdl.app.graphics.animation;
 
 {$mode objfpc}{$H+}
@@ -30,6 +39,7 @@ type
     procedure Join(ASample, AComparison : TRectangule;
       AGridOrientation : TGridOrientation);
     procedure Stop;
+    procedure Hide; override;
     property Sibling : TRectangule read FSibling;
     property Visible : Boolean read FVisible write FVisible;
   end;
@@ -181,6 +191,12 @@ end;
 procedure TAnimation.Stop;
 begin
   // change color
+end;
+
+procedure TAnimation.Hide;
+begin
+  inherited Hide;
+  FVisible := False;
 end;
 
 constructor TAnimation.Create;

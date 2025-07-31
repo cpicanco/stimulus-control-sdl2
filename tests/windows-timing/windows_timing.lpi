@@ -37,6 +37,11 @@
         <Filename Value="timestamps.windows.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="testtscunit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="TestTSCUnit"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -54,11 +59,6 @@
         <DebugInfoType Value="dsDwarf3"/>
       </Debugging>
     </Linking>
-    <Other>
-      <ConfigFile>
-        <WriteConfigFilePath Value=""/>
-      </ConfigFile>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>

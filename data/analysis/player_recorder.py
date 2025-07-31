@@ -38,6 +38,84 @@ class Recorder:
     def write(self, frame):
         self.device.write(frame)
 
+def record_videos():
+    import os
+
+    from fileutils import cd, data_dir
+    from player_synchronizer import Synchronizer
+    from player_drawings import (
+        BehaviorDrawingFactory,
+        GazeDrawingFactory
+    )
+    from explorer_study2 import load_participant_sources
+
+    start_from_reached = False
+    start_from = ''
+
+    sources = load_participant_sources()
+    for participant in sources:
+        for design_file in sources[participant]:
+            for source in sources[participant][design_file]:
+                # if 'Treino-AC-Ref-Intermitente' in source['name']:
+                date = source['date']
+                cycle = source['cycle']
+                code = source['code']
+                video_filename = code + '.mp4'
+                current = f'{participant} - {date}, {cycle}, {code}'
+
+                data_dir(verbose=False)
+                cd(source['path'], verbose=False)
+
+                # check if video already exists
+                if os.path.exists(video_filename):
+                    # print(f'Skipped: {current}')
+                    continue
+
+                if not start_from == '':
+                    if current == start_from:
+                        start_from_reached = True
+
+                    if not start_from_reached:
+                        # print(f'Skipped: {current}')
+                        continue
+
+                print(f'Recording: {current}')
+
+                session = Synchronizer(code)
+
+                behavior_factory = BehaviorDrawingFactory(participant)
+                gaze_factory = GazeDrawingFactory(session)
+
+                recorder = Recorder(
+                    width=session.screen.width,
+                    height=session.screen.height,
+                    video_filename=video_filename)
+                recorder.start()
+
+                for time, frame in session.frames:
+                    # if time < 30:
+                    #     continue
+                    # print(f'Frame: {time}')
+                    behavior_data = frame[frame['label'] == 0]
+                    gaze_data = frame[frame['label'] == 1]
+                    img = np.zeros((session.screen.height, session.screen.width, 3), dtype=np.uint8)
+
+                    for timestamp, _, i in behavior_data:
+                        behavior_factory.update(session.behavior.events[i])
+
+                    for component in behavior_factory.visible_components:
+                        component.paint(img)
+
+                    for timestamp, _, i in gaze_data:
+                        gaze_factory.update(session.gaze.events[i])
+                        gaze_factory.paint(img)
+
+                    recorder.device.write(img)
+                    # if time > 50:
+                    #     break
+
+                recorder.stop()
+
 if __name__ == '__main__':
     import numpy as np
     from player_media import arimo
@@ -52,7 +130,7 @@ if __name__ == '__main__':
     if not recorder.device.isOpened():
         raise RuntimeError("VideoWriter could not be opened.")
     for i in range(0, 100):
-        ft.putText(img=frame,
+        cv2.putText(img=frame,
                 text='Quick Fox',
                 org=(15, 70),
                 fontHeight=60,

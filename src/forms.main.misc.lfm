@@ -10,7 +10,7 @@ object FormMisc: TFormMisc
   ClientHeight = 629
   ClientWidth = 449
   SessionProperties = 'CheckBoxHideMouse.Checked;CheckBoxShowMarkers.Checked;CheckBoxShowModalFormForSpeechResponses.Checked;CheckBoxSimultaneousMTS.Caption;CheckBoxSimultaneousMTS.Checked;CheckBoxTestMode.Checked;CheckBoxUseGazeAsInput.Checked;CheckBoxUseRemoteServer.Checked;ComboBoxAudioFolder.ItemIndex;ComboBoxAudioPromptForText.ItemIndex;ComboBoxController.ItemIndex;ComboBoxEyeTracker.ItemIndex;ComboBoxFixedSamplePosition.ItemIndex;ComboBoxFontName.ItemIndex;ComboBoxMonitor.ItemIndex;ComboBoxShouldRestartAt.ItemIndex;FloatSpinEditCellsSize.Value;FloatSpinEditScreenWidth.Value;PageControl.TabIndex;PanelFontColor.Color;PanelFontColor.Font;RadioGroupDispenser.ItemIndex;SpinEditAudioLoopInterval.Value;SpinEditDefaultAudioLoops.Value;SpinEditFontSize.Value;SpinEditInterTrialInterval.Value;SpinEditLimitedHold.Value;SpinEditRecordingSeconds.Value;SpinEditTimeOut.Value;CheckBoxForceLastMonitor.Checked'
-  LCLVersion = '3.99.0.0'
+  LCLVersion = '4.99.0.0'
   OnClose = FormClose
   OnCreate = FormCreate
   object PageControl: TPageControl

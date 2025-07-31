@@ -1,6 +1,6 @@
 {
   Schedules
-  Copyright (C) 2010-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2010-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 

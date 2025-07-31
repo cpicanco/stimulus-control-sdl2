@@ -22,12 +22,13 @@ The following steps assume you have a good broadband connection and will take ap
 9. Click the `Setup+` button and check the `Include help` option under `Miscellaneous settings`.
 10. Click the `Install/update FPC+Lazarus` button and wait for the process to complete.
 
-## Step 2 (4 min) - Monokai Theme for Lazarus (optional)
+## Step 2 (4 min) - Monokai Dark Theme for Lazarus (optional)
 1. Download the `Monokai.xml` file with the [Monokai theme](https://wiki.freepascal.org/UserSuppliedSchemeSettings).
 2. Copy the `Monokai.xml` file to the folder `C:\lazarus-trunk\config_lazarus\userschemes`.
 3. Open Lazarus.
 4. Navigate to Tools > Options > Editor > Display > Colors, and select `Monokai` in the `Color Schemes` drop-down menu.
 5. Go to Lazarus > Tools > Options > Editor > Display font, and set it to `Consolas`, size 9.
+6. Install [metadarkstyle](https://github.com/zamtmn/metadarkstyle) package (tip: available at Online Package Manager)
 
 ## Step 3 (1 min) - Download Dependencies
 The project depends on three libraries:

@@ -6,7 +6,7 @@
 	url = https://github.com/cpicanco/EyeLink-for-Pascal.git
 [submodule "media"]
 	path = media
-	url = https://github.com/cpicanco/media.git
+	url = /g/Meu Drive/media.git
 [submodule "dependencies/pupil-fpc"]
 	path = dependencies/pupil-fpc
 	url = https://github.com/cpicanco/pupil-fpc.git

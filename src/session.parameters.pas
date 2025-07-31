@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2024-2025 Carlos Rafael Fernandes Picanço.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit session.parameters;
 
 {$mode objfpc}{$H+}
@@ -14,8 +23,10 @@ type
   TParametricObject = class
   private
     FOnAfterLoadingParameters: TNotifyEvent;
+    FOnBeforeLoadingParameters: TNotifyEvent;
     FParameters: TParameters;
     procedure SetOnAfterLoadingParameters(AValue: TNotifyEvent);
+    procedure SetOnBeforeLoadingParameters(AValue: TNotifyEvent);
   protected
     function GetValue(const AKey: string): string;
     procedure SetValue(const AKey: string; AValue: string);
@@ -31,6 +42,8 @@ type
     property Parameters : TParameters read FParameters;
     property OnAfterLoadingParameters : TNotifyEvent
       read FOnAfterLoadingParameters write SetOnAfterLoadingParameters;
+    property OnBeforeLoadingParameters : TNotifyEvent
+      read FOnBeforeLoadingParameters write SetOnBeforeLoadingParameters;
   end;
 
 implementation
@@ -55,6 +68,9 @@ var
   LValue : string;
   i: Integer;
 begin
+  if Assigned(OnBeforeLoadingParameters) then begin
+    OnBeforeLoadingParameters(AParameters);
+  end;
   for i := 0 to AParameters.Count -1 do begin
     AParameters.GetNameValue(i, LName, LValue);
     if FParameters.ContainsKey(LName) then begin
@@ -88,6 +104,12 @@ procedure TParametricObject.SetOnAfterLoadingParameters(AValue: TNotifyEvent);
 begin
   if FOnAfterLoadingParameters = AValue then Exit;
   FOnAfterLoadingParameters := AValue;
+end;
+
+procedure TParametricObject.SetOnBeforeLoadingParameters(AValue: TNotifyEvent);
+begin
+  if FOnBeforeLoadingParameters = AValue then Exit;
+  FOnBeforeLoadingParameters := AValue;
 end;
 
 function TParametricObject.GetValue(const AKey: string): string;

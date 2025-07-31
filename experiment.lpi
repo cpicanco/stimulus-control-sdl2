@@ -16,13 +16,16 @@
       <XPManifest>
         <DpiAware Value="True"/>
         <AnsiUTF8 Value="True"/>
+        <TextName Value="Stimulus Control"/>
+        <TextDesc Value="Freedom for building behavioral experiments"/>
       </XPManifest>
+      <Icon Value="0"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="64"/>
+      <BuildNr Value="90"/>
       <Language Value="0416"/>
       <Attributes pvaPrivateBuild="True"/>
       <StringTable Comments="Uma máquina de ensinar para experimentos comportamentais livres" InternalName="Stimulus Control" LegalCopyright="Carlos Rafael Fernandes Picanço" ProductName="Stimulus Control"/>
@@ -97,6 +100,7 @@
             </SyntaxOptions>
           </Parsing>
           <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
             <Checks>
               <IOChecks Value="True"/>
               <RangeChecks Value="True"/>
@@ -112,6 +116,7 @@
               <DebugInfoType Value="dsDwarf3"/>
               <UseHeaptrc Value="True"/>
             </Debugging>
+            <LinkSmart Value="True"/>
             <Options>
               <Win32>
                 <GraphicApplication Value="True"/>
@@ -120,8 +125,9 @@
           </Linking>
           <Other>
             <Verbosity>
-              <ShowDebugInfo Value="True"/>
-              <ShowHintsForUnusedUnitsInMainSrc Value="True"/>
+              <ShowWarn Value="False"/>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
             </Verbosity>
             <WriteFPCLogo Value="False"/>
             <CustomOptions Value="-dSDL2"/>
@@ -1091,6 +1097,7 @@
         <Filename Value="src\forms.question.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormQuestion"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
@@ -1118,6 +1125,11 @@
       <Unit>
         <Filename Value="src\eye.pas"/>
         <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\generics.map.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Generics.Map"/>
       </Unit>
     </Units>
   </ProjectOptions>

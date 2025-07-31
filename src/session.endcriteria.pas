@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2023 Carlos Rafael Fernandes Picanço.
+  Copyright (C) 2014-2025 Carlos Rafael Fernandes Picanço.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -262,7 +262,8 @@ var
 
   function NextBlockOnCriterionNotAchieved : SmallInt;
   begin
-    if FCurrentBlock.NextBlockOnNotCriterion > -1 then begin
+    if (FCurrentBlock.NextBlockOnNotCriterion > -1) or
+       FCurrentBlock.EndSessionOnNotCriterionAfterBlockRepetitions then begin
       Result := NextBlockAfterRepetitionDone(
         FCurrentBlock.NextBlockOnNotCriterion);
     end else begin

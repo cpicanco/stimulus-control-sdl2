@@ -1,0 +1,5 @@
+ID,Name,Trials,Relation,Samples,Comparisons,S1,S2,S3,C1,C2,C3,Distance,DragableAnimation,GridSize,Orientation,AutoAnimateOnStart,StimuliFolder,ReferenceName,LimitedHold,ReleaseFoodForIntermediateHits
+1,T1,10,A-A,3,3,A1,A2,A3,A1,A2,A3,0,OnResponse,3,None,F,,,,F
+2,T2,10,B-B,1,1,B1,,,B1,,,0,OnResponse,3,None,F,,,,F
+3,T3,10,C-C,1,1,C1,,,C1,,,0,OnResponse,3,None,F,,,,F
+4,M2,30,A-A,1,2,A1,,,A1,B1,,0,OnResponse,3,None,F,,,,F
