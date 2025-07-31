@@ -64,6 +64,7 @@ O arquivo "multi-sample.csv" contém parâmetros para configurar as tentativas d
 - **Samples**: Quantidade de estímulos modelos (móveis).
 - **Comparisons**: Quantidades de estímulos alvos (fixos).
 - **DragableAnimation**:
+- **StimuliFolder**: Nome da pasta  de imagens usada para carregar os arquivos png: media/png/NOME_DA_PASTA (escrever apenas NOME_DA_PASTA e não o endereço completo).
 - **GridSize**: Tamanho da grade de estímulos em formato NxN.
   - Por exemplo, se = 4, teremos uma matriz 4x4. Logo, é possível posicionar 16 estímulos na grade.
 - **Orientation**: Tipo de orientação do arraste.
