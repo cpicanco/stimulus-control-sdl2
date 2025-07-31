@@ -55,11 +55,6 @@ words_per_cycle = {
     6 : {'teaching': [bole, nifa], 'generalization': [febi, lano]},
 }
 
-# isr = intrasyllabic recombination
-isr_right = [nibe, bofi, leba, bona, lefi, nilo]
-isr_left = [nale, lani, febo, nole, bifa]
-isr_both = [nofa, lofi, fabe, febi, lano, falo, bena]
-
 category_per_word = {
     nibo : 'Teaching',
     fale : 'Teaching',
@@ -249,7 +244,8 @@ words_per_file = {
     'Ciclo6-6-Sondas-AC-Palavras-generalizacao-reservadas': words_per_cycle[6]['generalization'] + constant,
 
     'Ciclo6-7-Sondas-CD-Palavras-12-ensino-8-generalizacao': pre_test_12_8,
-    'Ciclo6-7-Sondas-CD-Palavras-30-Todas' : pre_test_hardcoded_order
+    'Ciclo6-7-Sondas-CD-Palavras-30-Todas' : pre_test_hardcoded_order,
+    'Ciclo2-0-Sondas-CD-Palavras-30-Todas' : pre_test_hardcoded_order
 }
 
 def recombine_letters(consonants='bfln', vowels='aeio'):
@@ -266,7 +262,7 @@ for word in recombine_letters():
     all.append(word)
 
 
-teaching = rf'({nibo}|{fale}|{boni}|{lefa}|{nile}|{bole}|{fani}{lebo}|{bofa}{leni}|{nifa}|{lebo})'
+teaching = rf'({nibo}|{fale}|{boni}|{lefa}|{nile}|{bole}|{fani}|{lebo}|{bofa}|{leni}|{nifa}|{fabo})'
 assessment = rf'({nale}|{lani}|{febo}|{nole}|{bifa}|{nofa}|{lofi}|{fabe}|{febi}|{lano}|{nibe}|{bofi}|{leba}|{bona}|{lefi}|{nilo})'
 
 isr_left = rf'({nofa}|{nale}|{lani}|{febo}|{nole}|{bifa})'
@@ -276,6 +272,31 @@ isr_right = rf'({nibe}|{bofi}|{leba}|{bona}|{lefi}|{nilo}|{falo}|{fabe})'
 list_right = [nibe, bofi, leba, bona, lefi, nilo, falo, fabe]
 list_left = [nofa, nale, lani, febo, nole, bifa]
 list_both = [lofi, febi, lano, bena]
+list_teaching = [nibo, fale, bofa, leni, lebo, fani, boni, lefa, fabo, nile, bole, nifa]
 
 if __name__ == '__main__':
-    pass
+    # Create word list
+    words = list_teaching
+
+    # Calculate the move cycle for each word
+    move_cycles = [(i // 2) + 2 for i in range(12)]
+
+    # Generate header
+    header = ['Word'] + [f'Cycle{i}' for i in range(1, 8)]
+
+    # Build table rows
+    rows = []
+    for i in range(12):
+        row = [words[i]]
+        for cycle in range(1, 8):
+            category = 'Category1' if cycle >= move_cycles[i] else 'Category2'
+            row.append(category)
+        rows.append(row)
+
+    # Write to TSV file
+    with open('word_categories.tsv', 'w') as f:
+        f.write('\t'.join(header) + '\n')
+        for row in rows:
+            f.write('\t'.join(row) + '\n')
+
+    print("Table successfully written to 'word_categories.tsv'")

@@ -3,7 +3,6 @@ participants = [
     '12-CIR21', # Engineering
     '13-POS23', # Engineering
     '14-RAC20', # Engineering
-    '15-le23',  # Engineering
     '19-GEO22', # Engineering
     '20-ANN23', # Engineering
     '4-BON24',  # Engineering

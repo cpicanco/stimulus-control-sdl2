@@ -56,6 +56,7 @@ class TrialEvents(BaseEvents):
     __Date__ = 'Date'
     __Time__ = 'Time'
     __File__ = 'File'
+    __Design__ = 'Design'
     __dtype__ = {
         'names' : (
             __Timestamp__,                      # 0
@@ -88,7 +89,8 @@ class TrialEvents(BaseEvents):
             __Condition__,                      # 27
             __Date__,                           # 28
             __Time__,                           # 29
-            __File__                            # 30
+            __File__,                           # 30
+            __Design__                          # 31
         ),
         'formats' : (
             np.float64, # 0
@@ -121,7 +123,8 @@ class TrialEvents(BaseEvents):
             'U4',       # 27
             'U10',      # 28
             'U10',      # 29
-            'U20'       # 30
+            'U20',      # 30
+            'U20'       # 31
             ) }
     __converters__ = {
         0 : lambda x: x.replace(',', '.'),
@@ -131,8 +134,8 @@ class TrialEvents(BaseEvents):
         24 : lambda x: x.replace('True', '1').replace('False', '0'),
         25 : lambda x: x.replace(',', '.')}
 
-    def __init__(self, info):
-        super().__init__(info)
+    def __init__(self, info, version='1'):
+        super().__init__(info, self.__class__.__name__+version)
         self.__convert_timestamps_to_seconds()
 
     def __convert_timestamps_to_seconds(self):

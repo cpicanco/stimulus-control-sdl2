@@ -27,10 +27,11 @@ class Grid:
         return '{'+'grid:{'+','.join(str(i)+':'+str(p) for i, p in enumerate(self.positions))+'}'+'}'
 
 class Information:
-    __supported_versions__ = ['1', '2']
+    __supported_versions__ = ['1', '2', '3']
     __header_version__ = 'Version:'
     __participant_name__ = 'Nome_do_sujeito:'
     __session_name__ = 'Nome_da_sessao:'
+    __session_design__ = 'Nome_do_planejamento:'
     __session_result__ = 'Resultado:'
     __grid__ = 'Grade_de_estimulos:'
     __monitor__ = 'Monitor:'
@@ -52,6 +53,7 @@ class Information:
         self.version = self.__get_version__()
         self.session_name = self.__get_session_name__()
         self.participant_name = self.__get_participant_name__()
+        self.session_design = self.__get_session_design__()
         self.start_date = self.__get_start_date__()
         self.end_date = self.__get_end_date__()
         self.start_time = self.__get_start_time__()
@@ -74,6 +76,12 @@ class Information:
 
     def __get_participant_name__(self):
         return self.__info_file__.loc[self.__participant_name__][1]
+
+    def __get_session_design__(self):
+        try:
+            return self.__info_file__.loc[self.__session_design__][1]
+        except KeyError:
+            return None
 
     def __get_result__(self):
         try:
@@ -141,6 +149,7 @@ class Information:
         return f'{self.__header_version__}\t{self.version}\n' \
                f'{self.__participant_name__}\t{self.participant_name}\n' \
                f'{self.__session_name__}\t{self.session_name}\n' \
+               f'{self.__session_design__}\t{self.session_design}\n' \
                f'{self.__grid__}\t{self.grid}\n' \
                f'{self.__monitor__}\t{self.monitor}\n' \
                f'{self.__start_date__}\t{self.start_date}\n' \

@@ -101,10 +101,13 @@ def list_data_folders(include_list=[], exclude_list=[], directory_name='.'):
             'dados-portugal',
             'dados-portugal-geovana',
             'output',
+            'output-nata',
+            'output.zip',
             '0-Rafael',
             '3-Teste',
             '7-Teste2',
-            'analysis.zip']
+            'analysis.zip',
+            'METADADOS.ods']
 
         entries = [entry for entry in all_entries \
                 if os.path.isdir(os.path.join(directory_name, entry)) \

@@ -1,16 +1,21 @@
 import numpy as np
-from scipy.stats import pearsonr, linregress
+from scipy.stats import pearsonr, linregress, kendalltau
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
+from figure_idioms import translations, language
+
 # Assuming you have two lists of data:
-def plot_correlation(x, y, xlabel, ylabel, title, save=False):
+def plot_correlation(x, y, xlabel, ylabel, title, save=False, limit_x=False):
     if len(x) == 0 or len(y) == 0:
         print(f"Skipping plot for {title} due to empty data.")
         return
 
+    tau, tau_p_value = kendalltau(x, y)
+    print(f"Kendall's tau({len(x)-2}) = {tau:.3f}, p = {tau_p_value:.3f}")
+
     r, p = pearsonr(x, y)
-    print(f"r({len(x)-2}) = {r:.3f}, p = {p:.3f}")
+    print(f"r({len(x)-2}) = {r:.3f}, p = {round(p):.3f}")
 
     slope, intercept, r_value, p_value, std_err = linregress(x, y)
     print(f"Regression Slope: {slope:.3f}")
@@ -26,10 +31,13 @@ def plot_correlation(x, y, xlabel, ylabel, title, save=False):
     ax.scatter(x, y)
     #draw line of best fit
     ax.plot(np.unique(x), np.poly1d(np.polyfit(x, y, 1))(np.unique(x)), color='red')
-    ax.text(0.2, 0.9, f'r = {r:.3f}', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-
-    if ylabel == 'Latency':
+    ax.text(0.05, 0.9, f'r = {r:.3f}, p < 0.001', horizontalalignment='left', verticalalignment='center', transform=ax.transAxes)
+    ax.text(0.05, 0.85, f'τ = {tau:.3f}, p = {tau_p_value:.3f}', horizontalalignment='left', verticalalignment='center', transform=ax.transAxes)
+    if ylabel == 'Latência':
         plt.ylim(0, 40)
+
+    if limit_x:
+        plt.xlim((-.2, .35))
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -37,7 +45,7 @@ def plot_correlation(x, y, xlabel, ylabel, title, save=False):
 
     fig.tight_layout()
     if save:
-        plt.savefig(f'correlation_{title}.png')
+        plt.savefig(f'correlation_pt_br_{title}.svg')
     else:
         plt.show()
     plt.close(fig)
@@ -74,7 +82,7 @@ def plot_correlation_2(x1, y1, x2, y2, xlabel, ylabel, name, title1, title2, sav
     axs[0].text(0.3, 0.9, f'R^2 = {round(r_squared1, 2)}, Slope = {round(slope1, 2)}', horizontalalignment='center', verticalalignment='center', transform=axs[0].transAxes)
     axs[1].text(0.3, 0.9, f'R^2 = {round(r_squared2, 2)}, Slope = {round(slope2, 2)}', horizontalalignment='center', verticalalignment='center', transform=axs[1].transAxes)
 
-    if ylabel == 'Latency':
+    if ylabel == translations[language]['correlation.plot_correlation_2']['ylabel']:
         axs[0].set_ylim(0, 40)
         axs[1].set_ylim(0, 40)
 

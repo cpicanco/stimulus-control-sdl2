@@ -48,7 +48,7 @@ def convert(override=True):
     for entry in list_files('.data.processed'):
         add_info_to_data_files(entry, override=override)
 
-def convert_all(folders=[foldername_1, foldername_2, foldername_3, foldername_4], exclude_list=[], override=False):
+def convert_all(folders=[foldername_1, foldername_2, foldername_3, foldername_4], exclude_list=[], override=True):
     for foldername in folders:
         change_data_folder_name(foldername)
 

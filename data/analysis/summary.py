@@ -1,37 +1,41 @@
 import numpy as np
 import scipy.stats as stats
 
+from constants import participants_to_ignore
+
 from explorer import(
     change_data_folder_name,
     foldername_1,
     foldername_2,
     foldername_3)
 
-from fileutils import (cd, data_dir, list_data_folders, list_files, load_file,
-    walk_and_execute)
+from fileutils import cd, list_data_folders
 
 from metadata import Metadata
 
-def collect_metadata(foldername):
-    change_data_folder_name(foldername)
-    data_dir()
-
+def collect_metadata(foldernames):
     container=[]
-    for participant in list_data_folders():
-        cd(participant)
-        try:
-            cd('analysis')
-        except FileNotFoundError:
-            cd('..')
-            continue
+    for foldername in foldernames:
+        change_data_folder_name(foldername)
+        # data_dir()
 
-        metadata = Metadata()
-        # check if key done: exists in metadata.items
-        if 'done' in metadata.items.keys():
-            if metadata.items['done']:
-                container.append(metadata)
-        cd('..')
-        cd('..')
+        for participant in list_data_folders():
+            if participant in participants_to_ignore:
+                continue
+            cd(participant)
+            try:
+                cd('analysis')
+            except FileNotFoundError:
+                cd('..')
+                continue
+
+            metadata = Metadata()
+            # check if key done: exists in metadata.items
+            if 'done' in metadata.items.keys():
+                if metadata.items['done']:
+                    container.append(metadata)
+            cd('..')
+            cd('..')
 
     return container
 
@@ -39,7 +43,7 @@ if __name__ == '__main__':
     ages = []
     genders = []
     fields = []
-    for metadata in collect_metadata(foldername_2):
+    for metadata in collect_metadata([foldername_1, foldername_2,foldername_3]):
         data = metadata.items
         # if data['code'] == 'VRA':
         #     continue
@@ -53,12 +57,15 @@ if __name__ == '__main__':
         average = (int(low) + int(high)) / 2
         ages.append(average)
 
-        print(f'{data["id"]}-{data["code"]}:{data["field"]}: {data["generalization"]}')
+        # print(f'{data["id"]}-{data["code"]}:{data["field"]}: {data["generalization"]}')
         fields.append(data['field'])
+
+    print(f'Participants: {len(ages)}')
 
     print(f'Females: {genders.count("F")}')
     print(f'Males: {genders.count("M")}')
 
+    
     # Calculate sample mean and standard error of the mean (SEM)
     mean = np.mean(ages)
     sem = stats.sem(ages)
@@ -80,9 +87,3 @@ if __name__ == '__main__':
     print(f'Max age: {np.max(ages)}')
     print(f'CI age: {confidence_interval}')
     print(f'SD age: {np.std(ages)}')
-    print(f'Social Sciences and Humanities: 6')
-    print(f'Engineering and Natural Sciences: 15')
-    print(f'No undergraduate degree: 1')
-    
-
-    # A média de idade dos participantes foi de 28,93 anos (DP = 5,57), com uma idade mínima de 20,0 anos e máxima de 42,5 anos. O intervalo de confiança de 95% para a média de idade foi de 26,40 a 31,46 anos.

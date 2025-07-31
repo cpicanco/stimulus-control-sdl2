@@ -69,7 +69,11 @@ trial_code_of_groups = {
 }
 
 participants_to_ignore = []
-
+participants_exceptions = [
+    # there was differential reinforcement for these two participants in the last 30 trials
+    '4_DIE25',
+    '5_TUC23',
+]
 foldername = 'estudo4'
 
 other_participants_groups = {

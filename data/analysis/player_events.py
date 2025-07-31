@@ -20,17 +20,22 @@ class BaseEvents:
     __dtype__ = None
     __converters__ = None
 
-    def __init__(self, info):
+    def __init__(self, info, version='1'):
+        self._label = None
         self.events = None
         self.info = info
         self.base_filename = self.info.base_filename
-        self._label = None
-        self.__load_from_file()
+        self.__load_from_file(version)
 
-    def __load_from_file(self):
+    def __load_from_file(self, version=''):
         extension = self.__class__.__extension__
         filename = self.base_filename + extension
-        dtype = self.__class__.__dtype__
+        if version == 'TrialEvents1':
+            dtype = {
+                'names': self.__class__.__dtype__['names'][:-1],
+                'formats': self.__class__.__dtype__['formats'][:-1]}
+        else:
+            dtype = self.__class__.__dtype__
         converters = self.__class__.__converters__
         self.events = load_from_file(filename, dtype, converters)
 

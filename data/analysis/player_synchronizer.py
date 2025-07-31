@@ -207,12 +207,12 @@ class TrialFilter:
             id = 1
             for FPOGID, fixation in denormalized_fixations.groupby('FPOGID'):
                 # skip invalid fixations
-                fx = fixation[fixation['FPOGV'] == 1]
-                if fx.empty:
+                fxs = fixation[fixation['FPOGV'] == 1]
+                if fxs.empty:
                     continue
 
                 # skip fixations too short
-                fixation_duration = fx['FPOGD'].max()
+                fixation_duration = fxs['FPOGD'].max()
                 if fixation_duration < 0.060:
                     continue
 
@@ -221,19 +221,19 @@ class TrialFilter:
                     'ID' : id,
                     'FPOGID': FPOGID,
                     'FPOGD': fixation_duration,
-                    'FPOGX': fx['FPOGX'].mean(),
-                    'FPOGY': fx['FPOGY'].mean(),
-                    'FPOGV': fx['FPOGV'].iloc[0],
-                    'TIME_TICK': fx['TIME_TICK'].iloc[0],
+                    'FPOGX': fxs['FPOGX'].mean(),
+                    'FPOGY': fxs['FPOGY'].mean(),
+                    'FPOGV': fxs['FPOGV'].iloc[0],
+                    'TIME_TICK': fxs['TIME_TICK'].iloc[0],
                 })
-                timestamps.append({'ID': id, 'TIME_TICKS': fx['TIME_TICK']})
+                timestamps.append({'ID': id, 'TIME_TICKS': fxs['TIME_TICK']})
                 id += 1
 
             return pd.DataFrame(processed_rows), timestamps
 
         def process_switchings(
             fixations_over_elements: list,
-            processed_fixations: pd.DataFrame,
+            fixations: pd.DataFrame,
             fixations_timestamps: list
         ) -> dict:
             # list of words "nibo", "fale", "fale", "nibo" ... or letters "n", "i", "b", "o", ...
@@ -253,7 +253,7 @@ class TrialFilter:
             switchings = np.sum(switchings_mask)
 
             contained_masks = np.any(np.array(contained_masks), axis=0)
-            switchings_timestamps = processed_fixations[switchings_mask]['ID']
+            switchings_timestamps = fixations[switchings_mask]['ID']
             switchings_timestamps = [f['TIME_TICKS'] for f in fixations_timestamps if f['ID'] in switchings_timestamps]
 
             return {
@@ -267,7 +267,7 @@ class TrialFilter:
 
         def process_fixations_over_letters(
                 letters : list,
-                processed_fixations : pd.DataFrame,
+                fixations : pd.DataFrame,
                 fixations_timestamps : list,
                 word_rectangle : Rectangle
             ) -> list:
@@ -277,9 +277,9 @@ class TrialFilter:
             for letter, letter_rectangle in zip(letters, letters_rectangles):
                 letter_contains = np.vectorize(letter_rectangle.contains)
                 letter_fixations_contained_mask = letter_contains(
-                    processed_fixations['FPOGX'], processed_fixations['FPOGY'])
+                    fixations['FPOGX'], fixations['FPOGY'])
 
-                contained = processed_fixations[letter_fixations_contained_mask]
+                contained = fixations[letter_fixations_contained_mask]
                 contained_fixations = pd.DataFrame({
                     'ID': contained['ID'],
                     'FPOGX': contained['FPOGX'],
@@ -301,7 +301,7 @@ class TrialFilter:
 
             switchings = process_switchings(
                 fixations_over_elements=fixations_over_letters,
-                processed_fixations=processed_fixations,
+                fixations=fixations,
                 fixations_timestamps=fixations_timestamps,
             )
 
@@ -314,9 +314,9 @@ class TrialFilter:
                 relation_letter : str
             ) -> list:
 
-            processed_fixations, fixations_timestamps = fixations
+            fxs, fixations_timestamps = fixations
 
-            if processed_fixations.empty:
+            if fxs.empty:
                 return [], {}
             fixations_over_words = []
             not_contained_mask = None
@@ -339,29 +339,29 @@ class TrialFilter:
                 to_word_space = np.vectorize(word_rectangle.to_relative_coordenates)
 
                 fixations_contained_mask = contains(
-                    processed_fixations['FPOGX'], processed_fixations['FPOGY'])
+                    fxs['FPOGX'], fxs['FPOGY'])
                 fixations_relative_to_word = to_word_space(
-                    processed_fixations['FPOGX'], processed_fixations['FPOGY'])
+                    fxs['FPOGX'], fxs['FPOGY'])
 
                 contained_fixations = pd.DataFrame({
-                    'ID': processed_fixations['ID'][fixations_contained_mask],
-                    'FPOGX': processed_fixations['FPOGX'][fixations_contained_mask],
-                    'FPOGY': processed_fixations['FPOGY'][fixations_contained_mask],
-                    'TIME_TICK': processed_fixations['TIME_TICK'][fixations_contained_mask],
-                    'FPOGD': processed_fixations['FPOGD'][fixations_contained_mask],
-                    'FPOGID': processed_fixations['FPOGID'][fixations_contained_mask],
-                    'FPOGV': processed_fixations['FPOGV'][fixations_contained_mask],
+                    'ID': fxs['ID'][fixations_contained_mask],
+                    'FPOGX': fxs['FPOGX'][fixations_contained_mask],
+                    'FPOGY': fxs['FPOGY'][fixations_contained_mask],
+                    'TIME_TICK': fxs['TIME_TICK'][fixations_contained_mask],
+                    'FPOGD': fxs['FPOGD'][fixations_contained_mask],
+                    'FPOGID': fxs['FPOGID'][fixations_contained_mask],
+                    'FPOGV': fxs['FPOGV'][fixations_contained_mask],
                 })
                 fixations_count = len(contained_fixations)
 
                 relative_fixations = pd.DataFrame({
-                    'ID': processed_fixations['ID'][fixations_contained_mask],
+                    'ID': fxs['ID'][fixations_contained_mask],
                     'FPOGX': fixations_relative_to_word[0][fixations_contained_mask],
                     'FPOGY': fixations_relative_to_word[1][fixations_contained_mask],
-                    'TIME_TICK': processed_fixations['TIME_TICK'][fixations_contained_mask],
-                    'FPOGD': processed_fixations['FPOGD'][fixations_contained_mask],
-                    'FPOGID': processed_fixations['FPOGID'][fixations_contained_mask],
-                    'FPOGV': processed_fixations['FPOGV'][fixations_contained_mask],
+                    'TIME_TICK': fxs['TIME_TICK'][fixations_contained_mask],
+                    'FPOGD': fxs['FPOGD'][fixations_contained_mask],
+                    'FPOGID': fxs['FPOGID'][fixations_contained_mask],
+                    'FPOGV': fxs['FPOGV'][fixations_contained_mask],
                 })
 
                 formated_word = {
@@ -382,7 +382,7 @@ class TrialFilter:
                     else:
                         formated_word['letter_fixations'] = process_fixations_over_letters(
                             letters=list(word),
-                            processed_fixations=processed_fixations,
+                            fixations=fxs,
                             fixations_timestamps=fixations_timestamps,
                             word_rectangle=word_rectangle
                         )
@@ -391,7 +391,7 @@ class TrialFilter:
                     if '_' in word: # in CB relations, '_' means 'C', so we can process letters
                         formated_word['letter_fixations'] = process_fixations_over_letters(
                             letters=list(word.replace('_', '')),
-                            processed_fixations=processed_fixations,
+                            fixations=fxs,
                             fixations_timestamps=fixations_timestamps,
                             word_rectangle=word_rectangle
                         )
@@ -400,7 +400,7 @@ class TrialFilter:
 
             word_switchings = process_switchings(
                 fixations_over_words,
-                processed_fixations,
+                fxs,
                 fixations_timestamps)
 
             return fixations_over_words, word_switchings
@@ -428,10 +428,10 @@ class TrialFilter:
             result = {}
             result['duration'] = section_duration
 
-            processed_fixations, fixations_timestamps = fixations
+            fxs, fixations_timestamps = fixations
 
-            mask = processed_fixations[self._gaze.__Timestamp__].between(timestamps.min(), timestamps.max())
-            section_fixations = processed_fixations[mask]
+            mask = fxs[self._gaze.__Timestamp__].between(timestamps.min(), timestamps.max())
+            section_fixations = fxs[mask]
             fixations_timestamps = [f for f in fixations_timestamps if f['ID'] in section_fixations['ID']]
 
             section_fixations = (section_fixations, fixations_timestamps)
@@ -483,7 +483,7 @@ class TrialFilter:
             self.setup_target_trial_events()
 
         denormalize = np.vectorize(self._screen.denormalize)
-        processed_fixations = process_fixations(self.gaze_df)
+        fxs = process_fixations(self.gaze_df)
 
         trials = []
         for trial_uid, trial_events in self.events_grouped_by_trial:
@@ -522,7 +522,7 @@ class TrialFilter:
                     continue
 
                 data_by_section[section] = process_section(
-                    fixations=processed_fixations,
+                    fixations=fxs,
                     trial_events=trial_events,
                     event_pattern=event_pattern,
                     section=section,
@@ -752,7 +752,7 @@ class TrialFilter:
 
 
 class Synchronizer:
-    def __init__(self, code: str):
+    def __init__(self, code: str, version: str = '1'):
         self.info = GazeInfo(code)
         self.screen = Screen(self.info.ScreenWidth, self.info.ScreenHeight)
 
@@ -764,7 +764,7 @@ class Synchronizer:
         self.gaze.label = 1
         self.gaze_indices = self.gaze.indices
 
-        self.trials = TrialEvents(self.info)
+        self.trials = TrialEvents(self.info, version=version)
         self.trials.label = 2
         self.trials_indices = self.trials.indices
 

@@ -1,6 +1,7 @@
 import os
 
 from fileutils import (
+    change_data_folder_name,
     as_data,
     file_exists,
     cd,
@@ -84,32 +85,40 @@ def load_probes_file(filename):
 def save_probes_file(filename, data):
     data.to_csv(filename, sep='\t', index=False)
 
-def get_probes():
+def get_probes(foldername):
+    change_data_folder_name(foldername)
     participant_folders = get_data_folders()
     container = []
     for folder in participant_folders:
         walk_and_execute(folder, data_by_relation, 'C-D', container)
+    cd('..')
     return pd.concat(container)
 
-def save_probes_by_participant(should_fix_cycles):
-    data = get_probes()
+def save_probes_by_participant(foldername, should_fix_cycles=False):
+    data = get_probes(foldername)
+
     # sort first by Date/Time, from oldest to newest
     # but convert to DateTime first
     # data['DateTime'] = pd.to_datetime(f"{data['Date']} {data['Time']}", format='%d/%m/%Y %H:%M:%S')
     # data = data.sort_values(by=['DateTime', ''])
-    data = data[data['HasDifferentialReinforcement'] == False]
+    data = data[(data['Condition'] == 7) | (data['Condition'] == 5)]
+
+
     column = data['Name']
     data.drop(columns='Name', inplace=True)
     data['Name'] = column
 
-    cd('analysis')
-    cd('output')
-
+    path = os.path.join('analysis', 'output', foldername)
+    if not os.path.exists(path):
+        os.mkdir(path)
+    cd(path)
     # get unique names from  participant column
     participants = data['Participant'].unique()
     # remove nan from participants
     participants = [x for x in participants if str(x) != 'nan']
     for participant in participants:
+        if participant == '4-DIE25\\':
+            pass
         # filter data per participant
         filtered_data = data[data['Participant'] == participant]
         # add a new column with incremental ID
@@ -340,8 +349,16 @@ if __name__ == "__main__":
     from study1_constants import foldername as foldername_1
     from study2_constants import foldername as foldername_2
     from study3_constants import foldername as foldername_3
+    from study4_constants import foldername as foldername_4
 
-    folders = [foldername_1, foldername_2, foldername_3]
+    # folders = [foldername_1, foldername_2, foldername_3]
+    # for foldername in folders:
+    #     concatenate_probes(foldername=foldername)
+    #     override_CD_probes_in_data_file(foldername,must_not_override=False)
+
+    # save_probes_by_participant(foldername_4)
+
+    folders = [foldername_4]
     for foldername in folders:
         concatenate_probes(foldername=foldername)
         override_CD_probes_in_data_file(foldername,must_not_override=False)

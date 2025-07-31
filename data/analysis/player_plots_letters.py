@@ -11,6 +11,7 @@ from fileutils import data_dir, cd
 
 from player_utils import calculate
 from explorer import (
+    cache_folder,
     foldername_2,
     load_from_csv
 )
@@ -71,17 +72,17 @@ def accumulated_frequency(data, hits, file_label, participant):
     fig, axes = plt.subplots(1, 1)
     axes = [axes]
 
-    fig.set_size_inches(6, 5)
+    fig.set_size_inches(5, 4)
 
-    axes[0].set_ylabel('Fixations over letter positions (accumulated frequency)')
+    axes[0].set_ylabel('Frequência acumulada')
 
-    maximum_y = 0
+    maximum_y = 1100
     minimum_y = 0
     cummulative_lines = []
     for i, (trials, fixations, letter) in enumerate(data):
         # Create a list of datetimes from the list of strings
 
-        maximum_y = max(round(max(fixations)), maximum_y)
+        # maximum_y = max(round(max(fixations)), maximum_y)
 
         # Create a stepped plot
         cummulative_line, = axes[0].step(trials, fixations,
@@ -106,7 +107,7 @@ def accumulated_frequency(data, hits, file_label, participant):
                     # linewidth=1,
                     marker='o',
                     color='black',
-                    label='Percent Correct\n(4 trial groups)')
+                    label='Porcentagem de acerto\n(grupos de 4 tentativas)')
 
 
     # get the minimum and maximum
@@ -135,14 +136,15 @@ def accumulated_frequency(data, hits, file_label, participant):
     labels = [line.get_label() for line in handles]
 
     # Add labels
-    axes[0].set_xlabel('Trials')
-    ax2.set_ylabel('Percent correct', color='black')
+    axes[0].set_xlabel('')
+    ax2.set_ylabel('Porcentagem', color='black')
 
     # # Add x and y labels in the middle of figure
-    fig.text(0.5, -0.02, 'Trials', ha='center', va='center', fontsize=12)
+    fig.text(0.5, -0.02, 'Tentativas', ha='center', va='center', fontsize=12)
 
     plt.tight_layout()
     fig.legend(handles, labels,
+               title='Frequência acumulada de fixações sobre a letra',
                loc='upper left',
                ncol=4,
                columnspacing=1.5,
@@ -164,8 +166,8 @@ def accumulated_frequency(data, hits, file_label, participant):
     #         axes[0].axvspan(row['start'], row['end'], facecolor='gray', alpha=0.25)
 
     # Show the plot
-    extension = 'png'
-    filename = f'{participant}_fixations_over_positions_{file_label}.{extension}'
+    extension = 'svg'
+    filename = f'{participant}_fixations_over_positions_{file_label}_accumulated.{extension}'
     print(filename)
     plt.savefig(filename, format=extension, dpi=300, transparent=False)
     plt.close()
@@ -184,9 +186,9 @@ def proportions(data, hits, file_label, participant):
     fig, axes = plt.subplots(1, 1)
     axes = [axes]
 
-    fig.set_size_inches(6, 5)
+    fig.set_size_inches(5, 4)
 
-    axes[0].set_ylabel('Fixations over letter positions (proportion)')
+    axes[0].set_ylabel('Porcentagem')
 
     maximum_y = 100
     minimum_y = 0
@@ -204,22 +206,12 @@ def proportions(data, hits, file_label, participant):
 
         cummulative_lines.append(cummulative_line)
 
-    # Plot the additional line on the secondary y-axis
-    ax2 = axes[0].twinx()
-    # porcentage_line, = ax2.plot(hits['uid'], hits['target_calculation'],
-    #                 linestyle='--',
-    #                 linewidth=1,
-    #                 marker='o',
-    #                 color='black',
-    #                 label='Percent Correct\n(4 trial groups)')
-
-    porcentage_line = ax2.scatter(hits['uid'], hits['target_calculation'],
+    porcentage_line = axes[0].scatter(hits['uid'], hits['target_calculation'],
                     # linestyle='--',
                     # linewidth=1,
                     marker='o',
                     color='black',
-                    label='Percent Correct\n(4 trial groups)')
-
+                    label='Porcentagem de acertos\n(grupos de 4 tentativas)')
 
     # get the minimum and maximum
     min_val, max_val = minimum_y, maximum_y
@@ -232,52 +224,32 @@ def proportions(data, hits, file_label, participant):
     axes[0].set_ylim([min_val - abs_10, max_val + abs_10])
     axes[0].set_yticks([min_val, mid_val//2, mid_val, mid_val+(mid_val//2), max_val])
 
-    abs_10 = abs_10*100/max_val
-    ax2.set_ylim(0-abs_10, 100+abs_10)
-
-    axes.append(ax2)
     for ax in axes:
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
         ax.spines['left'].set_visible(False)
 
-    # Combine the legend entries from both axes
-    handles = cummulative_lines
+    handles = cummulative_lines+[porcentage_line]
     labels = [line.get_label() for line in handles]
 
     # Add labels
-    axes[0].set_xlabel('Trials')
-    ax2.set_ylabel('Percent correct', color='black')
+    axes[0].set_xlabel('')
 
-    # # Add x and y labels in the middle of figure
-    fig.text(0.5, -0.02, 'Trials', ha='center', va='center', fontsize=12)
+    fig.text(0.5, -0.02, 'Tentativas', ha='center', va='center', fontsize=12)
 
     plt.tight_layout()
     fig.legend(handles, labels,
+               title='Fixações na letra',
                loc='upper left',
                ncol=4,
                columnspacing=1.5,
                handletextpad=0.5)
 
-    fig.legend([porcentage_line], [porcentage_line.get_label()],
-               loc='upper right',
-               ncol=1,
-               columnspacing=1.5,
-               handletextpad=0.5)
-
     plt.subplots_adjust(top=0.88)
-    # shade background for non-working periods
-    # if holidays_ranges is not None:
-    #     all_dates = sorted(set(all_dates))
-    #     holidays_ranges = holidays_ranges[holidays_ranges['start'] >= min(all_dates)]
-    #     holidays_ranges = holidays_ranges[holidays_ranges['end'] <= max(all_dates)]
-    #     for i, row in holidays_ranges.iterrows():
-    #         axes[0].axvspan(row['start'], row['end'], facecolor='gray', alpha=0.25)
 
-    # Show the plot
-    extension = 'png'
-    filename = f'{participant}_fixations_over_positions_{file_label}.{extension}'
+    extension = 'svg'
+    filename = f'{participant}_fixations_over_positions_{file_label}_proportion.{extension}'
     print(filename)
     plt.savefig(filename, format=extension, dpi=300, transparent=False)
     plt.close()
@@ -405,7 +377,9 @@ def single_index(data, hits, file_label, participant):
 def plot_accumulated_frequency():
     file_labels = ['01_cycle_teaching', '02_cycle_assessment', '03_multiple_probes_procedure']
 
-    df = load_from_csv(foldername_2)
+    folder = cache_folder()
+    filename = os.path.join(folder, f'{foldername_2}_processed_fixations.csv')
+    df = pd.read_csv(filename)
 
     df['participant'] = df.apply(lambda row: row['participant'].replace('\\', '').replace('-', '_'), axis=1)
 
@@ -418,10 +392,10 @@ def plot_accumulated_frequency():
 
     # normalize session column
     for participant, participant_data in df.groupby('participant'):
-        participant_data['file_num'] = participant_data['file'].str.extract(r'^(\d+)\.data\.processed$').astype(int)
-        unique_sorted = participant_data['file_num'].sort_values().unique()
-        mapping = {num: new_num for new_num, num in enumerate(unique_sorted)}
-        participant_data['session'] = participant_data['file_num'].map(mapping) + 1
+        # participant_data['file_num'] = participant_data['file'].str.extract(r'^(\d+)\.data\.processed$').astype(int)
+        # unique_sorted = participant_data['file_num'].sort_values().unique()
+        # mapping = {num: new_num for new_num, num in enumerate(unique_sorted)}
+        # participant_data['session'] = participant_data['file_num'].map(mapping) + 1
         # export(participant_data, '_teste.csv')
         filters = [
             (participant_data['condition'] == '2a') & (participant_data['relation'] == 'CD'),
@@ -433,12 +407,12 @@ def plot_accumulated_frequency():
 
             cd_data.loc[:, 'uid'] = range(1, len(cd_data) + 1)
             hits = calculate(cd_data, 'rolling_average_no_overlap', 'result')
-            letters = ['AOI1', 'AOI2', 'AOI3', 'AOI4']
+            letters = ['1ª', '2ª', '3ª', '4ª']
             letters_count = [
-                np.cumsum(cd_data['sample1_letter1_fixations_count'].values),
-                np.cumsum(cd_data['sample1_letter2_fixations_count'].values),
-                np.cumsum(cd_data['sample1_letter3_fixations_count'].values),
-                np.cumsum(cd_data['sample1_letter4_fixations_count'].values)
+                np.cumsum(cd_data['letter1_count'].values),
+                np.cumsum(cd_data['letter2_count'].values),
+                np.cumsum(cd_data['letter3_count'].values),
+                np.cumsum(cd_data['letter4_count'].values)
             ]
             letters_trials = [
                 [i for i in range(1, len(count) + 1)] for count in letters_count]
@@ -449,7 +423,9 @@ def plot_accumulated_frequency():
 def plot_proportions():
     file_labels = ['01_cycle_teaching', '02_cycle_assessment', '03_multiple_probes_procedure']
 
-    df = load_from_csv(foldername_2)
+    folder = cache_folder()
+    filename = os.path.join(folder, f'{foldername_2}_processed_fixations.csv')
+    df = pd.read_csv(filename)
 
     df['participant'] = df.apply(lambda row: row['participant'].replace('\\', '').replace('-', '_'), axis=1)
 
@@ -462,10 +438,10 @@ def plot_proportions():
 
     # normalize session column
     for participant, participant_data in df.groupby('participant'):
-        participant_data['file_num'] = participant_data['file'].str.extract(r'^(\d+)\.data\.processed$').astype(int)
-        unique_sorted = participant_data['file_num'].sort_values().unique()
-        mapping = {num: new_num for new_num, num in enumerate(unique_sorted)}
-        participant_data['session'] = participant_data['file_num'].map(mapping) + 1
+        # participant_data['file_num'] = participant_data['file'].str.extract(r'^(\d+)\.data\.processed$').astype(int)
+        # unique_sorted = participant_data['file_num'].sort_values().unique()
+        # mapping = {num: new_num for new_num, num in enumerate(unique_sorted)}
+        # participant_data['session'] = participant_data['file_num'].map(mapping) + 1
         # export(participant_data, '_teste.csv')
         filters = [
             (participant_data['condition'] == '2a') & (participant_data['relation'] == 'CD'),
@@ -477,12 +453,12 @@ def plot_proportions():
 
             cd_data.loc[:, 'uid'] = range(1, len(cd_data) + 1)
             hits = calculate(cd_data, 'rolling_average_no_overlap', 'result')
-            letters = ['AOI1', 'AOI2', 'AOI3', 'AOI4']
+            letters = ['1ª', '2ª', '3ª', '4ª']
             letters_count = [
-                cd_data['sample1_letter1_fixations_count'].values,
-                cd_data['sample1_letter2_fixations_count'].values,
-                cd_data['sample1_letter3_fixations_count'].values,
-                cd_data['sample1_letter4_fixations_count'].values
+                cd_data['letter1_count'].values,
+                cd_data['letter2_count'].values,
+                cd_data['letter3_count'].values,
+                cd_data['letter4_count'].values
             ]
 
             letters_trials = [
@@ -502,9 +478,26 @@ def plot_proportions():
 
             # Split the proportions back into a list of arrays for each letter
             letters_proportion = [percentages[i] for i in range(4)]
+            # Calculate moving average window=4 for each letter's proportions
+            window_size = 10
+            kernel = np.ones(window_size) / window_size  # Kernel [0.25, 0.25, 0.25, 0.25]
+            letters_ma = []
 
+            for prop in letters_proportion:
+                n = len(prop)
+                if n < window_size:
+                    # Not enough trials: return array of NaNs
+                    ma = np.full(n, np.nan)
+                else:
+                    # Compute moving averages for valid windows (positions 3 to end)
+                    valid_ma = np.convolve(prop, kernel, mode='valid')
+                    # Initialize array with NaNs
+                    ma = np.full(n, np.nan)
+                    # Fill valid moving averages starting at index 3
+                    ma[window_size-1:] = valid_ma
+                letters_ma.append(ma)
 
-            data = zip(letters_trials, letters_proportion, letters)
+            data = zip(letters_trials, letters_ma, letters)
             proportions(data, hits, file_label, participant)
 
 
@@ -571,7 +564,7 @@ def plot_index_isr_analysis():
         """
         Returns the proportion of fixations over letter positions
         """
-        words = hits['reference_word']
+        words = hits['word']
         responses = hits['response']
         fig, axes = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [3, 1]})
         # axes = [axes]
@@ -693,8 +686,8 @@ def plot_index_isr_analysis():
         filtered_data.loc[:, 'uid'] = range(1, len(filtered_data) + 1)
         # letters = ['AOI1', 'AOI2', 'AOI3', 'AOI4']
         letters_count = [
-            filtered_data['sample1_letter1_fixations_count'].values + filtered_data['sample1_letter2_fixations_count'].values,
-            filtered_data['sample1_letter3_fixations_count'].values + filtered_data['sample1_letter4_fixations_count'].values,
+            filtered_data['letter1_count'].values + filtered_data['letter2_count'].values,
+            filtered_data['letter3_count'].values + filtered_data['letter4_count'].values,
         ]
 
 
@@ -720,7 +713,9 @@ def plot_index_isr_analysis():
 
     file_labels = ['02_cycle_assessment', '03_multiple_probes_procedure']
 
-    df = load_from_csv(foldername_2)
+    folder = cache_folder()
+    filename = os.path.join(folder, f'{foldername_2}_processed_fixations.csv')
+    df = pd.read_csv(filename)
 
     df['participant'] = df.apply(lambda row: row['participant'].replace('\\', '').replace('-', '_'), axis=1)
 
@@ -739,7 +734,7 @@ def plot_index_isr_analysis():
         for file_label, filter_0 in zip(file_labels, filters_level_0):
             cd_data = participant_data[filter_0]
             for file_label2, filter_1, list_of_words in zip(file_labels_2, filters_level_1, lists_of_words):
-                filtered_data = cd_data[cd_data['reference_word'].str.match(filter_1)].copy(deep=True)
+                filtered_data = cd_data[cd_data['word'].str.match(filter_1)].copy(deep=True)
                 if filtered_data.empty:
                     if file_label2 == 'both' and file_label == '03_multiple_probes_procedure':
                         continue
@@ -749,7 +744,7 @@ def plot_index_isr_analysis():
 
                 for word in list_of_words:
                     pattern = rf'{word}'
-                    filtered_data = cd_data[cd_data['reference_word'].str.match(pattern)].copy(deep=True)
+                    filtered_data = cd_data[cd_data['word'].str.match(pattern)].copy(deep=True)
                     if filtered_data.empty:
                         if word == lani and file_label == '02_cycle_assessment':
                             continue
@@ -847,7 +842,7 @@ def compare_correct_responses_in_isr_categories(df, target_participant=''):
         cycle_data = []
         cycle_hits = []
         for _, dataframe in target_df.groupby('cycle'):
-            filtered = [dataframe[dataframe['reference_word'].str.match(filter_)] for filter_ in filters]
+            filtered = [dataframe[dataframe['word'].str.match(filter_)] for filter_ in filters]
 
             total_sum = 0
             total_len = 0
@@ -1055,10 +1050,10 @@ def compare_correct_incorrect_density_in_isr_categories():
     df.loc[df['session'] == max_sessions, 'cycle'] = 7
 
     conditions = [
-        df['reference_word'].str.match(isr_left),
-        df['reference_word'].str.match(isr_right),
-        df['reference_word'].str.match(isr_both),
-        df['reference_word'].str.match(teaching)
+        df['word'].str.match(isr_left),
+        df['word'].str.match(isr_right),
+        df['word'].str.match(isr_both),
+        df['word'].str.match(teaching)
     ]
 
     groups = [
@@ -1138,10 +1133,10 @@ def compare_correct_incorrect_density_in_isr_categories_group():
     df.loc[df['session'] == max_sessions, 'cycle'] = 7
 
     conditions = [
-        df['reference_word'].str.match(isr_left),
-        df['reference_word'].str.match(isr_right),
-        df['reference_word'].str.match(isr_both),
-        df['reference_word'].str.match(teaching)
+        df['word'].str.match(isr_left),
+        df['word'].str.match(isr_right),
+        df['word'].str.match(isr_both),
+        df['word'].str.match(teaching)
     ]
 
     groups = [
@@ -1271,7 +1266,9 @@ def plot_index_isr_analysis_v2():
     data_dir()
     cd(os.path.join('analysis', 'output', 'fixations_over_letters_v2'))
 
-    df = load_from_csv(foldername_2)
+    folder = cache_folder()
+    filename = os.path.join(folder, f'{foldername_2}_processed_fixations.csv')
+    df = pd.read_csv(filename)
 
     df['participant'] = df.apply(lambda row: row['participant'].replace('\\', '').replace('-', '_'), axis=1)
     df.loc[:, 'score'] = df.apply(calculate_index, axis=1, use_delta=False)
@@ -1284,10 +1281,10 @@ def plot_index_isr_analysis_v2():
     df.loc[df['session'] == max_sessions, 'cycle'] = 7
 
     conditions = [
-        df['reference_word'].str.match(isr_left),
-        df['reference_word'].str.match(isr_right),
-        df['reference_word'].str.match(isr_both),
-        df['reference_word'].str.match(teaching)
+        df['word'].str.match(isr_left),
+        df['word'].str.match(isr_right),
+        df['word'].str.match(isr_both),
+        df['word'].str.match(teaching)
     ]
 
     groups = [
@@ -2046,7 +2043,7 @@ def plot_index_isr_analysis_v2():
     #     ###############################
 
     #     tdf = cd_data[cd_data['group'] == 'left']
-    #     words = tdf['reference_word']
+    #     words = tdf['word']
     #     x = [i+1 for i in range(len(tdf['uid']))]
     #     colors = ['white' if not val else 'black' for val in tdf['result']]
 
@@ -2083,7 +2080,7 @@ def plot_index_isr_analysis_v2():
 
 
     #     tdf = cd_data[cd_data['group'] == 'right']
-    #     words = tdf['reference_word']
+    #     words = tdf['word']
 
     #     index_line, = axes[1].plot(x, tdf['score'],
     #                 linewidth=1,
@@ -2152,4 +2149,5 @@ def plot_index_isr_analysis_v2():
 
 
 if __name__ == '__main__':
-    plot_index_isr_analysis_v2()
+    # plot_accumulated_frequency()
+    plot_proportions()

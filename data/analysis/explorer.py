@@ -10,12 +10,13 @@ from constants import participants_to_ignore
 from study1_constants import foldername as foldername_1
 from study2_constants import foldername as foldername_2
 from study3_constants import foldername as foldername_3
+from study4_constants import foldername as foldername_4
+
 from player_synchronizer import Synchronizer
 from metadata import Metadata
 from words import words_per_file
 from fileutils import (
     cd,
-    # load_file,
     list_data_folders,
     change_data_folder_name,
     list_files,
@@ -23,90 +24,6 @@ from fileutils import (
 )
 
 from classes import Information
-
-# def fix_session_name_in_info_files():
-#     prefixes = {
-#         'Ciclo1-7': 'Ciclo2-0',
-#         'Ciclo2-7': 'Ciclo3-0',
-#         'Ciclo3-7': 'Ciclo4-0',
-#         'Ciclo4-7': 'Ciclo5-0',
-#         'Ciclo5-7': 'Ciclo6-0'
-#     }
-
-#     for foldername in [foldername_1]:
-#         change_data_folder_name(foldername)
-#         for participant_folder in list_data_folders():
-#             cd(participant_folder, verbose=False)
-#             cd('analysis', verbose=False)
-#             for date_folder in list_data_folders():
-#                 cd(date_folder, verbose=False)
-#                 for entry in list_files('.info.processed'):
-#                     info = Information(entry)
-#                     # if session name has the prefix 'Ciclo1-7', replace it with 'Ciclo2-0'
-#                     for prefix in prefixes.keys():
-#                         if prefix in info.session_name:
-#                             info.session_name = info.session_name.replace(prefix, prefixes[prefix])
-#                             info.save_to_file()
-#                             # print(str(info))
-#                             break
-#                 cd('..', verbose=False)
-#             cd('..', verbose=False)
-#             cd('..', verbose=False)
-
-# def fix_result_in_info_files():
-#     for foldername in [foldername_1]:
-#         change_data_folder_name(foldername)
-#         for participant_folder in list_data_folders():
-#             cd(participant_folder, verbose=False)
-#             cd('analysis', verbose=False)
-#             for date_folder in list_data_folders():
-#                 cd(date_folder, verbose=False)
-#                 for entry in list_files('.info.processed'):
-#                     info = Information(entry, verbose=False)
-#                     # if session name has the prefix 'Ciclo1-7', replace it with 'Ciclo2-0'
-#                     result = info.__info_file__.loc[info.__session_result__]
-#                     if result.shape[0] > 1:
-#                         print(result.iloc[0][1])
-#                 cd('..', verbose=False)
-#             cd('..', verbose=False)
-#             cd('..', verbose=False)
-
-
-
-#
-# from convertions import override_all_timestamps()
-#
-
-# def fix_response_in_data_files(foldername):
-#     def fix_all():
-#         for raw_entry in list_files('.data'):
-#             raw_data = convert_data_file(raw_entry)
-#             if raw_data is None:
-#                 continue
-#             processed_entry = raw_entry.replace('.data', '.data.processed')
-#             df = pd.DataFrame(raw_data[1:], columns=raw_data[0])
-#             processed_data = load_file(processed_entry)
-#             processed_data['Response'] = df['Response']
-#             processed_data.to_csv(processed_entry, sep='\t', index=False)
-
-
-#     change_data_folder_name(foldername)
-#     for participant_folder in list_data_folders():
-#         cd(participant_folder)
-#         cd('analysis')
-#         for date_folder in list_data_folders():
-#             cd(date_folder)
-#             if foldername == foldername_1:
-#                 fix_all()
-#             else:
-#                 for cycle_folder in list_data_folders():
-#                     cd(cycle_folder, verbose=False)
-#                     fix_all()
-#                     cd('..', verbose=False)
-#             cd('..', verbose=False)
-#         cd('..', verbose=False)
-#         cd('..', verbose=False)
-
 
 def append_session_name(names):
     for entry in list_files('.info.processed'):
@@ -238,7 +155,14 @@ def process_sources(sources, save_trials):
     calculate_fixation_mapping = {
         foldername_1: False,
         foldername_2: True,
-        foldername_3: False
+        foldername_3: False,
+        foldername_4: False,
+    }
+    version_mapping = {
+        foldername_1: '1',
+        foldername_2: '1',
+        foldername_3: '1',
+        foldername_4: '2',
     }
     for entry in list_files('.info.processed'):
         info = Information(entry)
@@ -278,14 +202,15 @@ def process_sources(sources, save_trials):
                 filename = '_'.join([
                             foldername,
                             participant.replace('-', '_'), code])
-                session = Synchronizer(code)
+
+                session = Synchronizer(code, version_mapping[foldername])
                 trials = session.trial_filter()
 
                 save_pickle(filename+'_trials', trials.DataFrame)
 
-                # if calculate_fixation_mapping[foldername]:
-                #     save_pickle(filename+'_processed_fixations', trials.processed_fixations())
-                #     save_pickle(filename+'_raw_fixations', trials.raw_fixations())
+                if calculate_fixation_mapping[foldername]:
+                    save_pickle(filename+'_processed_fixations', trials.processed_fixations())
+                    save_pickle(filename+'_raw_fixations', trials.raw_fixations())
 
                 del session
                 del trials
@@ -582,13 +507,16 @@ def export_to_csv():
         foldername_1: 1,
         foldername_2: 2,
         foldername_3: 3,
+        foldername_4: 4,
     }
-    foldernames = [foldername_1, foldername_2, foldername_3]
+    foldernames = [foldername_1, foldername_2, foldername_3, foldername_4]
     exporting1 = []
     exporting2 = []
     for foldername in foldernames:
         sources = load_participant_sources(foldername)
         for participant in sources:
+            if participant in participants_to_ignore:
+                continue
             participant_metadata = sources[participant].pop('metadata')
             for design_file in sources[participant]:
                 for source in sources[participant][design_file]:
@@ -601,6 +529,9 @@ def export_to_csv():
                         trials = load_pickle(filename)
                         trials['Study'] = study_uid_map[study]
                         exporting1.append(trials)
+
+            #########
+            ######## TODO: EXPORT PARTICIPANT METADATA
             exporting2.append(participant_metadata)
 
     del sources
@@ -611,15 +542,19 @@ def export_to_csv():
 
     df = pd.concat(exporting1, ignore_index=True)
 
-    df['Sample-Position.1'] = df['Sample-Position.1'].str.split('-').str[0]
     df['Sample_Position'] = df['Sample-Position.1'].str.split('-').str[1]
+    df['Sample-Position.1'] = df['Sample-Position.1'].str.split('-').str[0]
+
+    df['Response'] = df['Response'].apply(lambda x: x if '-' in x else x + '-4')
+    df['Response-Position'] = df['Response'].str.split('-').str[1]
+    df['Response'] = df['Response'].str.split('-').str[0]
 
     for i in range(1, 4):
         column1 = f'Comparison_{i}_Position'
         column2 = f'Comparison-Position.{i}'
 
-        df[column2] = df[column2].str.split('-').str[0]
         df[column1] = df[column2].str.split('-').str[1]
+        df[column2] = df[column2].str.split('-').str[0]
 
     df['Sample-Position.1'] = df['Sample.Figure']
 
@@ -656,6 +591,7 @@ def export_to_csv():
         'Cycle.ID': 'Cycle_UID_In_Participant',
         'Condition': 'Condition_UID_In_Participant',
         'File': 'Session_UID_In_Participant',
+        'Design': 'Participant_Group',
 
         # Session-level
         'Session_Date_Time': 'Session_Date_Time',
@@ -669,6 +605,7 @@ def export_to_csv():
         'Comparisons': 'Trial_Comparison_Count',
         'Result': 'Trial_Participant_Response_Outcome',
         'Response': 'Trial_Participant_Response',
+        'Response-Position': 'Trial_Participant_Response_Position',
         'Latency': 'Trial_Participant_Response_Latency',
         'HasDifferentialReinforcement': 'Trial_Differential_Reinforcement_Flag',
         'Sample-Position.1': 'Trial_Sample_Stimulus',
@@ -689,6 +626,7 @@ def export_to_csv():
     df['Trial_Participant_Response_Latency'] = df['Trial_Participant_Response_Latency'].round(4)
     df['Trial_Sample_Stimulus_Duration'] = df['Trial_Sample_Stimulus_Duration'].round(4)
     df['Trial_Comparison_Stimuli_Duration'] = df['Trial_Comparison_Stimuli_Duration'].round(4)
+    df['Trial_Participant_Response_Outcome'] = np.where(df['Trial_Participant_Response'] == df['Trial_Word'], 1, 0)
 
     df.loc[:, 'p_num'] = df['Participant_UID_In_Study'].str.extract(r'(\d+)').astype(int)
     df['Participant_UID_In_Study'] = 'P'+ df['p_num'].astype(str)
@@ -741,9 +679,6 @@ def load_all_from_csv():
 
 
 if __name__ == "__main__":
-    # for foldername in [foldername_1, foldername_2, foldername_3]:
-    #     fix_response_in_data_files(foldername)
-
     # # list unique session names
     # for foldername in [foldername_1, foldername_2, foldername_3]:
     #     session_names = unique_session_names(foldername)
@@ -793,10 +728,10 @@ if __name__ == "__main__":
 
     #     f.write('\t'.join([f'Total time: {total_time.to_string_hours()}']))
 
-    # for foldername in [foldername_1, foldername_2, foldername_3]:
-    #     save_participant_sources(foldername, True)
+    for foldername in [foldername_2]:
+        save_participant_sources(foldername, True)
 
-    export_to_csv()
+    # export_to_csv()
     # export_to_csv_2()
     # export_to_csv(foldername_3)
     # export_to_csv_all()
