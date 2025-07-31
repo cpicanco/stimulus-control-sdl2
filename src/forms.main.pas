@@ -159,7 +159,7 @@ begin
     if LNewParticipant.IsEmpty or (Length(LNewParticipant) < 3) then Exit;
     Items.Append(LNewParticipant);
     ItemIndex := Items.Count-1;
-    MenuItemCopyPNGFilesClick(ButtonNewParticipant);
+    // MenuItemCopyPNGFilesClick(ButtonNewParticipant);
   end;
 end;
 
